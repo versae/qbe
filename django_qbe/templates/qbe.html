@@ -1,0 +1,101 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block extrahead %}
+<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/yui.utilities.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/wireit.js"></script>
+<!--[if IE]>
+<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/excanvas.js"></script>
+<![endif]-->
+<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/jquery.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/jquery.formset.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/qbe.node.js"></script>
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}django_qbe/css/wireit.css" />
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}django_qbe/css/qbe.css" />
+{% endblock %}
+
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url admin:index %}">{% trans 'Home' %}</a>{% if title %} &rsaquo; {{ title }}{% endif %}</div>
+{% endblock %}
+
+{% block pretitle %}{% endblock %}
+{% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
+{% block content %}
+{% block object-tools %}
+<ul class="object-tools">
+<!--
+  <li>
+    <a href="javascript:void(0);" id="qbeDataTab">{% trans "Data" %}</a>
+  </li>
+-->
+  <li>
+    <a href="javascript:void(0);" id="qbeDiagramTab">{% trans "Diagram" %}</a>
+  </li>
+<!--
+  <li>
+    <a href="javascript:void(0);" id="qbeQueryTab">{% trans "Query" %}</a>
+  </li>
+-->
+  <li>
+    <a href="javascript:void(0);" id="qbeTabularTab">{% trans "Tabular" %}</a>
+  </li>
+  <li>
+    <a class="addlink" href="javascript:void(0);" id="qbeModelsTab">{% trans "Models" %}</a>
+  </li>
+</ul>
+{% endblock %}
+
+<form id="qbeForm" method="post" action="">
+
+<div class="qbeContainer qbeData" id="qbeData" style="display: none;"></div>
+<div class="qbeContainer qbeDiagram"><div id="qbeDiagram" style="display: none;"></div></div>
+<div class="qbeContainer qbeTabular" id="qbeTabular">
+
+<table cellspacing="0" class="module" width="100%">
+    <thead>
+        <tr>
+            <th>{% trans "Delete" %}</th>
+            <th>{% trans "Show" %}</th>
+            <th>{% trans "Model" %}</th>
+            <th>{% trans "Field" %}</th>
+            <th>{% trans "Sort" %}</th>
+            <th>{% trans "Criteria" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for form in formset.forms %}
+        <tr>
+            <td class="deletelink-box"></td>
+            <td>{{ form.show }}</td>
+            <td>{{ form.model }}</td>
+            <td>{{ form.field }}</td>
+            <td>{{ form.sort }}</td>
+            <td>{{ form.criteria }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+</div>
+<div class="qbeContainer qbeQuery" id="qbeQuery" style="display: none;"></div>
+<div class="qbeConnectorList" id="qbeConnectorList">
+{% for app_name, app_models in models.items %}
+    <h3>{{ app_name }}</h3>
+    {% for model_name, model in app_models.items %}
+    <div><input type="checkbox" class="qbeCheckModels" value="false" id="qbeModel_{{ model_name }}" name="qbeModel_{{ model_name }}" onclick="qbeNode.toggleModule('{{ app_name }}', '{{ model_name }}');"><label for="qbeModel_{{ model_name }}"><a href="javascript:void(0);">{{ model_name }}</a></label></div>
+    {% endfor %}
+{% endfor %}
+</div>
+
+<div class="submit-row">
+    <input type="submit" name="_save" class="default" value="{% trans "Run" %}">
+</div>
+{{ formset.management_form }}
+</form>
+
+<script>
+{% include "qbe.js" %}
+</script>
+
+{% endblock %}
+{% block sidebar %}{% endblock %}
+

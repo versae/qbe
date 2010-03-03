@@ -1,0 +1,89 @@
+/**
+ * Containers
+ */
+
+
+div.WireIt-Container div.body {
+    margin-left: 0px;
+    padding: 10px;
+    padding-bottom: 0px;
+    background: white;
+    color: black;
+    opacity: 1;
+    border: 2px solid #417690;
+    line-height: 35px;
+}
+
+div.WireIt-Container-ddhandle {
+   width: 100%;
+   height: 20px;
+   background: #417690;
+   color: #F4F379;
+   font-weight: normal;
+   text-align: center;
+   padding-top: 2px;
+   line-height: 150%;
+   cursor: move;
+   font-size: 12px;
+}
+
+
+div.WireIt-Container-resizehandle {
+   position: absolute;
+   bottom: 0;
+   right: 0;
+   width: 10px;
+   height: 10px;
+   cursor: se-resize;
+}
+
+WireIt-Container-closebutton {
+    display: none;
+}
+
+div.WireIt-Container-focused {
+   z-index: 15;
+   opacity: 1;
+}
+
+ 
+/**
+ * Layers
+ */
+div.WireIt-Layer {
+    /*
+    When we put a border to the layer, it messes getXY and create a small offset
+    in the wire connections
+    */
+    border: 0px none #fff;
+    overflow-x: auto;
+    overflow-y: auto;
+    margin: 0 0 0 0;
+    padding: 0px;
+    position: relative;
+    height: 400px;
+}
+
+div.qbeLeftMenu {
+    position: absolute;
+}
+
+div.qbeConnectorList {
+    position: absolute;
+    overflow-x: auto;
+    overflow-y: auto;
+    top: 95px;
+    right: 15px;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottomright: 5px;
+    background-color: #fff;
+    border: 1px solid #999999;
+    display: none;
+    padding: 5px;
+}

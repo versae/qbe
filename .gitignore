@@ -1,0 +1,11 @@
+*.xml
+/artworks
+/backups
+/base
+/creators
+/django_extensions
+/media
+/olwidget
+/admin.py
+/*.py
+/*.sh
