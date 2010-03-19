@@ -69,7 +69,7 @@ YAHOO.extend(qbe.Node, WireIt.Container, {
         }
 
         // Fix wires to container (no moving)
-        //this.positionTerminals();
+        // this.positionTerminals();
 
         // Declare the new terminals to the drag'n drop handler
         // (so the wires are moved around with the container)
@@ -125,7 +125,36 @@ qbe.Node.addModule = function (appName, modelName) {
                                  outputs: inouts[1],
                                  close: false});
     model.index = qbe.Node.Layer.containers.length;
+    if (model.relations.length) {
+        qbe.updateRelations(model);
+    }
 };
+
+/*
+ * Update relations among models
+ */
+qbe.updateRelations = function (model) {
+    var wires = [];
+    var relations = model.relations;
+    // wires = [{src: {moduleId: 1, terminalId: 2}, tgt: {moduleId: 1, terminalId: 3}}]
+    for(i=0; i<=relations.length; i++) {
+        var relation = relations[i];
+        if (relation) {
+            var source_field = model.fields[relation.source].index;
+            var source_model = model.index;
+            var src = {'moduleId': source_model, 'terminalId': source_field}
+            var target = relation.target;
+            var target_model = qbe.Models[target.name][target.model].index;
+            var target_field = target.field;
+            var tgt = {'moduleId': target_model, 'terminalId': source_field}
+            var wire = {src: src, tgt: tgt}
+            if (target_model) {
+                wires.push(wire);
+            }
+        }
+    }
+    // qbe.Node.Layer.setWiring(wires);
+}
 
 /**
  * Return in & outs according to relations among models
@@ -137,8 +166,10 @@ qbe.Node.getInOuts = function(model) {
     for(key in fields) {
         if (fields[key].target) {
             outputs.push(fields[key].label);
+            fields[key].index = outputs.length;
         } else {
             inputs.push(fields[key].label);
+            fields[key].index = inputs.length;
         }
     }
     return [inputs, outputs];
@@ -172,6 +203,17 @@ qbe.createLayer = function() {
         }
     }
     qbe.Node.Layer = new WireIt.Layer(qbe.Containers);
+    qbe.Node.Layer.eventContainerDragged.subscribe(function(e,params) {
+        var container = params[0];
+        var top = parseFloat(container.el.style.top);
+        if (top <= 0) {
+            container.el.style.top = "0px";
+        }
+        var left = parseFloat(container.el.style.left)
+        if (left <= 0) {
+            container.el.style.left = "0px";
+        }
+    });
 }
 
 /**

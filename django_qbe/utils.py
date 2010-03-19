@@ -47,8 +47,10 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
 
         # relations
         def add_relation(extras=""):
-            target = {'model': field.rel.to.__name__,
-                      'field': field.rel.get_related_field().name}
+            target = {
+                'name': field.rel.to.__module__.split(".")[-2].capitalize(),
+                'model': field.rel.to.__name__,
+                'field': field.rel.get_related_field().name}
             _rel = {
                 'target': target,
                 'type': type(field).__name__,
