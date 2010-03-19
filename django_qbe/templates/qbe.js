@@ -5,7 +5,7 @@
 if (!window.qbe) {
     var qbe = {};
 }
-//qbe.Models = {% autoescape off %}{{ json_models }}{% endautoescape %};
+qbe.Models = {% autoescape off %}{{ json_models }}{% endautoescape %};
 qbe.Containers = [];
 (function($) {
     $(document).ready(function() {
