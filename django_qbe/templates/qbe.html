@@ -81,7 +81,7 @@
 {% for app_name, app_models in models.items %}
     <h3>{{ app_name }}</h3>
     {% for model_name, model in app_models.items %}
-    <div><input type="checkbox" class="qbeCheckModels" value="false" id="qbeModel_{{ model_name }}" name="qbeModel_{{ model_name }}" onclick="qbeNode.toggleModule('{{ app_name }}', '{{ model_name }}');"><label for="qbeModel_{{ model_name }}"><a href="javascript:void(0);">{{ model_name }}</a></label></div>
+    <div><input type="checkbox" class="qbeCheckModels" value="false" id="qbeModel_{{ model_name }}" name="qbeModel_{{ model_name }}" onclick="qbe.Node.toggleModule('{{ app_name }}', '{{ model_name }}');"><label for="qbeModel_{{ model_name }}"><a href="javascript:void(0);">{{ model_name }}</a></label></div>
     {% endfor %}
 {% endfor %}
 </div>

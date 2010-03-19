@@ -21,9 +21,9 @@ class QueryByExampleForm(forms.Form):
                               required=True)
     field = forms.ChoiceField(label=_("Field"), choices=BLANK_CHOICES,
                               required=False)
+    criteria = forms.CharField(label=_("Criteria"), required=False)
     sort = forms.ChoiceField(label=_("Sort"), choices=SORT_CHOICES,
                              required=False)
-    criteria = forms.CharField(label=_("Criteria"), required=False)
 
     def __init__(self, *args, **kwargs):
         super(QueryByExampleForm, self).__init__(*args, **kwargs)
