@@ -35,7 +35,7 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
                 'name': field.name,
                 'type': type(field).__name__,
                 'blank': field.blank,
-                'label': u"%s" % field.verbose_name
+                'label': u"%s" % field.verbose_name.capitalize()
                 }})
 
         for field in app_model._meta.fields:

@@ -125,7 +125,7 @@ qbe.Node.addModule = function (appName, modelName) {
                                  outputs: inouts[1],
                                  close: false});
     model.index = qbe.Node.Layer.containers.length;
-    if (model.relations.length) {
+    if (model.relations.length > 0) {
         qbe.updateRelations(model);
     }
 };
@@ -134,7 +134,6 @@ qbe.Node.addModule = function (appName, modelName) {
  * Update relations among models
  */
 qbe.updateRelations = function (model) {
-    var wires = [];
     var relations = model.relations;
     // wires = [{src: {moduleId: 1, terminalId: 2}, tgt: {moduleId: 1, terminalId: 3}}]
     for(i=0; i<=relations.length; i++) {
@@ -142,18 +141,17 @@ qbe.updateRelations = function (model) {
         if (relation) {
             var source_field = model.fields[relation.source].index;
             var source_model = model.index;
-            var src = {'moduleId': source_model, 'terminalId': source_field}
             var target = relation.target;
             var target_model = qbe.Models[target.name][target.model].index;
             var target_field = target.field;
-            var tgt = {'moduleId': target_model, 'terminalId': source_field}
-            var wire = {src: src, tgt: tgt}
-            if (target_model) {
-                wires.push(wire);
+            if (source_model && target_model) {
+                console.log(source_model)
+                // console.log(qbe.Node.Layer.containers[source_model]);
+                console.log(target_model)
+                // console.log(qbe.Node.Layer.containers[target_model]);
             }
         }
     }
-    // qbe.Node.Layer.setWiring(wires);
 }
 
 /**
@@ -203,6 +201,8 @@ qbe.createLayer = function() {
         }
     }
     qbe.Node.Layer = new WireIt.Layer(qbe.Containers);
+    // We avoid nodes can be out of main container
+    /*
     qbe.Node.Layer.eventContainerDragged.subscribe(function(e,params) {
         var container = params[0];
         var top = parseFloat(container.el.style.top);
@@ -214,6 +214,7 @@ qbe.createLayer = function() {
             container.el.style.left = "0px";
         }
     });
+    */
 }
 
 /**

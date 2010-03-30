@@ -44,7 +44,7 @@
 </ul>
 {% endblock %}
 
-<form id="qbeForm" method="post" action="">
+<form id="qbeForm" method="post" action=".">
 
 <div class="qbeContainer qbeData" id="qbeData" style="display: none;"></div>
 <div class="qbeContainer qbeDiagram"><div id="qbeDiagram" style="display: none;"></div></div>
@@ -65,11 +65,11 @@
     {% for form in formset.forms %}
         <tr>
             <td class="deletelink-box"></td>
-            <td>{{ form.show }}</td>
-            <td>{{ form.model }}</td>
-            <td>{{ form.field }}</td>
-            <td>{{ form.sort }}</td>
-            <td>{{ form.criteria }}</td>
+            <td>{{ form.show.errors }}{{ form.show }}</td>
+            <td>{{ form.model.errors }}{{ form.model }}</td>
+            <td>{{ form.field.errors }}{{ form.field }}</td>
+            <td>{{ form.sort.errors }}{{ form.sort }}</td>
+            <td>{{ form.criteria.errors }}{{ form.criteria }}</td>
         </tr>
     {% endfor %}
     </tbody>

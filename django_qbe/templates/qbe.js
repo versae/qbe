@@ -44,6 +44,13 @@ qbe.Containers = [];
           deleteCssClass: "deletelink",
           added: updateRow
         });
+        $('#qbeForm').submit(function() {
+            var mustSubmit = ($(".submitIfChecked :checked").length > 0);
+            if (!mustSubmit) {
+                alert("{% trans "You must check any field to show." %}");
+            }
+            return mustSubmit;
+        });
 
         function updateRow() {
             var options = ['<option value="">----</option>'];
@@ -81,10 +88,12 @@ qbe.Containers = [];
                 var domTo = prefix +"-"+ cssSplit[cssSplit.length-1];
                 var options = ['<option value="">*</option>'];
                 for(key in fields) {
-                    if (!fields[key].target) {
+                    // We can't jump fields with no target 'cause they are
+                    // ManyToManyField and ForeignKey fields!
+                    // if (!fields[key].target) {
                         var value = fields[key].label;
                         options.push('<option value="'+ key +'">'+ value +'</option>');
-                    }
+                    // }
                 }
                 $("#"+ domTo).html(options.join(""));
                 // We need to raise change event
@@ -93,7 +102,7 @@ qbe.Containers = [];
         });
 
         $(".qbeFillFields").live("change", function() {
-            var enable = $(this).val();
+            var field = $(this).val();
             var splits = $(this).attr("id").split("-");
             var prefix = splits.splice(0, splits.length-1).join("-");
             var css = $(this).attr("class");
@@ -102,11 +111,22 @@ qbe.Containers = [];
             for(i=0; i<inputs.length; i++) {
                 var input = inputs[i];
                 var domTo = prefix +"-"+ input;
-                if (enable) {
+                if (field) {
                     $("#"+ domTo).removeAttr("disabled");
                 } else {
                     $("#"+ domTo).attr("disabled", "disabled");
                     $("#"+ domTo).val("");
+                }
+                if ($("#"+ domTo).is("input")) {
+                    var appModel = $("#"+ prefix +"-model").val();
+                    var fields = eval("qbe.Models."+ appModel).fields;
+                    if (field in fields && fields[field].target) {
+                        var target = fields[field].target;
+                        $("#"+ domTo).val(target['name'] +"."+ target['model'] +"."+ target['field']);
+                        $("#"+ domTo).prev().val("join")
+                    } else {
+                        $("#"+ domTo).val("");
+                    }
                 }
             }
         });
