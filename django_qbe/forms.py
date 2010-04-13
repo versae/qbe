@@ -27,8 +27,8 @@ SORT_CHOICES = (
 
 class QueryByExampleForm(forms.Form):
     show = forms.BooleanField(label=_("Show"), required=False)
-    model = forms.CharField(label=_("Model"), required=True)
-    field = forms.CharField(label=_("Field"), required=False)
+    model = forms.CharField(label=_("Model"))
+    field = forms.CharField(label=_("Field"))
     criteria = forms.CharField(label=_("Criteria"), required=False)
     sort = forms.ChoiceField(label=_("Sort"), choices=SORT_CHOICES,
                              required=False)
@@ -68,8 +68,31 @@ class QueryByExampleForm(forms.Form):
 
 
 class BaseQueryByExampleFormSet(BaseFormSet):
+    _selects = []
+    _froms = []
+    _wheres = []
+    _sorts = []
+    _params = []
 
-    def sql(self):
+    def clean(self):
+        """
+        Checks that there is almost one field to select
+        """
+        if any(self.errors):
+            # Don't bother validating the formset unless each form is valid on
+            # its own
+            return
+        selects, froms, wheres, sorts, params = self.get_query_parts()
+        if not selects:
+            validation_message = _(u"At least you must check a row to get.")
+            raise forms.ValidationError, validation_message
+        self._selects = selects
+        self._froms = froms
+        self._wheres = wheres
+        self._sorts = sorts
+        self._params = params
+
+    def get_query_parts(self):
         """
         Return SQL query for cleaned data
         """
@@ -77,6 +100,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         froms = []
         wheres = []
         sorts = []
+        params = []
         for data in self.cleaned_data:
             model = data["model"]
             field = data["field"]
@@ -99,23 +123,35 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                     if join not in wheres and join_model in TABLE_NAMES:
                         wheres.append(join)
                 elif operator in OPERATORS:
-                    db_operator = OPERATORS[operator] % over
+                    # db_operator = OPERATORS[operator] % over
+                    db_operator = OPERATORS[operator]
+                    params.append(over)
                     wheres.append(u"%s %s" % (db_field, db_operator))
             if model not in froms and model in TABLE_NAMES:
                 froms.append(model)
-        if sorts:
-            order_by = u"ORDER BY %s" % (", ".join(sorts))
+        return selects, froms, wheres, sorts, params
+
+    def get_raw_query(self):
+        if self._sorts:
+            order_by = u"ORDER BY %s" % (", ".join(self._sorts))
         else:
             order_by = u""
-        sql = u"""
-        SELECT %s
-        FROM %s
-        WHERE %s
-        %s ;""" % (", ".join(selects),
-                   ", ".join(froms),
-                   " AND ".join(wheres),
-                   order_by)
+        sql = u"""SELECT %s FROM %s WHERE %s %s ;""" \
+              % (", ".join(self._selects),
+                 ", ".join(self._froms),
+                 " AND ".join(self._wheres),
+                 order_by)
         return sql
+
+    def get_results(self):
+        """
+        Fetch all results after perform SQL query and 
+        """
+        sql = self.get_raw_query()
+        print sql
+        cursor = connection.cursor()
+        cursor.execute(sql, self._params)
+        return cursor.fetchall()
 
 
 QueryByExampleFormSet = formset_factory(QueryByExampleForm,

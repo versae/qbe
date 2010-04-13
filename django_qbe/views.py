@@ -21,9 +21,10 @@ def qbe(request):
         data = request.POST.copy()
         formset = QueryByExampleFormSet(data=data)
         if formset.is_valid():
-            sql_query = formset.sql()
-            return HttpResponse(sql_query, mimetype="text/plain")
-    formset = QueryByExampleFormSet()
+            results = formset.get_results()
+            return HttpResponse(results, mimetype="text/plain")
+    else:
+        formset = QueryByExampleFormSet()
     return render_to_response('qbe.html',
                               {'apps': apps,
                                'models': models,
