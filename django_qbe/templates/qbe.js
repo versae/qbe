@@ -87,14 +87,12 @@ qbe.Containers = [];
 
         $("#autocomplete").click(function() {
             var models = [];
-            for(i=0; i<qbe.Node.Layer.containers.length; i++) {
-                var container = qbe.Node.Layer.containers[i];
-                var config = container.config;
-                var key = config.application +"."+ config.title;
+            $(".qbeFillModels :selected").each(function() {
+                var key = $(this).val();
                 if (models.indexOf(key) == -1) {
                     models.push(key);
                 }
-            }
+            });
             $.ajax({
                 url: "{% url django_qbe.views.qbe_autocomplete %}",
                 dataType: 'json',
