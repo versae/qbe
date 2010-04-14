@@ -145,6 +145,7 @@ qbe.updateRelations = function (model) {
             var target_model = qbe.Models[target.name][target.model].index;
             var target_field = target.field;
             if (source_model && target_model) {
+                // TODO: Fix relations creation
                 console.log(source_model)
                 // console.log(qbe.Node.Layer.containers[source_model]);
                 console.log(target_model)
@@ -201,8 +202,8 @@ qbe.createLayer = function() {
         }
     }
     qbe.Node.Layer = new WireIt.Layer(qbe.Containers);
-    // We avoid nodes can be out of main container
     /*
+    // We avoid nodes can be out of main container
     qbe.Node.Layer.eventContainerDragged.subscribe(function(e,params) {
         var container = params[0];
         var top = parseFloat(container.el.style.top);

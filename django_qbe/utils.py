@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-import heapq
+from collections import deque
+from itertools import combinations
 
 from django.db.models import get_apps, get_models
 from django.db.models.fields.related import (ForeignKey, OneToOneField,
@@ -84,22 +85,54 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
     else:
         return graphs
 
-# Taken from http://code.activestate.com/recipes/119466-dijkstras-algorithm-for-shortest-paths/
-def shortest_path(G, start, end):
-   def flatten(L):       # Flatten linked list of form [0,[1,[2,[]]]]
-      while len(L) > 0:
-         yield L[0]
-         L = L[1]
 
-   q = [(0, start, ())]  # Heap of (cost, path_head, path_rest).
-   visited = set()       # Visited vertices.
-   while True:
-      (cost, v1, path) = heapq.heappop(q)
-      if v1 not in visited:
-         visited.add(v1)
-         if v1 == end:
-            return list(flatten(path))[::-1] + [v1]
-         path = (v1, path)
-         for (v2, cost2) in G[v1].iteritems():
-            if v2 not in visited:
-               heapq.heappush(q, (cost + cost2, v2, path))
+def qbe_graph(admin_site=None, directed=False):
+    models = qbe_models(admin_site)
+    graph = {}
+    for k, v in models.items():
+        for l, w in v.items():
+            key = "%s.%s" % (k, l)
+            relations = w['relations']
+            if key not in graph:
+                graph[key] = []
+            for r in relations:
+                value = "%s.%s" % (r['target']['name'], r['target']['model'])
+                if value not in graph[key]:
+                    graph[key].append(value)
+                if not directed:
+                    if value not in graph:
+                        graph[value] = []
+                    if key not in graph[value]:
+                        graph[value].append(key)
+    return graph
+
+
+def find_all_paths(graph, start, end, path=[]):
+    path = path + [start]
+    if start == end:
+        return [path]
+    if not graph.has_key(start):
+        return []
+    paths = []
+    for node in graph[start]:
+        if node not in path:
+            newpaths = find_all_paths(graph, node, end, path)
+            for newpath in newpaths:
+                paths.append(newpath)
+    return paths
+
+
+def autocomplete_graph(admin_site, current_models):
+    if len(current_models) < 2:
+        return None
+    graph = qbe_graph(admin_site)
+    valid_paths = []
+    for c, d in combinations(current_models, 2):
+        paths = find_all_paths(graph, c, d)
+        for path in paths:
+            if all(map(lambda x: x in path, current_models)):
+                for model in current_models:
+                    path.remove(model)
+                if path not in valid_paths:
+                    valid_paths.append(path)
+    return sorted(valid_paths, cmp=lambda x,y: cmp(len(x), len(y)))

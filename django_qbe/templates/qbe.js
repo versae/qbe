@@ -77,6 +77,35 @@ qbe.Containers = [];
             $(this).attr("checked", false);
         });
 
+        $(".submit-row input[type='submit']").click(function() {
+            var checked = ($("input[type='checkbox']:checked").length != 0);
+            if (!checked) {
+                alert("{% trans "Select at least one field to show" %}");
+            }
+            return checked;
+        });
+
+        $("#autocomplete").click(function() {
+            var models = [];
+            for(i=0; i<qbe.Node.Layer.containers.length; i++) {
+                var container = qbe.Node.Layer.containers[i];
+                var config = container.config;
+                var key = config.application +"."+ config.title;
+                if (models.indexOf(key) == -1) {
+                    models.push(key);
+                }
+            }
+            $.ajax({
+                url: "{% url django_qbe.views.qbe_autocomplete %}",
+                dataType: 'json',
+                data: "models="+ models.join(","),
+                type: 'post',
+                success: function(data) {
+                    console.log(data);
+                }
+            });
+        });
+
         $(".qbeFillModels").live("change", function() {
             var appModel = $(this).val();
             if (appModel) {

@@ -102,19 +102,22 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         sorts = []
         params = []
         for data in self.cleaned_data:
+            if not ("model" in data and "field" in data):
+                break
             model = data["model"]
             field = data["field"]
             show = data["show"]
             criteria = data["criteria"]
             sort = data["sort"]
             db_field = u"%s.%s" % (model, field)
-            if show:
+            operator, over = criteria
+            is_join = operator.lower() == 'join'
+            if show and not is_join:
                 selects.append(db_field)
             if sort:
                 sorts.append(db_field)
             if all(criteria):
-                operator, over = criteria
-                if operator.lower() == 'join':
+                if is_join:
                     over_split = over.lower().rsplit(".", 1)
                     join_model = over_split[0].replace(".", "_")
                     join_field = over_split[1]
@@ -122,6 +125,11 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                            % (join_model, join_field, db_field)
                     if join not in wheres and join_model in TABLE_NAMES:
                         wheres.append(join)
+                        if join_model not in froms:
+                            froms.append(join_model)
+                    join_select = u"%s.%s" % (join_model, join_field)
+                    if join_select not in selects:
+                        selects.append(join_select)
                 elif operator in OPERATORS:
                     # db_operator = OPERATORS[operator] % over
                     db_operator = OPERATORS[operator]
@@ -148,7 +156,8 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         Fetch all results after perform SQL query and 
         """
         sql = self.get_raw_query()
-        print sql
+        if settings.DEBUG:
+            print sql
         cursor = connection.cursor()
         cursor.execute(sql, self._params)
         return cursor.fetchall()

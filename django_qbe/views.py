@@ -5,12 +5,14 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
+from django.utils.simplejson import loads, dumps
 from django.utils.translation import ugettext as _
 
 from django_qbe.forms import QueryByExampleFormSet
-from django_qbe.utils import qbe_models
+from django_qbe.utils import autocomplete_graph, qbe_models
 
 from admin import admin_site
+
 
 @user_passes_test(lambda u: u.is_staff)
 def qbe(request):
@@ -40,3 +42,12 @@ def qbe_js(request):
                                'reports_label': _(u"Reports"),
                                'qbe_label': _(u"Query by Example")},
                               context_instance=RequestContext(request))
+
+
+def qbe_autocomplete(request):
+    nodes = None
+    if request.is_ajax() and request.POST:
+        models = request.POST.get('models', []).split(",")
+        nodes = autocomplete_graph(admin_site, models)
+    json_nodes = dumps(nodes)
+    return HttpResponse(json_nodes, mimetype="application/json")
