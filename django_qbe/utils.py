@@ -51,6 +51,24 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
                 'name': field.rel.to.__module__.split(".")[-2].capitalize(),
                 'model': field.rel.to.__name__,
                 'field': field.rel.get_related_field().name}
+            if hasattr(field.rel, 'through'):
+                # FIXME: Treatment of ManyToMany relations and through field
+                #        is not complete
+                through_fields = []
+                for through_field in field.rel.through._meta.fields:
+                    through_fields.append({
+                        'name': through_field.name,
+                        'type': type(through_field).__name__,
+                        'blank': through_field.blank,
+                        'label': u"%s" % through_field.verbose_name.capitalize()
+                    })
+                target.update({
+                    'through': {
+                        'name': field.rel.through.__module__.split(".")[-2].capitalize(),
+                        'model': field.rel.through.__name__,
+                        'fields': through_fields,
+                    }
+                })
             _rel = {
                 'target': target,
                 'type': type(field).__name__,

@@ -28,7 +28,7 @@ qbe.Containers = [];
         $("#qbeModelsTab").click(function() {
             $("#qbeConnectorList").toggle();
         });
-        selectTab = function(tab) {
+        function selectTab(tab) {
             $("#qbeTabular").hide();
             $("#qbeDiagram").hide();
             $("#qbeData").hide();
@@ -98,11 +98,37 @@ qbe.Containers = [];
                 dataType: 'json',
                 data: "models="+ models.join(","),
                 type: 'post',
-                success: function(data) {
-                    console.log(data);
-                }
+                success: showAutocompletionOptions
             });
         });
+
+        function showAutocompletionOptions(data) {
+            var select = $("#autocompletionOptions");
+            var options = ['<option disabled="disabled" value="">{% trans "With one of those sets" %}</option>'];
+            for(i=0; i<data.length; i++) {
+                var key = data[i].join("-");
+                var value = data[i].join(", ");
+                options.push('<option value="'+ key +'">'+ value +'</option>');
+            }
+            select.html(options.join(""));
+            select.show();
+            select.change(function() {
+                addRelationsFrom(select.val());
+            });
+        }
+
+        function addRelationsFrom(through) {
+            var appModels = through.split("-");
+            for(i=0; i<appModels.length; i++) {
+                var appModel = appModels[i];
+                if (!eval("qbe.Models."+ appModel).index) {
+                    var splits = appModel.split(".");
+                    qbe.Node.toggleModule(splits[0], splits[1]);
+                }
+                $("#qbeForm .addlink").click();
+                $(".qbeFillModels:last").val(appModel);
+            }
+        }
 
         $(".qbeFillModels").live("change", function() {
             var appModel = $(this).val();
@@ -149,8 +175,13 @@ qbe.Containers = [];
                     var fields = eval("qbe.Models."+ appModel).fields;
                     if (field in fields && fields[field].target) {
                         var target = fields[field].target;
-                        $("#"+ domTo).val(target['name'] +"."+ target['model'] +"."+ target['field']);
-                        $("#"+ domTo).prev().val("join")
+                        if (target.through) {
+                            addRelationsFrom(target.through);
+                            // TODO: Make autofill for ManyToManyFields over its self.
+                        } else {
+                            $("#"+ domTo).val(target['name'] +"."+ target['model'] +"."+ target['field']);
+                            $("#"+ domTo).prev().val("join")
+                        }
                     } else {
                         $("#"+ domTo).val("");
                     }
