@@ -15,18 +15,11 @@ from admin import admin_site
 
 
 @user_passes_test(lambda u: u.is_staff)
-def qbe(request):
+def qbe_form(request):
     apps = get_apps()
     models = qbe_models(admin_site=admin_site, only_admin_models=False)
     json_models = qbe_models(admin_site=admin_site, json=True)
-    if request.POST:
-        data = request.POST.copy()
-        formset = QueryByExampleFormSet(data=data)
-        if formset.is_valid():
-            results = formset.get_results()
-            return HttpResponse(results, mimetype="text/plain")
-    else:
-        formset = QueryByExampleFormSet()
+    formset = QueryByExampleFormSet()
     return render_to_response('qbe.html',
                               {'apps': apps,
                                'models': models,
@@ -36,9 +29,28 @@ def qbe(request):
                               context_instance=RequestContext(request))
 
 
+def qbe_results(request):
+    if request.POST:
+        data = request.POST.copy()
+        formset = QueryByExampleFormSet(data=data)
+        if formset.is_valid():
+            labels = formset.get_labels()
+            query = formset.get_raw_query()
+            results = formset.get_results(query)
+            return render_to_response('qbe_results.html',
+                                      {'formset': formset,
+                                       'title': _(u"Query by Example"),
+                                       'results': results,
+                                       'labels': labels,
+                                       'query': query},
+                                      context_instance=RequestContext(request))
+    else:
+        return HttpResponseRedirect(reverse("qbe_form"))
+
+
 def qbe_js(request):
     return render_to_response('qbe_index.js',
-                              {'qbe_url': reverse("django_qbe.views.qbe"),
+                              {'qbe_url': reverse("qbe_form"),
                                'reports_label': _(u"Reports"),
                                'qbe_label': _(u"Query by Example")},
                               context_instance=RequestContext(request))

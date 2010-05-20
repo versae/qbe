@@ -1,6 +1,7 @@
 if (!window.qbe) {
     var qbe = {};
 }
+qbe.CurrentModels = [];
 
 /**
  * @class qbe.Node
@@ -104,11 +105,10 @@ YAHOO.extend(qbe.Node, WireIt.Container, {
 qbe.Node.toggleModule = function (appName, modelName) {
     var model = qbe.Models[appName][modelName];
     var checked = document.getElementById('qbeModel_'+ modelName).checked;
-    if (!model.index && checked) {
+    if (checked) {
         qbe.Node.addModule(appName, modelName);
     } else {
-        qbe.Node.Layer.removeContainer(qbe.Node.Layer.containers[model.index-1]);
-        delete model.index;
+        qbe.Node.removeModule(appName, modelName);
     }
 }
 
@@ -118,15 +118,33 @@ qbe.Node.toggleModule = function (appName, modelName) {
 qbe.Node.addModule = function (appName, modelName) {
     var model = qbe.Models[appName][modelName];
     var inouts = qbe.Node.getInOuts(model);
-    qbe.Node.Layer.addContainer({xtype: "qbe.Node",
-                                 application: appName,
-                                 title: modelName,
-                                 inputs: inouts[0],
-                                 outputs: inouts[1],
-                                 close: false});
-    model.index = qbe.Node.Layer.containers.length;
-    if (model.relations.length > 0) {
-        qbe.updateRelations(model);
+    var appModel = appName +"."+ modelName;
+    if (qbe.CurrentModels.indexOf(appModel) < 0) {
+        qbe.CurrentModels.push(appModel);
+        qbe.Node.Layer.addContainer({xtype: "qbe.Node",
+                                     application: appName,
+                                     title: modelName,
+                                     inputs: inouts[0],
+                                     outputs: inouts[1],
+                                     close: false});
+        model.index = qbe.Node.Layer.containers.length;
+        if (model.relations.length > 0) {
+            qbe.updateRelations(model);
+        }
+    }
+};
+
+/*
+ * Removes a qbe Node from the layer
+ */
+qbe.Node.removeModule = function(appName, modelName) {
+    var appModel = appName +"."+ modelName;
+    var pos = qbe.CurrentModels.indexOf(appModel);
+    if (pos >= 0) {
+        qbe.CurrentModels.splice(pos, 1);
+        var model = qbe.Models[appName][modelName];
+        qbe.Node.Layer.removeContainer(qbe.Node.Layer.containers[model.index-1]);
+        delete model.index;
     }
 };
 

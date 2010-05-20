@@ -144,24 +144,41 @@ class BaseQueryByExampleFormSet(BaseFormSet):
             order_by = u"ORDER BY %s" % (", ".join(self._sorts))
         else:
             order_by = u""
-        sql = u"""SELECT %s FROM %s WHERE %s %s ;""" \
+        if self._wheres:
+            wheres = u"WHERE %s" % (" AND ".join(self._wheres))
+        else:
+            wheres = u""
+        sql = u"""SELECT %s FROM %s %s %s ;""" \
               % (", ".join(self._selects),
                  ", ".join(self._froms),
-                 " AND ".join(self._wheres),
+                 wheres,
                  order_by)
         return sql
 
-    def get_results(self):
+    def get_results(self, query=None):
         """
         Fetch all results after perform SQL query and 
         """
-        sql = self.get_raw_query()
+        if not query:
+            sql = self.get_raw_query()
+        else:
+            sql = query
         if settings.DEBUG:
             print sql
         cursor = connection.cursor()
         cursor.execute(sql, self._params)
         return cursor.fetchall()
 
+    def get_labels(self):
+        labels = []
+        if self._selects and isinstance(self._selects, (tuple, list)):
+            for select in self._selects:
+                label_splits = select.replace("_", ".").split(".")
+                label = u"%s.%s: %s" % (label_splits[0].capitalize(), 
+                                        label_splits[1].capitalize(),
+                                        label_splits[2].capitalize())
+                labels.append(label)
+        return labels
 
 QueryByExampleFormSet = formset_factory(QueryByExampleForm,
                                         formset=BaseQueryByExampleFormSet,

@@ -54,11 +54,10 @@ qbe.Containers = [];
 
         function updateRow() {
             var options = ['<option value="">----</option>'];
-            for(i=0; i<qbe.Node.Layer.containers.length; i++) {
-                var container = qbe.Node.Layer.containers[i];
-                var config = container.config;
-                var key = config.application +"."+ config.title;
-                var value = config.application +": "+ config.title;
+            for(i=0; i<qbe.CurrentModels.length; i++) {
+                var appModel = qbe.CurrentModels[i];
+                var key = appModel;
+                var value = appModel.replace(".", ": ");
                 options.push('<option value="'+ key +'">'+ value +'</option>');
             }
             $(".qbeFillModels").each(function() {
@@ -103,6 +102,9 @@ qbe.Containers = [];
         });
 
         function showAutocompletionOptions(data) {
+            if (!data) {
+                return false;
+            }
             var select = $("#autocompletionOptions");
             var options = ['<option disabled="disabled" value="">{% trans "With one of those sets" %}</option>'];
             for(i=0; i<data.length; i++) {
@@ -121,12 +123,11 @@ qbe.Containers = [];
             var appModels = through.split("-");
             for(i=0; i<appModels.length; i++) {
                 var appModel = appModels[i];
-                if (!eval("qbe.Models."+ appModel).index) {
-                    var splits = appModel.split(".");
-                    qbe.Node.toggleModule(splits[0], splits[1]);
-                }
+                var splits = appModel.split(".");
+                qbe.Node.addModule(splits[0], splits[1]);
                 $("#qbeForm .addlink").click();
                 $(".qbeFillModels:last").val(appModel);
+                $(".qbeFillModels:last").change();
             }
         }
 
