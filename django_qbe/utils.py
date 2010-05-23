@@ -4,12 +4,22 @@ from itertools import combinations
 from django.db.models import get_models
 from django.db.models.fields.related import (ForeignKey, OneToOneField,
                                              ManyToManyField)
+from django.conf import settings
+from django.utils.importlib import import_module
 from django.utils.simplejson import dumps
 
 try:
     from django.db.models.fields.generic import GenericRelation
 except ImportError:
     from django.contrib.contenttypes.generic import GenericRelation
+
+try:
+    qbe_formats = getattr(settings, "QBE_FORMATS_EXPORT", "qbe_formats")
+    formats = import_module(qbe_formats).formats
+except ImportError:
+    from django_qbe.exports import formats
+# Makes pyflakes happy
+formats
 
 
 def qbe_models(admin_site=None, only_admin_models=False, json=False):
@@ -54,15 +64,17 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
                 #        is not complete
                 through_fields = []
                 for through_field in field.rel.through._meta.fields:
+                    label = through_field.verbose_name.capitalize()
                     through_fields.append({
                         'name': through_field.name,
                         'type': type(through_field).__name__,
                         'blank': through_field.blank,
-                        'label': u"%s" % through_field.verbose_name.capitalize(),
+                        'label': u"%s" % label,
                     })
+                name = field.rel.through.__module__.split(".")[-2].capitalize()
                 target.update({
                     'through': {
-                        'name': field.rel.through.__module__.split(".")[-2].capitalize(),
+                        'name': name,
                         'model': field.rel.through.__name__,
                         'fields': through_fields,
                     }

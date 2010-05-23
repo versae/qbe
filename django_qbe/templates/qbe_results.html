@@ -10,16 +10,12 @@
 
 {% block content %}
 {% block object-tools %}
-<ul class="object-tools">
-  <li>
-    <a href="javascript:void(0);" id="qbeExportCSV">{% trans ".csv" %}</a>
-  </li>
-  <li>
-    <a href="javascript:void(0);" id="qbeExportODS">{% trans ".ods" %}</a>
-  </li>
-  <li>
-    <a href="javascript:void(0);" id="qbeExportXLS">{% trans ".xls" %}</a>
-  </li>
+<ul class="object-tools">   
+    {% for format in formats %}
+    <li>
+        <a href="{% url qbe_export format %}?hash={{ query_hash }}" id="qbeExport{{ format }}">.{{ format }}</a>
+    </li>
+    {% endfor %}
 </ul>
 {% endblock %}
 <code>
