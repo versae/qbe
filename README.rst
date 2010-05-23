@@ -30,6 +30,11 @@ And adding to the project settings::
       # [...] Any other application
 )
 
+And you must not forgive link or copy the *django_qbe/media/django_qbe*
+directory in your project media directory::
+
+  $ ln -s django_qbe/media/django_qbe /path/to/your/project/media/
+
 That's all. Then you can access to http://host:port/qbe
 However, you can add a link from your admin page changing the admin index
 template fo your AdminSite::
