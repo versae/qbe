@@ -20,7 +20,7 @@ near future. By the moment, you must download the *django_qbe* directory using
 git::
 
   $ git clone git://github.com/versae/qbe.git
-  $ copy -r qbe/django_qbe /path/to/your/project
+  $ cp -r qbe/django_qbe /path/to/your/project
 
 And adding to the project settings::
 
