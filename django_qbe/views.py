@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-from django.db.models import get_app, get_apps
+from django.db.models import get_apps
 from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.utils.simplejson import loads, dumps
+from django.utils.simplejson import dumps
 from django.utils.translation import ugettext as _
 
 from django_qbe.forms import QueryByExampleFormSet
@@ -14,8 +14,10 @@ from django_qbe.utils import autocomplete_graph, qbe_models
 
 from admin import admin_site
 
+qbe_access_for = getattr(settings, "QBE_ACCESS_FOR", lambda u: u.is_staff)
 
-@user_passes_test(lambda u: u.is_staff)
+
+@user_passes_test(qbe_access_for)
 def qbe_form(request):
     apps = get_apps()
     models = qbe_models(admin_site=admin_site, only_admin_models=False)
@@ -30,6 +32,7 @@ def qbe_form(request):
                               context_instance=RequestContext(request))
 
 
+@user_passes_test(qbe_access_for)
 def qbe_results(request):
     if request.POST:
         data = request.POST.copy()
@@ -53,6 +56,7 @@ def qbe_results(request):
         return HttpResponseRedirect(reverse("qbe_form"))
 
 
+@user_passes_test(qbe_access_for)
 def qbe_js(request):
     return render_to_response('qbe_index.js',
                               {'qbe_url': reverse("qbe_form"),
@@ -61,6 +65,7 @@ def qbe_js(request):
                               context_instance=RequestContext(request))
 
 
+@user_passes_test(qbe_access_for)
 def qbe_autocomplete(request):
     nodes = None
     if request.is_ajax() and request.POST:
