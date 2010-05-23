@@ -1,8 +1,8 @@
 window.onload = function() {
 //    var divUserTools = document.getElementById("user-tools");
 //    var aQBE = document.createElement("a");
-//    var txtQBE = document.createTextNode('QBE');
-//    aQBE.setAttribute("href", "/qbe/");
+//    var txtQBE = document.createTextNode('{{ qbe_label }}');
+//    aQBE.setAttribute("href", "{{ qbe_url }}");
 //    aQBE.appendChild(txtQBE);
 //    var txtSeparator = document.createTextNode('/ ');
 //    divUserTools.appendChild(txtSeparator);

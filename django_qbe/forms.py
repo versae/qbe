@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django import forms
 from django.db import connection
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.utils.importlib import import_module
@@ -128,8 +129,8 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                         if join_model not in froms:
                             froms.append(join_model)
                     join_select = u"%s.%s" % (join_model, join_field)
-                    if join_select not in selects:
-                        selects.append(join_select)
+#                    if join_select not in selects:
+#                        selects.append(join_select)
                 elif operator in OPERATORS:
                     # db_operator = OPERATORS[operator] % over
                     db_operator = OPERATORS[operator]
@@ -139,7 +140,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                 froms.append(model)
         return selects, froms, wheres, sorts, params
 
-    def get_raw_query(self):
+    def get_raw_query(self, add_extra_ids=False):
         if self._sorts:
             order_by = u"ORDER BY %s" % (", ".join(self._sorts))
         else:
@@ -148,37 +149,89 @@ class BaseQueryByExampleFormSet(BaseFormSet):
             wheres = u"WHERE %s" % (" AND ".join(self._wheres))
         else:
             wheres = u""
+        selects = self._get_selects_with_extra_ids()
+        if add_extra_ids:
+            selects = self._get_selects_with_extra_ids()
+        else:
+            selects = self._selects
         sql = u"""SELECT %s FROM %s %s %s ;""" \
-              % (", ".join(self._selects),
+              % (", ".join(selects),
                  ", ".join(self._froms),
                  wheres,
                  order_by)
         return sql
 
-    def get_results(self, query=None):
+    def get_results(self, query=None, admin_name=None, row_number=False):
         """
         Fetch all results after perform SQL query and 
         """
+        add_extra_ids = (admin_name != None)
         if not query:
-            sql = self.get_raw_query()
+            sql = self.get_raw_query(add_extra_ids)
         else:
             sql = query
         if settings.DEBUG:
             print sql
         cursor = connection.cursor()
         cursor.execute(sql, self._params)
-        return cursor.fetchall()
+        query_results = cursor.fetchall()
+        if admin_name:
+            selects = self._get_selects_with_extra_ids()
+            results = []
+            for r, row in enumerate(query_results):
+                i = 0
+                l = len(row)
+                if row_number:
+                    result = [(r + 1, u"#row%s" % (r + 1))]
+                else:
+                    result = []
+                while i < l:
+                    appmodel, field = selects[i].split(".")
+                    admin_url = reverse("%s:%s_change" % (admin_name,
+                                                           appmodel),
+                                         args=[row[i + 1]])
+                    result.append((row[i], admin_url))
+                    i += 2
+                results.append(result)
+            return results
+        else:
+            if row_number:
+                results = []
+                for r, row in enumerate(query_results):
+                    result = [r + 1]
+                    for cell in row:
+                        result.append(cell)
+                    results.append(result)
+                return results
+            else:
+                return query_results
 
-    def get_labels(self):
-        labels = []
-        if self._selects and isinstance(self._selects, (tuple, list)):
-            for select in self._selects:
+
+    def get_labels(self, add_extra_ids=False, row_number=False):
+        if row_number:
+            labels = [_(u"#")]
+        else:
+            labels = []
+        if add_extra_ids:
+            selects = self._get_selects_with_extra_ids()
+        else:
+            selects = self._selects
+        if selects and isinstance(selects, (tuple, list)):
+            for select in selects:
                 label_splits = select.replace("_", ".").split(".")
                 label = u"%s.%s: %s" % (label_splits[0].capitalize(), 
                                         label_splits[1].capitalize(),
                                         label_splits[2].capitalize())
                 labels.append(label)
         return labels
+
+    def _get_selects_with_extra_ids(self):
+        selects = []
+        for select in self._selects:
+            appmodel, field = select.split(".")
+            selects.append(select)
+            selects.append("%s.id" % appmodel)
+        return selects
 
 QueryByExampleFormSet = formset_factory(QueryByExampleForm,
                                         formset=BaseQueryByExampleFormSet,

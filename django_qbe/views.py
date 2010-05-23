@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db.models import get_app, get_apps
+from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
@@ -34,15 +35,19 @@ def qbe_results(request):
         data = request.POST.copy()
         formset = QueryByExampleFormSet(data=data)
         if formset.is_valid():
-            labels = formset.get_labels()
+            row_number = True
+            admin_name = getattr(settings, "QBE_ADMIN", "admin")
+            labels = formset.get_labels(row_number=row_number)
             query = formset.get_raw_query()
-            results = formset.get_results(query)
+            results = formset.get_results(admin_name=admin_name,
+                                          row_number=row_number)
             return render_to_response('qbe_results.html',
                                       {'formset': formset,
                                        'title': _(u"Query by Example"),
                                        'results': results,
                                        'labels': labels,
-                                       'query': query},
+                                       'query': query,
+                                       'admin_urls': (admin_name != None)},
                                       context_instance=RequestContext(request))
     else:
         return HttpResponseRedirect(reverse("qbe_form"))
