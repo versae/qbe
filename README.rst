@@ -60,11 +60,11 @@ Enable an Exhibit faceted navigation for results (not yet implemented)::
 
   QBE_EXHIBIT = False
 
-Admin module name to add admin urls in results
+Admin module name to add admin urls in results::
 
   QBE_ADMIN = "admin"
 
-Function to control to users with access to QBE
+Function to control to users with access to QBE::
 
   QBE_ACCESS_FOR = lambda user: user.is_staff
 
