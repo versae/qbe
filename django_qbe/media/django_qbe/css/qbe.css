@@ -87,3 +87,27 @@ div.qbeConnectorList {
     display: none;
     padding: 5px;
 }
+
+code#qbeSQL {
+    font-size: 15px;
+    font-weight: bold;
+    display: block;
+}
+
+#qbeResultsOptions {
+    font-size: 10px;
+}
+
+#qbeResultsOptions a {
+    font-size: 10px;
+}
+
+#qbeSaveQueryLi {
+    background: none;
+    padding: 2px 5px 0 0;
+}
+
+#qbeSaveQueryLi a {
+    background: none;
+    color: #999;
+}

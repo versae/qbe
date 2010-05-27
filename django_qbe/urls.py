@@ -5,6 +5,8 @@ from django_qbe.exports import formats
 urlpatterns = patterns('django_qbe.views',
     url(r'^$', 'qbe_form', name="qbe_form"),
     url(r'^js/$', 'qbe_js', name="qbe_js"),
+    url(r'^results/bookmark/$',
+        'qbe_bookmark', name="qbe_bookmark"),
     url(r'^results/export/(?P<format>(%s))/$' % "|".join(formats.keys()),
         'qbe_export', name="qbe_export"),
     url(r'^results/$', 'qbe_results', name="qbe_results"),

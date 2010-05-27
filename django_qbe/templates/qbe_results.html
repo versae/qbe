@@ -1,24 +1,54 @@
 {% extends "qbe.html" %}
 {% load i18n %}
 
-{% block extrahead %}{% endblock %}
+{% block extrahead %}
+<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/jquery.js"></script>
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}django_qbe/css/qbe.css" />
+{% endblock %}
 
 {% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url admin:index %}">{% trans 'Home' %}</a>{% if title %} &rsaquo; <a href="{% url qbe_form %}">{{ title }}<a> &rsaquo; {% trans "Results" %}{% endif %}</div>
 {% endblock %}
 
-{% block content_title %}{% if title %}<h1>{{ title }}: {{ results|length }} result{{ results|length|pluralize }}</h1>{% endif %}{% endblock %}
+{% block content_title %}{% if title %}
+<h1>
+    {% ifequal limit count %}
+    {{ title }}: {{ count|floatformat:0 }} result{{ count|floatformat:0|pluralize }}
+    {% else %}
+    {{ title }}: {{ limit|floatformat:0 }}/{{ count|floatformat:0 }} result{{ limit|floatformat:0|pluralize }}
+    {% endifequal %}
+</h1>
+{% endif %}{% endblock %}
 
 {% block content %}
 {% block object-tools %}
-<ul class="object-tools">   
+    {% ifequal limit count %}
+    Showing all {{ count|floatformat:0 }} result{{ results|length|pluralize }}
+    {% else %}
+    Showing {{ limit|floatformat:0 }} of {{ count|floatformat:0 }} result{{ results|length|pluralize }}
+    {% endifequal %}
+<span id="qbeResultsOptions">
+    {% ifequal limit count %}
+    (<a href="{% url qbe_results %}?hash={{ query_hash }}">show first ones</a>
+    {% else %}
+    (<a href="{% url qbe_results %}?hash={{ query_hash }}&show=all">show all</a>
+    {% endifequal %}
+    | <a href="#" onclick="jQuery('#qbeSQL').toggle();return false;">query</a>)
+</span>
+<ul class="object-tools">
+    <li id="qbeSaveQueryLi">
+        {% trans "Save query as" %}
+    </li>
+    <li>
+        <a href="{% url qbe_bookmark %}?data={{ pickled }}" title="{% trans "Drag this yo your bookmarks bar to save this query" %}" id="qbeBookmarkQuery">{% trans "bookmark" %}</a>
+    </li>
     {% for format in formats %}
     <li>
-        <a href="{% url qbe_export format %}?hash={{ query_hash }}" id="qbeExport{{ format }}">.{{ format }}</a>
+        <a href="{% url qbe_export format %}?hash={{ query_hash }}" title="{% trans "Export to" %} .{{ format }}" id="qbeExport{{ format }}">.{{ format }}</a>
     </li>
     {% endfor %}
 </ul>
 {% endblock %}
-<code>
+<code id="qbeSQL" style="display: none;">
 {{ query }}
 </code>
 <div id="changelist" class="module">

@@ -86,11 +86,13 @@
 {% endfor %}
 </div>
 
+{% trans "Show" %} <input type="text" name="limit" value="100"> {% trans "rows" %}
 <div class="submit-row">
     <input type="button" name="autocomplete" id="autocomplete" value="{% trans "Auto complete" %}">
     <select name="autocompletionOptions" id="autocompletionOptions" style="display: none;"></select>
     <input type="submit" name="_save" class="default" value="{% trans "Run" %}">
 </div>
+
 {{ formset.management_form }}
 </form>
 

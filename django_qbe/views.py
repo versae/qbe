@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
 from hashlib import md5
 
 from django.db.models import get_apps
@@ -9,11 +8,12 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.utils.simplejson import dumps
+from django.utils import simplejson
 from django.utils.translation import ugettext as _
 
 from django_qbe.forms import QueryByExampleFormSet
-from django_qbe.utils import autocomplete_graph, qbe_models, formats
+from django_qbe.utils import (autocomplete_graph, qbe_models, formats,
+                              pickle_encode, pickle_decode)
 
 from admin import admin_site
 
@@ -37,25 +37,39 @@ def qbe_form(request):
 
 @user_passes_test(qbe_access_for)
 def qbe_results(request):
-    if request.POST:
-        data = request.POST.copy()
+    query_hash = request.GET.get("hash", "")
+    query_key = "qbe_query_%s" % query_hash
+    if request.POST or query_key in request.session or "data" in request.GET:
+        if query_key in request.session:
+            data = request.session[query_key]
+        else:
+            data = request.POST.copy()
         formset = QueryByExampleFormSet(data=data)
         if formset.is_valid():
             row_number = True
             admin_name = getattr(settings, "QBE_ADMIN", "admin")
             labels = formset.get_labels(row_number=row_number)
             query = formset.get_raw_query()
-            results = formset.get_results(admin_name=admin_name,
+            count = formset.get_count()
+            limit = count
+            if not request.GET.get("show", None):
+                limit = data.get("limit", 100)
+            results = formset.get_results(limit=limit, admin_name=admin_name,
                                           row_number=row_number)
-            query_hash = md5(datetime.today().isoformat()).hexdigest()
-            query_key = "qbe_query_%s" % query_hash
-            request.session[query_key] = data
+            pickled = pickle_encode(data)
+            if not query_hash:
+                query_hash = md5(pickled + settings.SECRET_KEY).hexdigest()
+                query_key = "qbe_query_%s" % query_hash
+                request.session[query_key] = data
             return render_to_response('qbe_results.html',
                                       {'formset': formset,
                                        'title': _(u"Query by Example"),
                                        'results': results,
                                        'labels': labels,
                                        'query': query,
+                                       'count': count,
+                                       'limit': limit,
+                                       'pickled': pickled,
                                        'query_hash': query_hash,
                                        'admin_urls': (admin_name != None),
                                        'formats': formats},
@@ -65,10 +79,23 @@ def qbe_results(request):
 
 
 @user_passes_test(qbe_access_for)
-def qbe_export(request, format=None):
-    query_hash = request.GET.get("hash", None)
-    if format and format in formats and query_hash:
+def qbe_bookmark(request):
+    data = request.GET.get("data", None)
+    if data:
+        query_hash = md5(data + settings.SECRET_KEY).hexdigest()
         query_key = "qbe_query_%s" % query_hash
+        request.session[query_key] = pickle_decode(data)
+        reverse_url = u"%s?hash=%s" % (reverse("qbe_results"), query_hash)
+        return HttpResponseRedirect(reverse_url)
+    else:
+        return HttpResponseRedirect(reverse("qbe_form"))
+
+
+@user_passes_test(qbe_access_for)
+def qbe_export(request, format=None):
+    query_hash = request.GET.get("hash", "")
+    query_key = "qbe_query_%s" % query_hash
+    if format and format in formats and query_key in request.session:
         data = request.session[query_key]
         formset = QueryByExampleFormSet(data=data)
         if formset.is_valid():
@@ -94,5 +121,5 @@ def qbe_autocomplete(request):
     if request.is_ajax() and request.POST:
         models = request.POST.get('models', []).split(",")
         nodes = autocomplete_graph(admin_site, models)
-    json_nodes = dumps(nodes)
+    json_nodes = simplejson.dumps(nodes)
     return HttpResponse(json_nodes, mimetype="application/json")

@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
+import base64
+import pickle
+
 from itertools import combinations
 
 from django.db.models import get_models
 from django.db.models.fields.related import (ForeignKey, OneToOneField,
                                              ManyToManyField)
+from django.core.exceptions import SuspiciousOperation
 from django.conf import settings
+from django.utils.hashcompat import md5_constructor
 from django.utils.importlib import import_module
 from django.utils.simplejson import dumps
 
@@ -164,3 +169,26 @@ def autocomplete_graph(admin_site, current_models):
                 if path not in valid_paths:
                     valid_paths.append(path)
     return sorted(valid_paths, cmp=lambda x, y: cmp(len(x), len(y)))
+
+
+# Taken from django.contrib.sessions.backends.base
+def pickle_encode(session_dict):
+    "Returns the given session dictionary pickled and encoded as a string."
+    pickled = pickle.dumps(session_dict, pickle.HIGHEST_PROTOCOL)
+    pickled_md5 = md5_constructor(pickled + settings.SECRET_KEY).hexdigest()
+    return base64.encodestring(pickled + pickled_md5)
+
+
+# Taken from django.contrib.sessions.backends.base
+def pickle_decode(session_data):
+    encoded_data = base64.decodestring(session_data)
+    pickled, tamper_check = encoded_data[:-32], encoded_data[-32:]
+    pickled_md5 = md5_constructor(pickled + settings.SECRET_KEY).hexdigest()
+    if pickled_md5 != tamper_check:
+        raise SuspiciousOperation("User tampered with session cookie.")
+    try:
+        return pickle.loads(pickled)
+    # Unpickling can cause a variety of exceptions. If something happens,
+    # just return an empty dictionary (an empty session).
+    except:
+        return {}
