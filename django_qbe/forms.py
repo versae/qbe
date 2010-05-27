@@ -140,7 +140,8 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                 froms.append(model)
         return selects, froms, wheres, sorts, params
 
-    def get_raw_query(self, limit=None, count=False, add_extra_ids=False):
+    def get_raw_query(self, limit=None, offset=None, count=False,
+                      add_extra_ids=False):
         if self._sorts:
             order_by = u"ORDER BY %s" % (", ".join(self._sorts))
         else:
@@ -161,22 +162,30 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                 limits = u"LIMIT %s" % int(limit)
             except ValueError:
                 pass
-        sql = u"""SELECT %s FROM %s %s %s %s;""" \
+        offsets = u""
+        if offset:
+            try:
+                offsets = u"OFFSET %s" % int(offset)
+            except ValueError:
+                pass
+        sql = u"""SELECT %s FROM %s %s %s %s %s;""" \
               % (", ".join(selects),
                  ", ".join(self._froms),
                  wheres,
                  order_by,
-                 limits)
+                 limits,
+                 offsets)
         return sql
 
-    def get_results(self, limit=None, query=None, admin_name=None,
+    def get_results(self, limit=None, offset=None, query=None, admin_name=None,
                     row_number=False):
         """
         Fetch all results after perform SQL query and
         """
         add_extra_ids = (admin_name != None)
         if not query:
-            sql = self.get_raw_query(limit=limit, add_extra_ids=add_extra_ids)
+            sql = self.get_raw_query(limit=limit, offset=offset,
+                                     add_extra_ids=add_extra_ids)
         else:
             sql = query
         if settings.DEBUG:
@@ -187,11 +196,15 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         if admin_name:
             selects = self._get_selects_with_extra_ids()
             results = []
+            try:
+                offset = int(offset)
+            except ValueError:
+                offset = 0
             for r, row in enumerate(query_results):
                 i = 0
                 l = len(row)
                 if row_number:
-                    result = [(r + 1, u"#row%s" % (r + 1))]
+                    result = [(r + offset + 1, u"#row%s" % (r + offset + 1))]
                 else:
                     result = []
                 while i < l:

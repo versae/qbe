@@ -1,5 +1,5 @@
 {% extends "qbe.html" %}
-{% load i18n %}
+{% load i18n qbe_tags %}
 
 {% block extrahead %}
 <script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/jquery.js"></script>
@@ -11,11 +11,7 @@
 
 {% block content_title %}{% if title %}
 <h1>
-    {% ifequal limit count %}
     {{ title }}: {{ count|floatformat:0 }} result{{ count|floatformat:0|pluralize }}
-    {% else %}
-    {{ title }}: {{ limit|floatformat:0 }}/{{ count|floatformat:0 }} result{{ limit|floatformat:0|pluralize }}
-    {% endifequal %}
 </h1>
 {% endif %}{% endblock %}
 
@@ -24,13 +20,13 @@
     {% ifequal limit count %}
     Showing all {{ count|floatformat:0 }} result{{ results|length|pluralize }}
     {% else %}
-    Showing {{ limit|floatformat:0 }} of {{ count|floatformat:0 }} result{{ results|length|pluralize }}
+    Showing from {{ offset|floatformat:0 }} to {{ offset_limit|floatformat:0 }} of {{ count|floatformat:0 }} result{{ results|length|pluralize }}
     {% endifequal %}
 <span id="qbeResultsOptions">
     {% ifequal limit count %}
-    (<a href="{% url qbe_results %}?hash={{ query_hash }}">show first ones</a>
+    (<a href="{% url qbe_results query_hash %}">show first ones</a>
     {% else %}
-    (<a href="{% url qbe_results %}?hash={{ query_hash }}&show=all">show all</a>
+    (<a href="{% url qbe_results query_hash %}?show=all">show all</a>
     {% endifequal %}
     | <a href="#" onclick="jQuery('#qbeSQL').toggle();return false;">query</a>)
 </span>
@@ -76,5 +72,9 @@
     {% endfor %}
     </tbody>
 </table>
+<p class="paginator">
+{% qbe_paginator count limit page %}
+{{ count|floatformat:0 }} result{{ count|floatformat:0|pluralize }}
+</p>
 </div>
 {% endblock %}
