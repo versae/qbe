@@ -152,6 +152,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
             wheres = u""
         if count:
             selects = (u"COUNT(*) as count", )
+            order_by = u""
         elif add_extra_ids:
             selects = self._get_selects_with_extra_ids()
         else:
