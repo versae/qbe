@@ -14,7 +14,8 @@ def qbe_paginator(total_pages, rows_per_page, current_page):
             if page == current_page:
                 html = u'<span class="this-page">%s</span>' % (page + 1)
             elif page == 0:
-                html = u'<a class="start" href="?p=%s">%s</a>' % (page, page + 1)
+                html = u'<a class="start" href="?p=%s">%s</a>' % (page,
+                                                                  page + 1)
             elif page == pages - 1:
                 html = u'<a class="end" href="?p=%s">%s</a>' % (page, page + 1)
             else:
