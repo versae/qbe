@@ -259,34 +259,111 @@ def qbe_forest(graph, nodes):
     return sorted(forest, cmp=lambda x, y: cmp(len(x), len(y)))
 
 
-def find_all_paths(graph, start, end, path=[]):
-    path = path + [start]
-    if start == end:
+def find_all_paths(graph, start_node, end_node, path=None):
+    if not path:
+        path = []
+    path = path + [start_node]
+    if start_node == end_node:
         return [path]
-    if start not in graph:
+    if start_node not in graph:
         return []
     paths = []
-    for source_field, (node, target_field) in graph[start].items():
-        if node not in path:
-            newpaths = find_all_paths(graph, node, end, path)
+    for source_edge, target_node, target_edge in graph[start_node]:
+        if target_node not in path:
+            newpaths = find_all_paths(graph, target_node, end_node, path)
             for newpath in newpaths:
                 paths.append(newpath)
     return paths
 
 
+def find_minimal_paths(graph, start_node, end_node):
+
+    def find_all_paths(graph, start_node, end_node, start_edge, end_edge,
+                       path=None, minimun=float("Inf")):
+        if not path:
+            path = []
+        path = path + [start_node]
+        if start_node == end_node:
+            return [path], minimun
+        if start_node not in graph:
+            return [], minimun
+        paths = []
+        if len(path) < minimun:
+            for source_edge, target_node, target_edge in graph[start_node]:
+                if target_node not in path:
+                    newpaths, minimun = find_all_paths(graph, target_node, end_node,
+                                                       target_edge, source_edge,
+                                                       path, minimun)
+                    for newpath in newpaths:
+                        newpath_length = len(newpath)
+                        if minimun > newpath_length:
+                            minimun = newpath_length
+                        if newpath not in paths:
+                            paths.append(newpath)
+        return paths, minimun
+
+    paths, minimun = find_all_paths(graph, start_node, end_node,
+                                    start_edge=None, end_edge=None,
+                                    path=None, minimun=float("Inf"))
+#    return [p for p in paths if len(p) <= minimun]
+    return paths
+
+
+def _combine(items, val=None, paths=None, length=None):
+    if not paths:
+        paths = []
+    if not length:
+        length = len(items)
+    if not val:
+        val = []
+    if len(val) == length - 1 and len(items) == 1:
+        return [(val + [i]) for i in items[0]]
+    for i, item in enumerate(items[:-1]):
+        for value in item:
+            val.append(value)
+            path = combine(items[i+1:], val, paths, length)
+            val.pop()
+            def visited_path(x):
+                return x not in paths
+            path = filter(visited_path, path)
+            paths.extend(path)
+    return paths
+
+
+def combine(items):
+    """
+    Create a matrix in wich each row is a tuple containing one of optiones
+    """
+    lengths = [len(i) for i in items]
+    length = reduce(lambda x, y: x * y, lengths)
+    items_length = len(items)
+    repeats = []
+    for i in range(items_length):
+        if i == items_length - 1:
+            repeat = 1
+        else:
+            repeat = reduce(lambda x, y: x * y, lengths[i + 1:])
+        repeats.append(repeat)
+    matrix = []
+    for i, item in enumerate(items):
+        row = []
+        for subset in item:
+            row.extend([subset for r in range(repeats[i])])
+        matrix.append(row * (length / len(row)))
+    # Transpose the matrix
+    return zip(*matrix)
+
+
 def autocomplete_graph(admin_site, current_models, directed=False):
-    if len(current_models) < 2:
-        return None
     graph = qbe_graph(admin_site, directed=directed)
     valid_paths = []
     for c, d in combinations(current_models, 2):
-        paths = find_all_paths(graph, c, d)
-        for path in paths:
-            if all(map(lambda x: x in path, current_models)):
-                for model in current_models:
-                    path.remove(model)
-                if path not in valid_paths:
-                    valid_paths.append(path)
+        paths = find_minimal_paths(graph, c, d)
+        valid_paths.append(combine(paths))
+#        for path in paths:
+#            if all(map(lambda x: x in path, current_models)):
+#                if path not in valid_paths:
+#                    valid_paths.append(path)
     return sorted(valid_paths, cmp=lambda x, y: cmp(len(x), len(y)))
 
 
