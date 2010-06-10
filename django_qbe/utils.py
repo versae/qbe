@@ -6,6 +6,7 @@ import random
 from collections import deque
 from copy import copy
 from itertools import combinations
+from math import floor
 
 from django.db.models import get_models
 from django.db.models.fields.related import (ForeignKey, OneToOneField,
@@ -291,8 +292,10 @@ def find_minimal_paths(graph, start_node, end_node):
         if len(path) < minimun:
             for source_edge, target_node, target_edge in graph[start_node]:
                 if target_node not in path:
-                    newpaths, minimun = find_all_paths(graph, target_node, end_node,
-                                                       target_edge, source_edge,
+                    newpaths, minimun = find_all_paths(graph, target_node,
+                                                       end_node,
+                                                       target_edge,
+                                                       source_edge,
                                                        path, minimun)
                     for newpath in newpaths:
                         newpath_length = len(newpath)
@@ -305,7 +308,6 @@ def find_minimal_paths(graph, start_node, end_node):
     paths, minimun = find_all_paths(graph, start_node, end_node,
                                     start_edge=None, end_edge=None,
                                     path=None, minimun=float("Inf"))
-#    return [p for p in paths if len(p) <= minimun]
     return paths
 
 
@@ -321,8 +323,9 @@ def _combine(items, val=None, paths=None, length=None):
     for i, item in enumerate(items[:-1]):
         for value in item:
             val.append(value)
-            path = combine(items[i+1:], val, paths, length)
+            path = _combine(items[i + 1:], val, paths, length)
             val.pop()
+
             def visited_path(x):
                 return x not in paths
             path = filter(visited_path, path)
@@ -330,28 +333,36 @@ def _combine(items, val=None, paths=None, length=None):
     return paths
 
 
-def combine(items):
+def combine(items, k=None):
     """
-    Create a matrix in wich each row is a tuple containing one of optiones
+    Create a matrix in wich each row is a tuple containing one of solutions or
+    solution k-esima.
     """
+    length_items = len(items)
     lengths = [len(i) for i in items]
     length = reduce(lambda x, y: x * y, lengths)
-    items_length = len(items)
-    repeats = []
-    for i in range(items_length):
-        if i == items_length - 1:
-            repeat = 1
-        else:
-            repeat = reduce(lambda x, y: x * y, lengths[i + 1:])
-        repeats.append(repeat)
-    matrix = []
-    for i, item in enumerate(items):
-        row = []
-        for subset in item:
-            row.extend([subset for r in range(repeats[i])])
-        matrix.append(row * (length / len(row)))
-    # Transpose the matrix
-    return zip(*matrix)
+    repeats = [reduce(lambda x, y: x * y, lengths[i:])
+               for i in range(1, length_items)] + [1]
+    if k is not None:
+        k = k % length
+        indices = [int(floor((k % (lengths[i] * repeats[i])) / repeats[i]))
+                   for i in range(length_items)]
+        return [items[i][indices[i]] for i in range(length_items)]
+    else:
+        matrix = []
+        for i, item in enumerate(items):
+            row = []
+            for subset in item:
+                row.extend([subset] * repeats[i])
+            times = length / len(row)
+            matrix.append(row * times)
+        # Transpose the matrix or return the columns instead rows
+        return zip(*matrix)
+
+
+def graphs_join(graphs):
+    print "Combine % elements" % len(graphs)
+    return []
 
 
 def autocomplete_graph(admin_site, current_models, directed=False):
@@ -359,7 +370,10 @@ def autocomplete_graph(admin_site, current_models, directed=False):
     valid_paths = []
     for c, d in combinations(current_models, 2):
         paths = find_minimal_paths(graph, c, d)
-        valid_paths.append(combine(paths))
+    combined_sets = combine(paths)
+    for combined_set in combined_sets:
+        path = graphs_join(combined_set)
+        valid_paths.append(path)
 #        for path in paths:
 #            if all(map(lambda x: x in path, current_models)):
 #                if path not in valid_paths:
