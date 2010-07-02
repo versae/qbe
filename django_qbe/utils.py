@@ -5,8 +5,17 @@ import random
 
 from collections import deque
 from copy import copy
-from itertools import combinations
-from math import floor
+try:
+    from itertools import combinations
+except ImportError:
+
+    def combinations(items, n):
+        if n == 0:
+            yield []
+        else:
+            for i in xrange(len(items)):
+                for cc in combinations(items[i + 1:], n - 1):
+                    yield [items[i]] + cc
 
 from django.db.models import get_models
 from django.db.models.fields.related import (ForeignKey, OneToOneField,
@@ -345,7 +354,8 @@ def combine(items, k=None):
                for i in range(1, length_items)] + [1]
     if k is not None:
         k = k % length
-        indices = [int(floor((k % (lengths[i] * repeats[i])) / repeats[i]))
+        # Python division by default is integer division (~ floor(a/b))
+        indices = [(k % (lengths[i] * repeats[i])) / repeats[i]
                    for i in range(length_items)]
         return [items[i][indices[i]] for i in range(length_items)]
     else:

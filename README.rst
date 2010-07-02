@@ -22,7 +22,7 @@ git::
   $ git clone git://github.com/versae/qbe.git
   $ cp -r qbe/django_qbe /path/to/your/project
 
-And adding to the project settings::
+Adding to the project settings::
 
   INSTALLED_APPS = (
       # [...] django builtins applications
@@ -30,7 +30,12 @@ And adding to the project settings::
       # [...] Any other application
 )
 
-And you must not forgive link or copy the *django_qbe/media/django_qbe*
+And adding the urlconf in your project urls.py::
+
+    # qbe
+    url(r'^qbe/', include('django_qbe.urls')),
+
+You must not forgive link or copy the *django_qbe/media/django_qbe*
 directory in your project media directory::
 
   $ ln -s django_qbe/media/django_qbe /path/to/your/project/media/
