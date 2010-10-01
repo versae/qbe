@@ -28,7 +28,7 @@ Adding to the project settings::
       # [...] django builtins applications
       'django_qbe',
       # [...] Any other application
-)
+  )
 
 And adding the urlconf in your project urls.py::
 
