@@ -44,13 +44,13 @@ qbe.Containers = [];
           deleteCssClass: "deletelink",
           added: updateRow
         });
-        $('#qbeForm').submit(function() {
-            var mustSubmit = ($(".submitIfChecked :checked").length > 0);
-            if (!mustSubmit) {
-                alert("{% trans "You must check any field to show." %}");
-            }
-            return mustSubmit;
-        });
+//        $('#qbeForm').submit(function() {
+//            var mustSubmit = ($(".submitIfChecked:checked").length > 0);
+//            if (!mustSubmit) {
+//                alert("{% trans "You must check any field to show." %}");
+//            }
+//            return mustSubmit;
+//        });
 
         function updateRow() {
             var options = ['<option value="">----</option>'];
