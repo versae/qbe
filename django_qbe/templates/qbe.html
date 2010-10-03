@@ -45,7 +45,7 @@
 {% endblock %}
 
 <form id="qbeForm" method="post" action="{% url qbe_proxy %}">
-
+{% csrf_token %}
 <div class="qbeContainer qbeData" id="qbeData" style="display: none;"></div>
 <div class="qbeContainer qbeDiagram"><div id="qbeDiagram" style="display: none;"></div></div>
 <div class="qbeContainer qbeTabular" id="qbeTabular">
