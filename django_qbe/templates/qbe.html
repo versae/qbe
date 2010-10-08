@@ -2,15 +2,15 @@
 {% load i18n %}
 
 {% block extrahead %}
-<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/yui.utilities.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/wireit.js"></script>
+<!--<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/yui.utilities.js"></script>-->
+<!--<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/wireit.js"></script>-->
 <!--[if IE]>
 <script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/excanvas.js"></script>
 <![endif]-->
 <script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/jquery.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/jquery.formset.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/qbe.node.js"></script>
-<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}django_qbe/css/wireit.css" />
+<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/qbe.core.js"></script>
+<!--<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}django_qbe/css/wireit.css" />-->
 <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}django_qbe/css/qbe.css" />
 {% endblock %}
 
@@ -81,12 +81,12 @@
 {% for app_name, app_models in models.items %}
     <h3>{{ app_name }}</h3>
     {% for model_name, model in app_models.items %}
-    <div><input type="checkbox" class="qbeCheckModels" value="false" id="qbeModel_{{ model_name }}" name="qbeModel_{{ model_name }}" onclick="qbe.Node.toggleModule('{{ app_name }}', '{{ model_name }}');"><label for="qbeModel_{{ model_name }}"><a href="javascript:void(0);">{{ model_name }}</a></label></div>
+    <div><input type="checkbox" class="qbeCheckModels" value="false" id="qbeModel_{{ model_name }}" name="qbeModel_{{ model_name }}" onchange="qbe.Core.toggleModule('{{ app_name }}', '{{ model_name }}');"><label for="qbeModel_{{ model_name }}">{{ model_name }}</label></div>
     {% endfor %}
 {% endfor %}
 </div>
 
-{% trans "Show" %} <input type="text" name="limit" value="100"> {% trans "rows" %}
+{% trans "Show" %} <input type="text" name="limit" id="id_form_limit" value="100"> {% trans "rows" %}
 <div class="submit-row">
     <input type="button" name="autocomplete" id="autocomplete" value="{% trans "Auto complete" %}">
     <select name="autocompletionOptions" id="autocompletionOptions" style="display: none;"></select>

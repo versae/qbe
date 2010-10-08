@@ -6,6 +6,11 @@ if (!window.qbe) {
     var qbe = {};
 }
 qbe.Models = {% autoescape off %}{{ json_models }}{% endautoescape %};
+{% if json_data %}
+qbe.Data = {% autoescape off %}{{ json_data }}{% endautoescape %};
+{% else %}
+qbe.Data = null;
+{% endif %}
 qbe.Containers = [];
 (function($) {
     $(document).ready(function() {
@@ -124,7 +129,7 @@ qbe.Containers = [];
             for(i=0; i<appModels.length; i++) {
                 var appModel = appModels[i];
                 var splits = appModel.split(".");
-                qbe.Node.addModule(splits[0], splits[1]);
+                qbe.Core.addModule(splits[0], splits[1]);
                 $("#qbeForm .addlink").click();
                 $(".qbeFillModels:last").val(appModel);
                 $(".qbeFillModels:last").change();
@@ -189,5 +194,51 @@ qbe.Containers = [];
                 }
             }
         });
+
+        function loadData(data) {
+            var initialForms, maxForms, totalForms;
+            initialForms = parseInt(data["form-INITIAL_FORMS"][0]);
+            maxForms = parseInt(data["form-MAX_NUM_FORMS"][0]);
+            totalForms = parseInt(data["form-TOTAL_FORMS"][0]);
+            for(var i=initialForms; i<totalForms; i++) {
+                var appModel, splits, show, model, field, sorted;
+                appModel = data["form-"+ i +"-model"][0];
+                if (!(appModel in qbe.CurrentModels)) {
+                    splits = appModel.split(".");
+                    app = splits[0];
+                    model = splits[1];
+                    qbe.Core.addModule(app, model);
+                    $("#qbeModel_"+ model).attr("checked", "checked");
+                }
+                updateModels();
+                $("#id_form-"+ i +"-model").val(appModel);
+                $("#id_form-"+ i +"-model").change();
+                field = data["form-"+ i +"-field"][0];
+                $("#id_form-"+ i +"-field").val(field);
+                $("#id_form-"+ i +"-field").change();
+                sorted = data["form-"+ i +"-sort"][0];
+                $("#id_form-"+ i +"-sort").val(sorted);
+                show = data["form-"+ i +"-show"][0];
+                if (show && show == "on") {
+                    $("#id_form-"+ i +"-show").attr("checked", "checked");
+                } else {
+                    $("#id_form-"+ i +"-show").remove("checked");
+                }
+                c = 0;
+                criteria = data["form-"+ i +"-criteria_"+ c];
+                while(criteria) {
+                    $("#id_form-"+ i +"-criteria_"+ c).val(criteria[0]);
+                    criteria = data["form-"+ i +"-criteria_"+ ++c];
+                }
+            }
+            $("#id_form_limit").val(data["limit"][0]);
+        };
+
+        function initialize() {
+            if (qbe.Data) {
+                loadData(qbe.Data);
+            }
+        };
+        initialize();
     });
 })(jQuery.noConflict());

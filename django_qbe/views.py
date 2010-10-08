@@ -22,16 +22,27 @@ qbe_access_for = getattr(settings, "QBE_ACCESS_FOR", lambda u: u.is_staff)
 
 @user_passes_test(qbe_access_for)
 def qbe_form(request):
+    query_hash = request.GET.get("hash", "")
+    query_key = "qbe_query_%s" % query_hash
+    formset = QueryByExampleFormSet()
+    json_data = None
+    if query_key in request.session:
+        data = request.session[query_key]
+        formset = QueryByExampleFormSet(data=data)
+        if not formset.is_valid():
+            formset = QueryByExampleFormSet()
+        else:
+            json_data = simplejson.dumps(data)
     apps = get_apps()
     models = qbe_models(admin_site=admin_site, only_admin_models=False)
     json_models = qbe_models(admin_site=admin_site, json=True)
-    formset = QueryByExampleFormSet()
     return render_to_response('qbe.html',
                               {'apps': apps,
                                'models': models,
                                'formset': formset,
                                'title': _(u"Query by Example"),
-                               'json_models': json_models},
+                               'json_models': json_models,
+                               'json_data': json_data},
                               context_instance=RequestContext(request))
 
 
@@ -63,7 +74,6 @@ def qbe_results(request, query_hash):
         row_number = True
         admin_name = getattr(settings, "QBE_ADMIN", "admin")
         labels = formset.get_labels(row_number=row_number)
-        query = formset.get_raw_query()
         count = formset.get_count()
         limit = count
         try:
@@ -79,6 +89,7 @@ def qbe_results(request, query_hash):
         results = formset.get_results(limit=limit, offset=offset,
                                       admin_name=admin_name,
                                       row_number=row_number)
+        query = formset.get_raw_query()
         pickled = pickle_encode(data)
         return render_to_response('qbe_results.html',
                                   {'formset': formset,

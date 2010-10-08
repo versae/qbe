@@ -74,6 +74,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
     _wheres = []
     _sorts = []
     _params = []
+    _raw_query = None
 
     def clean(self):
         """
@@ -142,6 +143,8 @@ class BaseQueryByExampleFormSet(BaseFormSet):
 
     def get_raw_query(self, limit=None, offset=None, count=False,
                       add_extra_ids=False):
+        if self._raw_query:
+            return self._raw_query
         if self._sorts:
             order_by = u"ORDER BY %s" % (", ".join(self._sorts))
         else:
