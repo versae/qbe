@@ -57,6 +57,7 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
             'type': type(field).__name__,
             'blank': field.blank,
             'label': u"%s" % field.verbose_name.capitalize(),
+            'primary': field.primary_key,
         }}
 
     def get_through_fields(field):

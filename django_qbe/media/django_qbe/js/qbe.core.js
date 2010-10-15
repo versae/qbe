@@ -25,6 +25,7 @@ qbe.Core.addModule = function (appName, modelName) {
     var inouts = qbe.Core.getInOuts(model);
     var appModel = appName +"."+ modelName;
     if (qbe.CurrentModels.indexOf(appModel) < 0) {
+        qbe.Diagram.addBox(appName, modelName);
         qbe.CurrentModels.push(appModel);
         if (model.relations.length > 0) {
             qbe.updateRelations(model);

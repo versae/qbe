@@ -8,8 +8,11 @@
 <script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/excanvas.js"></script>
 <![endif]-->
 <script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/jquery.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"></script> 
 <script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/jquery.formset.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/jquery.jsplumb.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/qbe.core.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/qbe.diagram.js"></script>
 <!--<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}django_qbe/css/wireit.css" />-->
 <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}django_qbe/css/qbe.css" />
 {% endblock %}
@@ -47,7 +50,7 @@
 <form id="qbeForm" method="post" action="{% url qbe_proxy %}">
 {% csrf_token %}
 <div class="qbeContainer qbeData" id="qbeData" style="display: none;"></div>
-<div class="qbeContainer qbeDiagram"><div id="qbeDiagram" style="display: none;"></div></div>
+<div class="qbeContainer qbeDiagram" id="qbeDiagram" style="display: none;"><div id="qbeBoxAnchor"></div></div>
 <div class="qbeContainer qbeTabular" id="qbeTabular">
 
 <table cellspacing="0" class="module" width="100%">
