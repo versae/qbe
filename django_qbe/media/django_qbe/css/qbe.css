@@ -90,6 +90,8 @@ div.qbeDiagram #qbeDiagramContainer {
     overflow: auto;
     position: relative;
     width: 100%;
+    background: url("/media/django_qbe/img/grid.jpg") scroll left top #FAFAFA;
+    margin-bottom: 10px;
 }
 
 div.qbeDiagram #qbeBoxAnchor {

@@ -22,19 +22,9 @@
 {% block content %}
 {% block object-tools %}
 <ul class="object-tools">
-<!--
-  <li>
-    <a href="javascript:void(0);" id="qbeDataTab">{% trans "Data" %}</a>
-  </li>
--->
   <li>
     <a href="javascript:void(0);" id="qbeDiagramTab">{% trans "Diagram" %}</a>
   </li>
-<!--
-  <li>
-    <a href="javascript:void(0);" id="qbeQueryTab">{% trans "Query" %}</a>
-  </li>
--->
   <li>
     <a href="javascript:void(0);" id="qbeTabularTab">{% trans "Tabular" %}</a>
   </li>
@@ -48,9 +38,7 @@
 {% csrf_token %}
 <div class="qbeContainer qbeData" id="qbeData" style="display: none;"></div>
 <div class="qbeContainer qbeDiagram" id="qbeDiagram" style="display: none;">
-    <div id="qbeDiagramContainer">
-        <div id="qbeBoxAnchor"></div>
-    </div>
+    <div id="qbeDiagramContainer"></div>
 </div>
 <div class="qbeContainer qbeTabular" id="qbeTabular">
 
@@ -91,6 +79,7 @@
 </div>
 
 {% trans "Show" %} <input type="text" name="limit" id="id_form_limit" value="100"> {% trans "rows" %}
+<input type="hidden" name="positions" id="id_form_positions">
 <div class="submit-row">
     <input type="button" name="autocomplete" id="autocomplete" value="{% trans "Auto complete" %}">
     <select name="autocompletionOptions" id="autocompletionOptions" style="display: none;"></select>

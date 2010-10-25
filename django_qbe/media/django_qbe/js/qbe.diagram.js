@@ -2,7 +2,6 @@ qbe.Diagram = {};
 
 (function($) {
     $(document).ready(function() {
-        var divBoxAnchor = $("#qbeBoxAnchor");
         jsPlumb.Defaults.Container = "qbeDiagramContainer";
 
         qbe.Diagram.addBox = function (appName, modelName) {
@@ -13,8 +12,8 @@ qbe.Diagram = {};
             divBox = $("<DIV>");
             divBox.attr("id", "qbeBox_"+ modelName);
             divBox.css({
-                "left": (Math.random() * 150 + 1)+ "px",
-                "top": (Math.random() * 250 + 1)+ "px"
+                "left": (parseInt(Math.random() * 15 + 1) * 10) + "px",
+                "top": (parseInt(Math.random() * 25 + 1) * 10) + "px",
             });
             divBox.attr();
             divBox.addClass("body");
@@ -52,12 +51,14 @@ qbe.Diagram = {};
                 divFields.addClass("noOverflow");
             } else if (countFields > 0) {
                 divFields.addClass("fieldsContainer");
+                /*
                 divFields.mouseover(function() {
                     $(this).removeClass("fieldsContainer");
                 });
                 divFields.mouseout(function() {
                     $(this).addClass("fieldsContainer");
                 });
+                */
             }
             if (divManies) {
                 divBox.append(divManies);
@@ -69,22 +70,20 @@ qbe.Diagram = {};
             divBox.prepend(divTitle);
             root.append(divBox);
             divBox.draggable({
-                handle: ".title"
+                handle: ".title",
+                grid: [10, 10],
+                stop: function (event, ui) {
+                    var $this, position, left, top;
+                    $this = $(this);
+                    position = $this.position()
+                    if (position.left <= 170) {
+                        $this.css("left", "10px")
+                    }
+                    if (position.top <= 0) {
+                        $this.css("top", "10px")
+                    }
+                }
             });
-
-//            divBoxAnchor.plumb({
-//                scope: "qbeDraging",
-//                target: "qbeBox_"+ modelName,
-//                endpoints: [
-//                    new jsPlumb.Endpoints.Dot({radius: 0}),
-//                    new jsPlumb.Endpoints.Dot({radius: 0})
-//                ],
-//                paintStyle: {
-//                    strokeStyle: '#fff',
-//                    lineWidth: 0
-//                }
-//            });
-//            $("canvas:last").css({"display": "none"});
         };
 
         qbe.Diagram.addRelated = function (obj) {
@@ -103,7 +102,25 @@ qbe.Diagram = {};
             }
             $(".qbeCheckModels").change();
             qbe.Core.updateRelations(appName, qbe.Models[appName][modelName]);
-        }
+        };
+
+        qbe.Diagram.saveBoxPositions = function () {
+            var positions, position, left, top, splits, appModel, modelName;
+            positions = [];
+            for(var i=0; i<qbe.CurrentModels.length; i++) {
+                appModel = qbe.CurrentModels[i];
+                splits = appModel.split(".");
+                modelName = splits[1];
+                position = $("#qbeBox_"+ modelName).position();
+                positions.push(modelName +"@"+ position.left +";"+ position.top);
+            }
+            $("#id_form_positions").val(positions.join("|"));
+        };
 
     });
+
+    $(window).resize(function () {
+        $("#qbeDiagramContainer").height($(window).height() - 210);
+    });
+
 })(jQuery.noConflict());

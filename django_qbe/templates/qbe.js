@@ -20,6 +20,7 @@ qbe.Containers = [];
         });
         $("#qbeDiagramTab").click(function() {
             selectTab("Diagram");
+            $(window).resize();
             return false;
         });
         $("#qbeDataTab").click(function() {
@@ -85,6 +86,8 @@ qbe.Containers = [];
             var checked = ($("input[type='checkbox']:checked").length != 0);
             if (!checked) {
                 alert("{% trans "Select at least one field to show" %}");
+            } else {
+                qbe.Diagram.saveBoxPositions();
             }
             return checked;
         });
@@ -232,12 +235,25 @@ qbe.Containers = [];
                 }
             }
             $("#id_form_limit").val(data["limit"][0]);
+            var positions, position_splits, splits, modelName;
+            positions = data["positions"][0].split("|");
+            for(var i=0; i<positions.length; i++) {
+                splits = positions[i].split("@");
+                modelName = splits[0];
+                position_splits = splits[1].split(":");
+                $("#qbeBox_"+ modelName).css({
+                    left: position_splits[0],
+                    top: position_splits[1]
+                });
+            }
+            $("#id_positions").val(data["positions"][0]);
         };
 
         function initialize() {
             if (qbe.Data) {
                 loadData(qbe.Data);
             }
+            $(window).resize();
         };
         initialize();
     });
