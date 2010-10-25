@@ -3,18 +3,13 @@ qbe.Diagram = {};
 (function($) {
     $(document).ready(function() {
         var divBoxAnchor = $("#qbeBoxAnchor");
-        jsPlumb.Defaults.DragOptions = { cursor: 'pointer', zIndex:2000 };
-//        // default to blue at one end and green at the other
-//        jsPlumb.Defaults.EndpointStyles = [{ fillStyle:'#225588' }, { fillStyle:'#558822' }];
-//        // blue endpoints 7 px; green endpoints 11.
-        jsPlumb.Defaults.Endpoints = [ new jsPlumb.Endpoints.Dot({radius:0}), new jsPlumb.Endpoints.Dot({radius:0})];
-        // default to a gradient stroke from blue to green.  for IE provide all green fallback.
-        jsPlumb.Defaults.PaintStyle = { strokeStyle:'#fff', lineWidth:0 };
+        jsPlumb.Defaults.Container = "qbeDiagramContainer";
 
         qbe.Diagram.addBox = function (appName, modelName) {
-            var model, root, divBox, divTitle, fieldName, field, divField;
+            var model, root, divBox, divTitle, fieldName, field, divField, divFields, divManies, primaries, countFields;
+            primaries = [];
             model = qbe.Models[appName][modelName];
-            root = $("#qbeDiagram");
+            root = $("#qbeDiagramContainer");
             divBox = $("<DIV>");
             divBox.attr("id", "qbeBox_"+ modelName);
             divBox.css({
@@ -26,27 +21,89 @@ qbe.Diagram = {};
             divTitle = $("<DIV>");
             divTitle.addClass("title");
             divTitle.html(modelName);
-            divBox.append(divTitle);
+            divFields = $("<DIV>");
+            countFields = 0;
             for(fieldName in model.fields) {
                 field = model.fields[fieldName];
                 divField = $("<DIV>");
                 divField.addClass("field");
-                if (field.primary) {
-                    divField.addClass("primary");
-                } else if (field.type == "ForeignKey") {
-                    divField.addClass("foreign");
-                }
                 divField.html(field.label);
-                divBox.append(divField);
+                divField.attr("id", "qbeBoxField_"+ appName +"."+ modelName +"."+ fieldName);
+                if (field.type == "ForeignKey") {
+                    divField.addClass("foreign");
+                    divField.click(qbe.Diagram.addRelated);
+                    divBox.prepend(divField);
+                } else if (field.type == "ManyToManyField") {
+                    divField.addClass("many");
+                    divField.click(qbe.Diagram.addRelated);
+                    if (!divManies) {
+                        divManies = $("<DIV>");
+                    }
+                    divManies.append(divField);
+                } else if (field.primary) {
+                    divField.addClass("primary");
+                    primaries.push(divField);
+                } else {
+                    divFields.append(divField);
+                    countFields++;
+                }
             }
+            if (countFields < 5 && countFields > 0) {
+                divFields.addClass("noOverflow");
+            } else if (countFields > 0) {
+                divFields.addClass("fieldsContainer");
+                divFields.mouseover(function() {
+                    $(this).removeClass("fieldsContainer");
+                });
+                divFields.mouseout(function() {
+                    $(this).addClass("fieldsContainer");
+                });
+            }
+            if (divManies) {
+                divBox.append(divManies);
+            }
+            divBox.append(divFields);
+            for(divField in primaries) {
+                divBox.prepend(primaries[divField]);
+            }
+            divBox.prepend(divTitle);
             root.append(divBox);
-            divBoxAnchor.plumb({target: "qbeBox_"+ modelName});
+            divBox.draggable({
+                handle: ".title"
+            });
+
+//            divBoxAnchor.plumb({
+//                scope: "qbeDraging",
+//                target: "qbeBox_"+ modelName,
+//                endpoints: [
+//                    new jsPlumb.Endpoints.Dot({radius: 0}),
+//                    new jsPlumb.Endpoints.Dot({radius: 0})
+//                ],
+//                paintStyle: {
+//                    strokeStyle: '#fff',
+//                    lineWidth: 0
+//                }
+//            });
+//            $("canvas:last").css({"display": "none"});
         };
 
-//        jsPlumb.connect({source:'window1', target:'window3', anchors:[jsPlumb.makeAnchor( 0.05, 1, 0, 1 ), jsPlumb.Anchors.TopCenter], connector:new jsPlumb.Connectors.Straight()});
-//        jsPlumb.connect({source:'window1', target:'window4', anchors:[jsPlumb.Anchors.BottomCenter, jsPlumb.Anchors.TopCenter]});
-//        jsPlumb.connect({source:'window1', target:'window6', anchors:[jsPlumb.makeAnchor( 0.95, 1, 0, 1 ), jsPlumb.Anchors.TopCenter]});
-//        jsPlumb.connect({source:'window1', target:'window5', anchors:[jsPlumb.makeAnchor( 0.275, 1, 0, 1 ), jsPlumb.Anchors.TopCenter]});
-//        jsPlumb.connect({source:'window1', target:'window2', anchors:[jsPlumb.makeAnchor( 0.725, 1, 0, 1 ), jsPlumb.Anchors.TopCenter]});
+        qbe.Diagram.addRelated = function (obj) {
+            var splits, appName, modelName, fieldName, field, target;
+            splits = this.id.split("qbeBoxField_")[1].split(".");
+            appName = splits[0];
+            modelName = splits[1];
+            fieldName = splits[2];
+            field = qbe.Models[appName][modelName].fields[fieldName];
+            target = field.target;
+            qbe.Core.addModule(target.name, target.model);
+            $("#qbeModel_"+ target.model).attr("checked", "checked");
+            if (target.through && (!qbe.Models[target.through.name][target.through.model].is_auto)) {
+                qbe.Core.addModule(target.through.name, target.through.model);
+                $("#qbeModel_"+ target.through.model).attr("checked", "checked");
+            }
+            $(".qbeCheckModels").change();
+            qbe.Core.updateRelations(appName, qbe.Models[appName][modelName]);
+        }
+
     });
 })(jQuery.noConflict());

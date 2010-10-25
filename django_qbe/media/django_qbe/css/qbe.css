@@ -7,7 +7,6 @@ div.qbeDiagram div.body {
     margin: 0px;
     background: white;
     color: black;
-/*    opacity: 0.8;*/
     border: 2px solid #417690;
     line-height: 20px;
     width: 170px;
@@ -15,6 +14,21 @@ div.qbeDiagram div.body {
     position: relative;
     float: left;
     position: relative;
+    box-shadow: 2px 2px 5px #aaa;
+   -o-box-shadow: 2px 2px 5px #aaa;
+   -webkit-box-shadow: 2px 2px 5px #aaa;
+   -moz-box-shadow: 2px 2px 5px #aaa;
+    opacity: 0.8; 
+    filter: alpha(opacity=80); 
+}
+
+div.qbeDiagram div.body:hover {
+    box-shadow: 2px 2px 5px #444;
+   -o-box-shadow: 2px 2px 5px #444;
+   -webkit-box-shadow: 2px 2px 5px #444;
+   -moz-box-shadow: 2px 2px 5px #444;
+    opacity: 0.95; 
+    filter: alpha(opacity=95);
 }
 
 div.qbeDiagram div.title {
@@ -31,6 +45,17 @@ div.qbeDiagram div.title {
    overflow: hidden;
 }
 
+div.qbeDiagram div.fieldsContainer {
+/*    border-top: 1px dashed #99999D;*/
+    height: 95px;
+    overflow: auto;
+}
+
+div.qbeDiagram div.noOverflow {
+/*    border-top: 1px dashed #99999D;*/
+    overflow: none;
+}
+
 div.qbeDiagram div.field {
     color: #99999D;
     height: 20px;
@@ -40,11 +65,31 @@ div.qbeDiagram div.field {
 
 div.qbeDiagram div.primary {
     font-weight: bold;
-    background: url("/media/django_qbe/img/key.gif") no-repeat center right;
+    background: url("/media/django_qbe/img/key.gif") no-repeat center right #eee;
 }
 
 div.qbeDiagram div.foreign {
     font-style: italic;
+    background: url("/media/django_qbe/img/right_arrow.gif") no-repeat scroll right center #FAFAFA;
+    cursor: pointer;
+}
+
+div.qbeDiagram div.many {
+    font-style: italic;
+    text-decoration: underline;
+    background: url("/media/django_qbe/img/right_arrow_red.gif") no-repeat scroll right center #FAFAFA;
+    cursor: pointer;
+}
+
+div.qbeDiagram #qbeDiagramContainer {
+/*    background-color: #EEE0FE;*/
+    border: 1px dashed #EEE0FE;
+    float: left;
+    height: 300px;
+    opacity: 0.9;
+    overflow: auto;
+    position: relative;
+    width: 100%;
 }
 
 div.qbeDiagram #qbeBoxAnchor {
@@ -63,32 +108,11 @@ div.qbeDiagram .resizehandle {
    cursor: se-resize;
 }
 
-WireIt-Container-closebutton {
-    display: none;
-}
-
-div.WireIt-Container-focused {
-   z-index: 15;
-   opacity: 1;
-}
 
  
 /**
  * Layers
  */
-div.WireIt-Layer {
-    /*
-    When we put a border to the layer, it messes getXY and create a small offset
-    in the wire connections
-    */
-    border: 0px none #fff;
-    overflow-x: auto;
-    overflow-y: auto;
-    margin: 0 0 0 0;
-    padding: 0px;
-    position: relative;
-    height: 400px;
-}
 
 div.qbeLeftMenu {
     position: absolute;

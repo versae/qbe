@@ -127,6 +127,7 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
             'relations': [],
             'collapse': ((app_model not in admin_models) or
                          (app_model not in app_models_with_no_includes)),
+            'is_auto': app_model not in app_models_with_no_includes,
         }
 
         for field in app_model._meta.fields:
