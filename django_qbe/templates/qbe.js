@@ -221,12 +221,11 @@ qbe.Containers = [];
                 $("#id_form-"+ i +"-field").change();
                 sorted = data["form-"+ i +"-sort"][0];
                 $("#id_form-"+ i +"-sort").val(sorted);
+                $("#id_form-"+ i +"-show").remove("checked");
                 if (data["form-"+ i +"-show"]) {
                     show = data["form-"+ i +"-show"][0];
                     if (show && show == "on") {
                         $("#id_form-"+ i +"-show").attr("checked", "checked");
-                    } else {
-                        $("#id_form-"+ i +"-show").remove("checked");
                     }
                 }
                 c = 0;
