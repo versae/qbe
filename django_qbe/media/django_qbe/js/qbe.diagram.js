@@ -73,6 +73,8 @@ qbe.Diagram = {};
                 handle: ".title",
                 grid: [10, 10],
                 stop: function (event, ui) {
+                    // Avoid drag boxes out of the container
+                    /*
                     var $this, position, left, top;
                     $this = $(this);
                     position = $this.position()
@@ -82,6 +84,7 @@ qbe.Diagram = {};
                     if (position.top <= 0) {
                         $this.css("top", "10px")
                     }
+                    */
                 }
             });
         };

@@ -221,11 +221,13 @@ qbe.Containers = [];
                 $("#id_form-"+ i +"-field").change();
                 sorted = data["form-"+ i +"-sort"][0];
                 $("#id_form-"+ i +"-sort").val(sorted);
-                show = data["form-"+ i +"-show"][0];
-                if (show && show == "on") {
-                    $("#id_form-"+ i +"-show").attr("checked", "checked");
-                } else {
-                    $("#id_form-"+ i +"-show").remove("checked");
+                if (data["form-"+ i +"-show"]) {
+                    show = data["form-"+ i +"-show"][0];
+                    if (show && show == "on") {
+                        $("#id_form-"+ i +"-show").attr("checked", "checked");
+                    } else {
+                        $("#id_form-"+ i +"-show").remove("checked");
+                    }
                 }
                 c = 0;
                 criteria = data["form-"+ i +"-criteria_"+ c];
@@ -239,11 +241,13 @@ qbe.Containers = [];
             positions = data["positions"][0].split("|");
             for(var i=0; i<positions.length; i++) {
                 splits = positions[i].split("@");
+                console.log(splits)
                 modelName = splits[0];
-                position_splits = splits[1].split(":");
+                position_splits = splits[1].split(";");
+                console.log($("#qbeBox_"+ modelName))
                 $("#qbeBox_"+ modelName).css({
-                    left: position_splits[0],
-                    top: position_splits[1]
+                    left: position_splits[0] +"px",
+                    top: position_splits[1] +"px"
                 });
             }
             $("#id_positions").val(data["positions"][0]);
