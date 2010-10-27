@@ -14,6 +14,8 @@ qbe.Data = null;
 qbe.Containers = [];
 (function($) {
     $(document).ready(function() {
+        var rows = "#qbeConditionsTable tbody tr";
+
         $("#qbeTabularTab").click(function() {
             selectTab("Tabular");
             return false;
@@ -45,20 +47,25 @@ qbe.Containers = [];
         $('#qbeForm tbody tr').formset({
           prefix: '{{ formset.prefix }}',
           addText: '{% trans "Add another" %}',
-          addCssClass: "addlink",
-          deleteText: '',
-          deleteCssClass: "deletelink",
+          addCssClass: "add-row",
+          deleteText: '{% trans "Remove" %}',
+          deleteCssClass: "inline-deletelink",
+          formCssClass: "dynamic-{{ formset.prefix }}",
+          emptyCssClass: "add-row",
+          removed: alternatingRows,
           added: updateRow
         });
-//        $('#qbeForm').submit(function() {
-//            var mustSubmit = ($(".submitIfChecked:checked").length > 0);
-//            if (!mustSubmit) {
-//                alert("{% trans "You must check any field to show." %}");
-//            }
-//            return mustSubmit;
-//        });
+        // Workaround in order to get the class "add-row" in the right row
+        $(rows +":last").addClass("add-row");
 
-        function updateRow() {
+        function alternatingRows() {
+            $(rows).not(".add-row").removeClass("row1 row2");
+            $(rows +":even").not(".add-row").addClass("row1");
+            $(rows +":odd").not(".add-row").addClass("row2");
+            $(rows +":last").addClass("add-row");
+        }
+
+        function updateRow(row) {
             var options = ['<option value="">----</option>'];
             for(i=0; i<qbe.CurrentModels.length; i++) {
                 var appModel = qbe.CurrentModels[i];
@@ -71,6 +78,7 @@ qbe.Containers = [];
                 $(this).html(options.join(""));
                 $(this).val(val);
             });
+            alternatingRows()
         }
 
         function updateModels() {

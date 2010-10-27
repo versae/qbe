@@ -236,7 +236,7 @@ qbe.Diagram = {};
     });
 
     $(window).resize(function () {
-        $("#qbeDiagramContainer").height($(window).height() - 210);
+        $("#qbeDiagramContainer").height($(window).height() - 130);
     });
 
 })(jQuery.noConflict());

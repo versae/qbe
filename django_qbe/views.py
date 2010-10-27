@@ -36,13 +36,15 @@ def qbe_form(request):
     apps = get_apps()
     models = qbe_models(admin_site=admin_site, only_admin_models=False)
     json_models = qbe_models(admin_site=admin_site, json=True)
+    admin_media_prefix = settings.ADMIN_MEDIA_PREFIX
     return render_to_response('qbe.html',
                               {'apps': apps,
                                'models': models,
                                'formset': formset,
                                'title': _(u"Query by Example"),
                                'json_models': json_models,
-                               'json_data': json_data},
+                               'json_data': json_data,
+                               'ADMIN_MEDIA_PREFIX': admin_media_prefix},
                               context_instance=RequestContext(request))
 
 
@@ -91,6 +93,7 @@ def qbe_results(request, query_hash):
                                       row_number=row_number)
         query = formset.get_raw_query()
         pickled = pickle_encode(data)
+        admin_media_prefix = settings.ADMIN_MEDIA_PREFIX
         return render_to_response('qbe_results.html',
                                   {'formset': formset,
                                    'title': _(u"Query by Example"),
@@ -105,7 +108,8 @@ def qbe_results(request, query_hash):
                                    'pickled': pickled,
                                    'query_hash': query_hash,
                                    'admin_urls': (admin_name != None),
-                                   'formats': formats},
+                                   'formats': formats,
+                                   'ADMIN_MEDIA_PREFIX': admin_media_prefix},
                                   context_instance=RequestContext(request))
 
 
