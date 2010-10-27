@@ -11,9 +11,8 @@ div.qbeDiagram div.body {
     line-height: 20px;
     width: 170px;
     z-index: 20;
-    position: relative;
     float: left;
-    position: relative;
+    position: absolute;
     box-shadow: 2px 2px 5px #aaa;
    -o-box-shadow: 2px 2px 5px #aaa;
    -webkit-box-shadow: 2px 2px 5px #aaa;
