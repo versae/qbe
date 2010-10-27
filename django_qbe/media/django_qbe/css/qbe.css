@@ -56,25 +56,25 @@ div.qbeDiagram div.noOverflow {
     overflow: none;
 }
 
-div.qbeDiagram div.field {
+option.field,div.qbeDiagram div.field {
     color: #99999D;
     height: 20px;
     font-size: 12px;
     padding: 2px 5px 2px 5px;
 }
 
-div.qbeDiagram div.primary {
+option.primary,div.qbeDiagram div.primary {
     font-weight: bold;
     background: url("/media/django_qbe/img/key.gif") no-repeat center right #eee;
 }
 
-div.qbeDiagram div.foreign {
+option.foreign,div.qbeDiagram div.foreign {
     font-style: italic;
     background: url("/media/django_qbe/img/right_arrow.gif") no-repeat scroll right center #FAFAFA;
     cursor: pointer;
 }
 
-div.qbeDiagram div.many {
+option.many,div.qbeDiagram div.many {
     font-style: italic;
     text-decoration: underline;
     background: url("/media/django_qbe/img/right_arrow_red.gif") no-repeat scroll right center #FAFAFA;

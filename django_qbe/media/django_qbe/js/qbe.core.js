@@ -57,71 +57,24 @@ qbe.Core = function() {};
             var sourceModelName, sourceFieldName, sourceId, sourceField, divSource;
             var targetModel, targetAppName, targetModelName, targetFieldName, targetId, targetField, divTarget;
             relations = sourceModel.relations;
-            jsPlumb.Defaults.DragOptions = { cursor: 'pointer', zIndex:2000 };
             for(i=0; i<=relations.length; i++) {
                 relation = relations[i];
                 if (relation) {
                     sourceModelName = sourceModel.name;
                     sourceFieldName = relation.source;
-                    label = null;
-                    labelStyle = null;
-                    paintStyle = {
-                        strokeStyle: '#96D25C',
-                        lineWidth: 2
-                    };
-                    backgroundPaintStyle = {
-                        lineWidth: 4,
-                        strokeStyle: '#70A249'
-                    };
-                    makeOverlay = function() {
-                        return [
-                            new jsPlumb.Overlays.PlainArrow({
-                                foldback: 0,
-                                fillStyle: '#96D25C',
-                                strokeStyle: '#70A249',
-                                location: 0.99,
-                                width: 10,
-                                length: 10})
-                        ];
-                    };
+                    label = qbe.Diagram.Defaults["foreign"].label;
+                    labelStyle = qbe.Diagram.Defaults["foreign"].labelStyle;
+                    paintStyle = qbe.Diagram.Defaults["foreign"].paintStyle;
+                    makeOverlays = qbe.Diagram.Defaults["foreign"].makeOverlays;
+                    backgroundPaintStyle = qbe.Diagram.Defaults["foreign"].backgroundPaintStyle;
                     if (relation.target.through) {
                         if (qbe.Models[relation.target.through.name][relation.target.through.model].is_auto) {
                             targetModel = relation.target;
                             label = relation.target.through.model;
-                            labelStyle = {
-                                fillStyle: "white",
-                                padding: 0.25,
-                                font: "12px sans-serif", 
-                                color: "#C55454",
-                                borderStyle: "#C55454", 
-                                borderWidth: 3
-                            };
-                            paintStyle = {
-                                strokeStyle: '#DB9292',
-                                lineWidth: 2
-                            };
-                            backgroundPaintStyle = {
-                                lineWidth: 4,
-                                strokeStyle: '#C55454'
-                            };
-                            makeOverlay = function() {
-                                return [
-                                    new jsPlumb.Overlays.PlainArrow({
-                                        foldback: 0,
-                                        fillStyle: '#DB9292',
-                                        strokeStyle: '#C55454',
-                                        location: 0.75,
-                                        width: 10,
-                                        length: 10}),
-                                    new jsPlumb.Overlays.PlainArrow({
-                                        foldback: 0,
-                                        fillStyle: '#DB9292',
-                                        strokeStyle: '#C55454',
-                                        location: 0.25,
-                                        width: 10,
-                                        length: 10})
-                                ];
-                            };
+                            labelStyle = qbe.Diagram.Defaults["many"].labelStyle;
+                            paintStyle = qbe.Diagram.Defaults["many"].paintStyle;
+                            makeOverlays = qbe.Diagram.Defaults["many"].makeOverlays;
+                            backgroundPaintStyle = qbe.Diagram.Defaults["many"].backgroundPaintStyle;
                         } else {
                             targetModel = relation.target.through;
                         }
@@ -141,34 +94,8 @@ qbe.Core = function() {};
                         divTarget = document.getElementById(targetId);
                         if (divSource && divTarget) {
                             sourceField = $("#qbeBoxField_"+ sourceAppName +"\\."+ sourceModelName +"\\."+ sourceFieldName);
-                            targetField = $("#qbeBoxField_"+ targetAppName +"\\."+ targetModelName +"\\."+ targetFieldName);
-                            mediumHeight = sourceField.css("height");
-                            mediumHeight = parseInt(mediumHeight.substr(0, mediumHeight.length - 2)) / 2;
-                            jsPlumb.Defaults.Container = "qbeDiagramContainer";
-                            jsPlumb.connect({
-                                scope: "qbeBox",
-                                label: label,
-                                labelStyle: labelStyle,
-                                source: sourceId,
-                                target: targetId,
-                                endpoints: [
-                                    new jsPlumb.Endpoints.Dot({radius: 0}),
-                                    new jsPlumb.Endpoints.Dot({radius: 0})
-                                ],
-                                paintStyle: paintStyle,
-                                backgroundPaintStyle: backgroundPaintStyle,
-                                overlays: makeOverlay(),
-                                anchors: [
-                                    jsPlumb.makeDynamicAnchor([
-                                        jsPlumb.makeAnchor(1, 0, 1, 0, 0, sourceField.position().top + mediumHeight + 4),
-                                        jsPlumb.makeAnchor(0, 0, -1, 0, 0, sourceField.position().top + mediumHeight + 4)
-                                    ]),
-                                    jsPlumb.makeDynamicAnchor([
-                                        jsPlumb.makeAnchor(0, 0, -1, 0, 0, targetField.position().top + mediumHeight + 4),
-                                        jsPlumb.makeAnchor(1, 0, 1, 0, 0, targetField.position().top + mediumHeight + 4)
-                                    ])
-                                ]
-                            });
+                            targetField = $("#qbeBoxField_"+ targetAppName +"\\."+ targetModelName +"\\."+ targetFieldName)
+                            qbe.Diagram.addRelation(sourceId, sourceField, targetId, targetField, label, labelStyle, paintStyle, backgroundPaintStyle, makeOverlays());
                         }
                     }
                 }

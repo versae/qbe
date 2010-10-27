@@ -153,8 +153,17 @@ qbe.Containers = [];
                     // We can't jump fields with no target 'cause they are
                     // ManyToManyField and ForeignKey fields!
                     // if (!fields[key].target) {
-                        var value = fields[key].label;
-                        options.push('<option value="'+ key +'">'+ value +'</option>');
+                        var style, value = fields[key].label;
+                        if (fields[key].type == "ForeignKey") {
+                            style = "foreign";
+                        } else if (fields[key].type == "ManyToManyField") {
+                            style = "many";
+                        } else if (fields[key].primary) {
+                            style = "primary";
+                        } else {
+                            style = "";
+                        }
+                        options.push('<option class="'+ style +'" value="'+ key +'">'+ value +'</option>');
                     // }
                 }
                 $("#"+ domTo).html(options.join(""));
@@ -236,17 +245,20 @@ qbe.Containers = [];
                 }
             }
             $("#id_form_limit").val(data["limit"][0]);
-            var positions, position_splits, splits, modelName;
+            var positions, positionSplits, splits, appModel, appName, modelName;
             positions = data["positions"][0].split("|");
             for(var i=0; i<positions.length; i++) {
                 splits = positions[i].split("@");
-                console.log(splits)
-                modelName = splits[0];
-                position_splits = splits[1].split(";");
-                console.log($("#qbeBox_"+ modelName))
+                appModel = splits[0].split(".");
+                appName = appModel[0];
+                modelName = appModel[1];
+                positionSplits = splits[1].split(";");
+                if (!(appModel in qbe.CurrentModels)) {
+                    qbe.Core.addModule(appName, modelName);
+                }
                 $("#qbeBox_"+ modelName).css({
-                    left: position_splits[0] +"px",
-                    top: position_splits[1] +"px"
+                    left: positionSplits[0],
+                    top: positionSplits[1]
                 });
             }
             $("#id_positions").val(data["positions"][0]);
