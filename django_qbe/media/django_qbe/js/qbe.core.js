@@ -44,7 +44,7 @@ qbe.Core = function() {};
             if (pos >= 0) {
                 qbe.CurrentModels.splice(pos, 1);
                 var model = qbe.Models[appName][modelName];
-                delete model.index;
+                qbe.Diagram.removeBox(appName, modelName)
             }
         };
 
@@ -87,7 +87,8 @@ qbe.Core = function() {};
                     sourceId = "qbeBox_"+ sourceModelName;
                     targetId = "qbeBox_"+ targetModelName;
                     hasConnection = jsPlumb.getConnections({scope: "qbeBox", source: sourceId, target: targetId});
-                    if (sourceModel && targetModel
+                    console.log(hasConnection["qbeBox"]);
+                    if (sourceModel && targetModel) {
                         && (!hasConnection["qbeBox"]
                             || (hasConnection["qbeBox"] && hasConnection["qbeBox"].length == 0))) {
                         divSource = document.getElementById(sourceId);

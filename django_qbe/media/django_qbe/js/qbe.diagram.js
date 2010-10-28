@@ -146,13 +146,15 @@ qbe.Diagram = {};
                     $this = $(this);
                     position = $this.position()
                     left = position.left;
-                    if (position.left <= 170) {
+                    if (position.left < 0) {
                         left = "0px";
                     }
-                    if (position.top <= 0) {
+                    if (position.top < 0) {
                         top = "0px";
                     }
-                    $this.animate({left: left, top: top});
+                    $this.animate({left: left, top: top}, "slow", function() {
+                        jsPlumb.repaint(["qbeBox_"+ modelName]);
+                    });
                 }
             });
         };
@@ -218,6 +220,11 @@ qbe.Diagram = {};
             qbe.Core.updateRelations(appName, qbe.Models[appName][modelName]);
         };
 
+        qbe.Diagram.removeBox = function (appName, modelName) {
+            jsPlumb.detachEverything("qbeBox_"+ modelName);
+            $("#qbeBox_"+ modelName).remove();
+        };
+
         qbe.Diagram.saveBoxPositions = function () {
             var positions, left, top, splits, appModel, modelName;
             positions = [];
@@ -229,7 +236,6 @@ qbe.Diagram = {};
                 top = $("#qbeBox_"+ modelName).css("top");
                 positions.push(appModel +"@"+ left +";"+ top);
             }
-            alert(positions.join("|"))
             $("#id_form_positions").val(positions.join("|"));
         };
 
@@ -237,6 +243,10 @@ qbe.Diagram = {};
 
     $(window).resize(function () {
         $("#qbeDiagramContainer").height($(window).height() - 130);
+    });
+
+    $(window).unload(function () {
+        jsPlumb.unload();
     });
 
 })(jQuery.noConflict());
