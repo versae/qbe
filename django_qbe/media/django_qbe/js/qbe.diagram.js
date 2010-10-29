@@ -67,7 +67,7 @@ qbe.Diagram = {};
             }
         }
 
-        jsPlumb.Defaults.DragOptions = { cursor: 'pointer', zIndex:2000 };
+        jsPlumb.Defaults.DragOptions = {cursor: 'pointer', zIndex:2000};
         jsPlumb.Defaults.Container = "qbeDiagramContainer";
 
         /**
@@ -121,12 +121,15 @@ qbe.Diagram = {};
             } else if (countFields > 0) {
                 divFields.addClass("fieldsContainer");
                 /*
+                // Uncomment to change the size of the div containing the regular
+                // fields no mouse over/out
                 divFields.mouseover(function() {
                     $(this).removeClass("fieldsContainer");
                 });
                 divFields.mouseout(function() {
                     $(this).addClass("fieldsContainer");
                 });
+                jsPlumb.repaint(["qbeBox_"+ modelName]);
                 */
             }
             if (divManies) {
@@ -152,13 +155,12 @@ qbe.Diagram = {};
                     if (position.top < 0) {
                         top = "0px";
                     }
-                    $this.animate({left: left, top: top}, "slow", function() {
+                    $this.animate({left: left, top: top}, "fast", function() {
                         jsPlumb.repaint(["qbeBox_"+ modelName]);
                     });
                 }
             });
         };
-
 
         /**
          * Create a relation between a element with id sourceId and targetId
@@ -230,11 +232,44 @@ qbe.Diagram = {};
                     && qbe.CurrentRelations.indexOf(sourceField.attr("id") +"~"+ targetField.attr("id")) >= 0);
         };
 
+        /**
+         * Remove the box and all connections related to it
+         */
         qbe.Diagram.removeBox = function (appName, modelName) {
-            jsPlumb.detachEverything("qbeBox_"+ modelName);
             $("#qbeBox_"+ modelName).remove();
         };
 
+        /**
+         * Remove all connetions for the box identified by appName and modelName
+         */
+        qbe.Diagram.removeRelations = function (appName, modelName) {
+            var currentRelations, relation, relationsSplits, relationsLength, sourceSplits, sourceId, targetSplits, targetId;
+            currentRelations = [];
+            relationsLength = qbe.CurrentRelations.length;
+            for(var i=0; i<relationsLength; i++) {
+                relation = qbe.CurrentRelations[i];
+                if (relation.indexOf(appName +"."+ modelName) < 0) {
+                    currentRelations.push(relation);
+                } else {
+                    relationsSplit = relation.split("~");
+                    source = relationsSplit[0];
+                    sourceSplits = source.split("qbeBoxField_")[1].split(".");
+                    sourceId = "qbeBox_"+ sourceSplits[1];
+                    target = relationsSplit[1];
+                    targetSplits = target.split("qbeBoxField_")[1].split(".");
+                    targetId = "qbeBox_"+ targetSplits[1];
+                    jsPlumb.detach(sourceId, targetId);
+                }
+            }
+            qbe.CurrentRelations = currentRelations;
+            jsPlumb.clearCache();
+        };
+
+
+        /**
+         * Save the positions of the all the boxes in a serialized way into a
+         * input type hidden
+         */
         qbe.Diagram.saveBoxPositions = function () {
             var positions, left, top, splits, appModel, modelName;
             positions = [];

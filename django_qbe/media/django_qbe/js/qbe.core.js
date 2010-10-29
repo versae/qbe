@@ -25,7 +25,6 @@ qbe.Core = function() {};
          */
         qbe.Core.addModule = function (appName, modelName) {
             var model = qbe.Models[appName][modelName];
-            var inouts = qbe.Core.getInOuts(model);
             var appModel = appName +"."+ modelName;
             if (qbe.CurrentModels.indexOf(appModel) < 0) {
                 qbe.Diagram.addBox(appName, modelName);
@@ -46,6 +45,7 @@ qbe.Core = function() {};
                 qbe.CurrentModels.splice(pos, 1);
                 var model = qbe.Models[appName][modelName];
                 qbe.Diagram.removeBox(appName, modelName)
+                qbe.Diagram.removeRelations(appName, modelName);
             }
         };
 
@@ -99,25 +99,6 @@ qbe.Core = function() {};
                     }
                 }
             }
-        }
-
-        /**
-         * Return in & outs according to relations among models
-         */
-        qbe.Core.getInOuts = function(model) {
-            var inputs = [];
-            var outputs = [];
-            var fields = model.fields || {};
-            for(key in fields) {
-                if (fields[key].target) {
-                    outputs.push(fields[key].label);
-                    fields[key].index = outputs.length;
-                } else {
-                    inputs.push(fields[key].label);
-                    fields[key].index = inputs.length;
-                }
-            }
-            return [inputs, outputs];
         }
 
     });
