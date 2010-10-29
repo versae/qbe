@@ -2,6 +2,7 @@ if (!window.qbe) {
     var qbe = {};
 }
 qbe.CurrentModels = [];
+qbe.CurrentRelations = [];
 qbe.Core = function() {};
 
 (function($) {
@@ -53,7 +54,7 @@ qbe.Core = function() {};
          */
         qbe.Core.updateRelations = function (sourceAppName, sourceModel) {
             var label, labelStyle, paintStyle, backgroundPaintStyle, makeOverlay;
-            var relations, relation, mediumHeight, hasConnection;
+            var relations, relation, mediumHeight, connections;
             var sourceModelName, sourceFieldName, sourceId, sourceField, divSource;
             var targetModel, targetAppName, targetModelName, targetFieldName, targetId, targetField, divTarget;
             relations = sourceModel.relations;
@@ -84,18 +85,15 @@ qbe.Core = function() {};
                     targetAppName = targetModel.name;
                     targetModelName = targetModel.model;
                     targetFieldName = targetModel.field;
-                    sourceId = "qbeBox_"+ sourceModelName;
-                    targetId = "qbeBox_"+ targetModelName;
-                    hasConnection = jsPlumb.getConnections({scope: "qbeBox", source: sourceId, target: targetId});
-                    console.log(hasConnection["qbeBox"]);
-                    if (sourceModel && targetModel) {
-                        && (!hasConnection["qbeBox"]
-                            || (hasConnection["qbeBox"] && hasConnection["qbeBox"].length == 0))) {
+                    sourceField = $("#qbeBoxField_"+ sourceAppName +"\\."+ sourceModelName +"\\."+ sourceFieldName);
+                    targetField = $("#qbeBoxField_"+ targetAppName +"\\."+ targetModelName +"\\."+ targetFieldName);
+                    if (sourceModel && targetModel
+                        && !qbe.Diagram.hasConnection(sourceField, targetField)) {
+                        sourceId = "qbeBox_"+ sourceModelName;
+                        targetId = "qbeBox_"+ targetModelName;
                         divSource = document.getElementById(sourceId);
                         divTarget = document.getElementById(targetId);
                         if (divSource && divTarget) {
-                            sourceField = $("#qbeBoxField_"+ sourceAppName +"\\."+ sourceModelName +"\\."+ sourceFieldName);
-                            targetField = $("#qbeBoxField_"+ targetAppName +"\\."+ targetModelName +"\\."+ targetFieldName)
                             qbe.Diagram.addRelation(sourceId, sourceField, targetId, targetField, label, labelStyle, paintStyle, backgroundPaintStyle, makeOverlays());
                         }
                     }

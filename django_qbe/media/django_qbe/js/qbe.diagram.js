@@ -200,6 +200,7 @@ qbe.Diagram = {};
                     ])
                 ]
             });
+            qbe.CurrentRelations.push(sourceField.attr("id") +"~"+ targetField.attr("id"));
         }
 
         qbe.Diagram.addRelated = function (obj) {
@@ -218,6 +219,15 @@ qbe.Diagram = {};
             }
             $(".qbeCheckModels").change();
             qbe.Core.updateRelations(appName, qbe.Models[appName][modelName]);
+        };
+
+        /**
+         * Returns a boolean value according to the relation between sourceId
+         * and targetId does exist or not
+         */
+        qbe.Diagram.hasConnection = function (sourceField, targetField) {
+            return (sourceField && targetField
+                    && qbe.CurrentRelations.indexOf(sourceField.attr("id") +"~"+ targetField.attr("id")) >= 0);
         };
 
         qbe.Diagram.removeBox = function (appName, modelName) {
