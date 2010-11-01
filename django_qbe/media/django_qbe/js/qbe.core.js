@@ -24,14 +24,21 @@ qbe.Core = function() {};
          * Adds a qbe.Core to the layer
          */
         qbe.Core.addModule = function (appName, modelName) {
-            var model = qbe.Models[appName][modelName];
-            var appModel = appName +"."+ modelName;
+            var appModel, model, target1, target2;
+            $("#qbeModel_"+ modelName).attr("checked", "checked");
+            model = qbe.Models[appName][modelName];
+            appModel = appName +"."+ modelName;
             if (qbe.CurrentModels.indexOf(appModel) < 0) {
-                qbe.Diagram.addBox(appName, modelName);
                 qbe.CurrentModels.push(appModel);
-                if (model.relations.length > 0) {
-                    qbe.Core.updateRelations(appName, model);
+                if (model.is_auto) {
+                    target1 = model.relations[0].target;
+                    target2 = model.relations[1].target;
+                    qbe.Core.addModule(target1.name, target1.model);
+                    qbe.Core.addModule(target2.name, target2.model);
+                } else {
+                    qbe.Diagram.addBox(appName, modelName);
                 }
+                qbe.Core.updateRelations();
             }
         };
 
@@ -52,16 +59,20 @@ qbe.Core = function() {};
         /*
          * Update relations among models
          */
-        qbe.Core.updateRelations = function (sourceAppName, sourceModel) {
+        qbe.Core.updateRelations = function () {
             var label, labelStyle, paintStyle, backgroundPaintStyle, makeOverlay;
             var relations, relation, mediumHeight, connections;
-            var sourceModelName, sourceFieldName, sourceId, sourceField, divSource;
+            var sourceAppModel, sourceModelName, sourceAppName, sourceModel, sourceFieldName, sourceId, sourceField, sourceSplits, divSource;
             var targetModel, targetAppName, targetModelName, targetFieldName, targetId, targetField, divTarget;
-            relations = sourceModel.relations;
-            for(i=0; i<=relations.length; i++) {
-                relation = relations[i];
-                if (relation) {
-                    sourceModelName = sourceModel.name;
+            for(var i=0; i<qbe.CurrentModels.length; i++) {
+                sourceAppModel = qbe.CurrentModels[i];
+                sourceSplits = sourceAppModel.split(".");
+                sourceAppName = sourceSplits[0];
+                sourceModelName = sourceSplits[1];
+                sourceModel = qbe.Models[sourceAppName][sourceModelName];
+                relations = sourceModel.relations;
+                for(var j=0; j<relations.length; j++) {
+                    relation = relations[j];
                     sourceFieldName = relation.source;
                     label = qbe.Diagram.Defaults["foreign"].label;
                     labelStyle = qbe.Diagram.Defaults["foreign"].labelStyle;

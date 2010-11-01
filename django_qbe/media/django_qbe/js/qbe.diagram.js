@@ -205,6 +205,9 @@ qbe.Diagram = {};
             qbe.CurrentRelations.push(sourceField.attr("id") +"~"+ targetField.attr("id"));
         }
 
+        /**
+         * Add related many to many models through clicking in the field name
+         */
         qbe.Diagram.addRelated = function (obj) {
             var splits, appName, modelName, fieldName, field, target;
             splits = this.id.split("qbeBoxField_")[1].split(".");
@@ -220,7 +223,6 @@ qbe.Diagram = {};
                 $("#qbeModel_"+ target.through.model).attr("checked", "checked");
             }
             $(".qbeCheckModels").change();
-            qbe.Core.updateRelations(appName, qbe.Models[appName][modelName]);
         };
 
         /**
@@ -265,7 +267,6 @@ qbe.Diagram = {};
             jsPlumb.clearCache();
         };
 
-
         /**
          * Save the positions of the all the boxes in a serialized way into a
          * input type hidden
@@ -286,10 +287,17 @@ qbe.Diagram = {};
 
     });
 
+    /**
+     * Resize the diagram container height according to the resize event over
+     * the window
+     */
     $(window).resize(function () {
         $("#qbeDiagramContainer").height($(window).height() - 130);
     });
 
+    /**
+     * Unload jsPlumb
+     */
     $(window).unload(function () {
         jsPlumb.unload();
     });

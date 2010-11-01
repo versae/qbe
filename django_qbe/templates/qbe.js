@@ -228,7 +228,6 @@ qbe.Containers = [];
                     app = splits[0];
                     model = splits[1];
                     qbe.Core.addModule(app, model);
-                    $("#qbeModel_"+ model).attr("checked", "checked");
                 }
                 updateModels();
                 $("#id_form-"+ i +"-model").val(appModel);
