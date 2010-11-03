@@ -26,22 +26,12 @@ qbe.Containers = [];
             qbe.Diagram.repaintAll();
             return false;
         });
-        $("#qbeDataTab").click(function() {
-            selectTab("Data");
-            return false;
-        });
-        $("#qbeQueryTab").click(function() {
-            selectTab("Query");
-            return false;
-        });
         $("#qbeModelsTab").click(function() {
             $("#qbeConnectorList").toggle();
         });
         function selectTab(tab) {
             $("#qbeTabular").hide();
             $("#qbeDiagram").hide();
-            $("#qbeData").hide();
-            $("#qbeQuery").hide();
             $("#qbe"+ tab).show();
         }
 
@@ -53,40 +43,13 @@ qbe.Containers = [];
           deleteCssClass: "inline-deletelink",
           formCssClass: "dynamic-{{ formset.prefix }}",
           emptyCssClass: "add-row",
-          removed: alternatingRows,
-          added: updateRow
+          removed: qbe.Core.alternatingRows,
+          added: qbe.Core.updateRow
         });
         // Workaround in order to get the class "add-row" in the right row
         $(rows +":last").addClass("add-row");
 
-        function alternatingRows() {
-            $(rows).not(".add-row").removeClass("row1 row2");
-            $(rows +":even").not(".add-row").addClass("row1");
-            $(rows +":odd").not(".add-row").addClass("row2");
-            $(rows +":last").addClass("add-row");
-        }
-
-        function updateRow(row) {
-            var options = ['<option value="">----</option>'];
-            for(i=0; i<qbe.CurrentModels.length; i++) {
-                var appModel = qbe.CurrentModels[i];
-                var key = appModel;
-                var value = appModel.replace(".", ": ");
-                options.push('<option value="'+ key +'">'+ value +'</option>');
-            }
-            $(".qbeFillModels").each(function() {
-                var val = $(this).val();
-                $(this).html(options.join(""));
-                $(this).val(val);
-            });
-            alternatingRows()
-        }
-
-        function updateModels() {
-            $(this).each(updateRow);
-        }
-
-        $(".qbeCheckModels").change(updateModels);
+        $(".qbeCheckModels").change(qbe.Core.updateModels);
         $(".qbeCheckModels").each(function() {
             $(this).attr("checked", false);
         });
@@ -132,172 +95,16 @@ qbe.Containers = [];
             select.html(options.join(""));
             select.show();
             select.change(function() {
-                addRelationsFrom(select.val());
+                qbe.Core.addRelationsFrom(select.val());
             });
-        }
-
-        function addRelationsFrom(through) {
-            var appModels = through.split("-");
-            for(var i=0; i<appModels.length; i++) {
-                var appModel = appModels[i];
-                var splits = appModel.split(".");
-                qbe.Core.addModule(splits[0], splits[1]);
-                $("#qbeForm .add-row").click();
-                $(".qbeFillModels:last").val(splits[0] +"."+ splits[1]);
-                $(".qbeFillModels:last").change();
-                $(".qbeFillFields:last").val(splits[2]);
-                $(".qbeFillFields:last").change();
-            }
-        }
-
-        $(".qbeFillModels").live("change", function() {
-            var appModel = $(this).val();
-            if (appModel) {
-                var fields = eval("qbe.Models."+ appModel).fields;
-                var splits = $(this).attr("id").split("-");
-                var prefix = splits.splice(0, splits.length-1).join("-");
-                var css = $(this).attr("class");
-                var cssSplit = css.split("to:")
-                var domTo = prefix +"-"+ cssSplit[cssSplit.length-1];
-                var option, optFields, optPrimaries, optForeigns, optManies;
-                optFields = [];
-                optPrimaries = [];
-                optForeigns = [];
-                optManies = [];
-                for(key in fields) {
-                    // We can't jump fields with no target 'cause they are
-                    // ManyToManyField and ForeignKey fields!
-                    var style, value = fields[key].label;
-                    if (fields[key].type == "ForeignKey") {
-                        style = "foreign";
-                        option = '<option class="'+ style +'" value="'+ key +'">'+ value +'</option>'
-                        optForeigns.push(option);
-                    } else if (fields[key].type == "ManyToManyField") {
-                        style = "many";
-                        option = '<option class="'+ style +'" value="'+ key +'">'+ value +'</option>'
-                        optManies.push(option);
-                    } else if (fields[key].primary) {
-                        style = "primary";
-                        option = '<option class="'+ style +'" value="'+ key +'">'+ value +'</option>'
-                        optPrimaries.push(option);
-                    } else {
-                        style = "";
-                        option = '<option class="'+ style +'" value="'+ key +'">'+ value +'</option>'
-                        optFields.push(option);
-                    }
-                }
-                $("#"+ domTo).html('<option value="">*</option>' + optPrimaries.join("") + optForeigns.join("") + optManies.join("") + optFields.join(""));
-                // We need to raise change event
-                $("#"+ domTo).change();
-            }
-        });
-
-        $(".qbeFillFields").live("change", function() {
-            var field = $(this).val();
-            var splits = $(this).attr("id").split("-");
-            var prefix = splits.splice(0, splits.length-1).join("-");
-            var css = $(this).attr("class");
-            var cssSplit = css.split("enable:")
-            var inputs = cssSplit[cssSplit.length-1].split(",");
-            for(i=0; i<inputs.length; i++) {
-                var input = inputs[i];
-                var domTo = prefix +"-"+ input;
-                if (field) {
-                    $("#"+ domTo).removeAttr("disabled");
-                } else {
-                    $("#"+ domTo).attr("disabled", "disabled");
-                    $("#"+ domTo).val("");
-                }
-                if ($("#"+ domTo).is("input")) {
-                    var appModel = $("#"+ prefix +"-model").val();
-                    var fields = eval("qbe.Models."+ appModel).fields;
-                    var primary = eval("qbe.Models."+ appModel).primary;
-                    if (field in fields && fields[field].target) {
-                        var target, targetRel, targetModel, targetStrings, targetString, relations
-                        target = fields[field].target;
-                        if (target.through) {
-                            $(this).parent().parent().children("td:last").children("a").click();
-                            targetModel = qbe.Models[target.through.name][target.through.model];
-                            targetsString = [];
-                            relations = targetModel.relations;
-                            for(var r=0; r<targetModel.relations.length; r++) {
-                                targetRel = targetModel.relations[r];
-                                targetString = target.through.name +"."+ target.through.model +"."+ targetRel.source;
-                                targetsString.push(targetString);
-                            }
-                            addRelationsFrom(targetsString.join("-"));
-                        } else {
-                            targetString = target.name +"."+ target.model +"."+ target.field;
-                            $("#"+ domTo).val(targetString);
-                            $("#"+ domTo).prev().val("join");
-                            addRelationsFrom(targetString);
-                        }
-                    } else {
-                        $("#"+ domTo).val("");
-                    }
-                }
-            }
-        });
-
-        function loadData(data) {
-            var initialForms, maxForms, totalForms;
-            initialForms = parseInt(data["form-INITIAL_FORMS"][0]);
-            maxForms = parseInt(data["form-MAX_NUM_FORMS"][0]);
-            totalForms = parseInt(data["form-TOTAL_FORMS"][0]);
-            for(var i=initialForms; i<totalForms; i++) {
-                var appModel, splits, show, model, field, sorted;
-                appModel = data["form-"+ i +"-model"][0];
-                if (!(appModel in qbe.CurrentModels)) {
-                    splits = appModel.split(".");
-                    app = splits[0];
-                    model = splits[1];
-                    qbe.Core.addModule(app, model);
-                }
-                updateModels();
-                $("#id_form-"+ i +"-model").val(appModel);
-                $("#id_form-"+ i +"-model").change();
-                field = data["form-"+ i +"-field"][0];
-                $("#id_form-"+ i +"-field").val(field);
-                $("#id_form-"+ i +"-field").change();
-                sorted = data["form-"+ i +"-sort"][0];
-                $("#id_form-"+ i +"-sort").val(sorted);
-                $("#id_form-"+ i +"-show").remove("checked");
-                if (data["form-"+ i +"-show"]) {
-                    show = data["form-"+ i +"-show"][0];
-                    if (show && show == "on") {
-                        $("#id_form-"+ i +"-show").attr("checked", "checked");
-                    }
-                }
-                c = 0;
-                criteria = data["form-"+ i +"-criteria_"+ c];
-                while(criteria) {
-                    $("#id_form-"+ i +"-criteria_"+ c).val(criteria[0]);
-                    criteria = data["form-"+ i +"-criteria_"+ ++c];
-                }
-            }
-            $("#id_form_limit").val(data["limit"][0]);
-            var positions, positionSplits, splits, appModel, appName, modelName;
-            positions = data["positions"][0].split("|");
-            for(var i=0; i<positions.length; i++) {
-                splits = positions[i].split("@");
-                appModel = splits[0].split(".");
-                appName = appModel[0];
-                modelName = appModel[1];
-                positionSplits = splits[1].split(";");
-                if (!(appModel in qbe.CurrentModels)) {
-                    qbe.Core.addModule(appName, modelName);
-                }
-                $("#qbeBox_"+ modelName).css({
-                    left: positionSplits[0],
-                    top: positionSplits[1]
-                });
-            }
-            $("#id_positions").val(data["positions"][0]);
         };
+
+        $(".qbeFillModels").live("change", qbe.Core.fillModelsEvent);
+        $(".qbeFillFields").live("change", qbe.Core.fillFieldsEvent);
 
         function initialize() {
             if (qbe.Data) {
-                loadData(qbe.Data);
+                qbe.Core.loadData(qbe.Data);
             }
             $(window).resize();
         };
