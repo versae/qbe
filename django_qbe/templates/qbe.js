@@ -137,13 +137,15 @@ qbe.Containers = [];
 
         function addRelationsFrom(through) {
             var appModels = through.split("-");
-            for(i=0; i<appModels.length; i++) {
+            for(var i=0; i<appModels.length; i++) {
                 var appModel = appModels[i];
                 var splits = appModel.split(".");
                 qbe.Core.addModule(splits[0], splits[1]);
-                $("#qbeForm .addlink").click();
-                $(".qbeFillModels:last").val(appModel);
+                $("#qbeForm .add-row").click();
+                $(".qbeFillModels:last").val(splits[0] +"."+ splits[1]);
                 $(".qbeFillModels:last").change();
+                $(".qbeFillFields:last").val(splits[2]);
+                $(".qbeFillFields:last").change();
             }
         }
 
@@ -160,19 +162,17 @@ qbe.Containers = [];
                 for(key in fields) {
                     // We can't jump fields with no target 'cause they are
                     // ManyToManyField and ForeignKey fields!
-                    // if (!fields[key].target) {
-                        var style, value = fields[key].label;
-                        if (fields[key].type == "ForeignKey") {
-                            style = "foreign";
-                        } else if (fields[key].type == "ManyToManyField") {
-                            style = "many";
-                        } else if (fields[key].primary) {
-                            style = "primary";
-                        } else {
-                            style = "";
-                        }
-                        options.push('<option class="'+ style +'" value="'+ key +'">'+ value +'</option>');
-                    // }
+                    var style, value = fields[key].label;
+                    if (fields[key].type == "ForeignKey") {
+                        style = "foreign";
+                    } else if (fields[key].type == "ManyToManyField") {
+                        style = "many";
+                    } else if (fields[key].primary) {
+                        style = "primary";
+                    } else {
+                        style = "";
+                    }
+                    options.push('<option class="'+ style +'" value="'+ key +'">'+ value +'</option>');
                 }
                 $("#"+ domTo).html(options.join(""));
                 // We need to raise change event
@@ -199,14 +199,26 @@ qbe.Containers = [];
                 if ($("#"+ domTo).is("input")) {
                     var appModel = $("#"+ prefix +"-model").val();
                     var fields = eval("qbe.Models."+ appModel).fields;
+                    var primary = eval("qbe.Models."+ appModel).primary;
                     if (field in fields && fields[field].target) {
-                        var target = fields[field].target;
+                        var target, targetRel, targetModel, targetStrings, targetString, relations
+                        target = fields[field].target;
                         if (target.through) {
-                            addRelationsFrom(target.through);
-                            // TODO: Make autofill for ManyToManyFields over its self.
+                            $(this).parent().parent().children("td:last").children("a").click();
+                            targetModel = qbe.Models[target.through.name][target.through.model];
+                            targetsString = [];
+                            relations = targetModel.relations;
+                            for(var r=0; r<targetModel.relations.length; r++) {
+                                targetRel = targetModel.relations[r];
+                                targetString = target.through.name +"."+ target.through.model +"."+ targetRel.source;
+                                targetsString.push(targetString);
+                            }
+                            addRelationsFrom(targetsString.join("-"));
                         } else {
-                            $("#"+ domTo).val(target['name'] +"."+ target['model'] +"."+ target['field']);
-                            $("#"+ domTo).prev().val("join")
+                            targetString = target.name +"."+ target.model +"."+ target.field;
+                            $("#"+ domTo).val(targetString);
+                            $("#"+ domTo).prev().val("join");
+                            addRelationsFrom(targetString);
                         }
                     } else {
                         $("#"+ domTo).val("");
