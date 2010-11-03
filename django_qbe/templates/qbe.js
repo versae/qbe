@@ -159,23 +159,34 @@ qbe.Containers = [];
                 var css = $(this).attr("class");
                 var cssSplit = css.split("to:")
                 var domTo = prefix +"-"+ cssSplit[cssSplit.length-1];
-                var options = ['<option value="">*</option>'];
+                var option, optFields, optPrimaries, optForeigns, optManies;
+                optFields = [];
+                optPrimaries = [];
+                optForeigns = [];
+                optManies = [];
                 for(key in fields) {
                     // We can't jump fields with no target 'cause they are
                     // ManyToManyField and ForeignKey fields!
                     var style, value = fields[key].label;
                     if (fields[key].type == "ForeignKey") {
                         style = "foreign";
+                        option = '<option class="'+ style +'" value="'+ key +'">'+ value +'</option>'
+                        optForeigns.push(option);
                     } else if (fields[key].type == "ManyToManyField") {
                         style = "many";
+                        option = '<option class="'+ style +'" value="'+ key +'">'+ value +'</option>'
+                        optManies.push(option);
                     } else if (fields[key].primary) {
                         style = "primary";
+                        option = '<option class="'+ style +'" value="'+ key +'">'+ value +'</option>'
+                        optPrimaries.push(option);
                     } else {
                         style = "";
+                        option = '<option class="'+ style +'" value="'+ key +'">'+ value +'</option>'
+                        optFields.push(option);
                     }
-                    options.push('<option class="'+ style +'" value="'+ key +'">'+ value +'</option>');
                 }
-                $("#"+ domTo).html(options.join(""));
+                $("#"+ domTo).html('<option value="">*</option>' + optPrimaries.join("") + optForeigns.join("") + optManies.join("") + optFields.join(""));
                 // We need to raise change event
                 $("#"+ domTo).change();
             }
