@@ -142,7 +142,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         return selects, froms, wheres, sorts, params
 
     def get_raw_query(self, limit=None, offset=None, count=False,
-                      add_extra_ids=False):
+                      add_extra_ids=False, add_params=False):
         if self._raw_query:
             return self._raw_query
         if self._sorts:
@@ -179,7 +179,10 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                  order_by,
                  limits,
                  offsets)
-        return sql
+        if add_params:
+            return u"%s # %s" % (sql, ", ".join(self._params))
+        else:
+            return sql
 
     def get_results(self, limit=None, offset=None, query=None, admin_name=None,
                     row_number=False):

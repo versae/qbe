@@ -91,7 +91,7 @@ def qbe_results(request, query_hash):
         results = formset.get_results(limit=limit, offset=offset,
                                       admin_name=admin_name,
                                       row_number=row_number)
-        query = formset.get_raw_query()
+        query = formset.get_raw_query(add_params=True)
         pickled = pickle_encode(data)
         admin_media_prefix = settings.ADMIN_MEDIA_PREFIX
         return render_to_response('qbe_results.html',
