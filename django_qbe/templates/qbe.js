@@ -23,6 +23,7 @@ qbe.Containers = [];
         $("#qbeDiagramTab").click(function() {
             selectTab("Diagram");
             $(window).resize();
+            qbe.Diagram.repaintAll();
             return false;
         });
         $("#qbeDataTab").click(function() {

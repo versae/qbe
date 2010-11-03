@@ -81,7 +81,7 @@ qbe.Diagram = {};
             divBox = $("<DIV>");
             divBox.attr("id", "qbeBox_"+ modelName);
             divBox.css({
-                "left": (parseInt(Math.random() * 15 + 1) * 10) + "px",
+                "left": (parseInt(Math.random() * 55 + 1) * 10) + "px",
                 "top": (parseInt(Math.random() * 25 + 1) * 10) + "px"
             });
             divBox.attr();
@@ -285,7 +285,21 @@ qbe.Diagram = {};
             $("#id_form_positions").val(positions.join("|"));
         };
 
+        /**
+         *
+         */
+        qbe.Diagram.repaintAll = function () {
+            var appModel, splits;
+            for(var i=0; i<qbe.CurrentModels.length; i++) {
+                appModel = qbe.CurrentModels[i];
+                splits = appModel.split(".");
+                qbe.Diagram.removeRelations(splits[0], splits[1]);
+            }
+            qbe.Core.updateRelations();
+        };
+
     });
+
 
     /**
      * Resize the diagram container height according to the resize event over
