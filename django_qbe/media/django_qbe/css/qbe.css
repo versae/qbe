@@ -182,5 +182,6 @@ input.qbeCheckModels {
     position: relative;
     width: 14%;
     float: right;
+    overflow: auto;
     margin-top: 10px;
 }
