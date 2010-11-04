@@ -306,7 +306,10 @@ qbe.Diagram = {};
      * the window
      */
     $(window).resize(function () {
-        $("#qbeDiagramContainer").height($(window).height() - 130);
+        var height;
+        height = $(window).height() - 140;
+        $("#qbeDiagramContainer").height(height);
+        $(".qbeModelList").height(height);
     });
 
     /**

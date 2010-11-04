@@ -27,7 +27,13 @@ qbe.Containers = [];
             return false;
         });
         $("#qbeModelsTab").click(function() {
-            $("#qbeConnectorList").toggle();
+            // #qbeConnectorList,
+            $("#changelist-filter").toggle();
+            if ($(".qbeContainer").css("width") == "85%") {
+                $(".qbeContainer").css("width", "100%");
+            } else {
+                $(".qbeContainer").css("width", "85%");
+            }
         });
         function selectTab(tab) {
             $("#qbeTabular").hide();
