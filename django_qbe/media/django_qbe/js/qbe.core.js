@@ -74,6 +74,26 @@ qbe.Core = function() {};
         };
 
         /**
+         * Toggle visibility of models
+         */
+        qbe.Core.toggleModel = function () {
+            var id, appName, modelName, idSplits, splits, $this;
+            $this = $(this);
+            idSplits = $this.attr("id").split("qbeModelAnchor_");
+            splits = idSplits[1].split(".");
+            appName = splits[0];
+            modelName = splits[1];
+            $("#qbeModelItem_"+ modelName).toggleClass("selected");
+            if ($("#qbeModelItem_"+ modelName).hasClass("selected")) {
+                qbe.Core.addModule(appName, modelName);
+            } else {
+                qbe.Core.removeModule(appName, modelName);
+            }
+            qbe.Core.updateModels();
+            return false;
+        }
+
+        /**
          * Invokes the update of the each row
          */
         qbe.Core.updateModels = function() {
@@ -129,7 +149,7 @@ qbe.Core = function() {};
         };
 
         /**
-         * Event triggered qhen the SELECT tag for fill models is changed
+         * Event triggered when the SELECT tag for fill models is changed
          */
         qbe.Core.fillModelsEvent = function() {
             var appModel, key, fields, splits, appModelSplits, prefix, css, cssSplit, domTo, option, optFields, optPrimaries, optForeigns, optManies, style, value;
@@ -175,7 +195,7 @@ qbe.Core = function() {};
         };
 
         /**
-         *
+         * Event triggered when the SELECT tag for fill fields is changed
          */
         qbe.Core.fillFieldsEvent = function() {
             var field, splits, prefix, css, cssSplit, inputs, input, domTo, appModel, appModelSplits, fields, primary, target, targetRel, targetModel, targetStrings, targetString, relations;
@@ -225,24 +245,10 @@ qbe.Core = function() {};
         };
 
         /**
-         * Toggle visibility of models
-         */
-        qbe.Core.toggleModule = function (appName, modelName) {
-            var model = qbe.Models[appName][modelName];
-            var checked = document.getElementById('qbeModel_'+ modelName).checked;
-            if (checked) {
-                qbe.Core.addModule(appName, modelName);
-            } else {
-                qbe.Core.removeModule(appName, modelName);
-            }
-        };
-
-        /**
          * Adds a qbe.Core to the layer
          */
         qbe.Core.addModule = function (appName, modelName) {
             var appModel, model, target1, target2;
-            $("#qbeModel_"+ modelName).attr("checked", "checked");
             model = qbe.Models[appName][modelName];
             appModel = appName +"."+ modelName;
             if (qbe.CurrentModels.indexOf(appModel) < 0) {

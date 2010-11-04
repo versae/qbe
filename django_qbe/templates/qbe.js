@@ -55,10 +55,7 @@ qbe.Containers = [];
         // Workaround in order to get the class "add-row" in the right row
         $(rows +":last").addClass("add-row");
 
-        $(".qbeCheckModels").change(qbe.Core.updateModels);
-        $(".qbeCheckModels").each(function() {
-            $(this).attr("checked", false);
-        });
+        $("a.qbeModelAnchor").click(qbe.Core.toggleModel);
 
         $(".submit-row input[type='submit']").click(function() {
             var checked = ($("input[type='checkbox']:checked").length != 0);

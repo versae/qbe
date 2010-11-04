@@ -123,26 +123,6 @@ div.qbeLeftMenu {
     position: absolute;
 }
 
-div.qbeConnectorList {
-    position: absolute;
-    overflow-x: auto;
-    overflow-y: auto;
-    top: 95px;
-    right: 15px;
-    -webkit-border-top-left-radius: 5px;
-    -webkit-border-top-right-radius: 5px;
-    -webkit-border-bottom-left-radius: 5px;
-    -webkit-border-bottom-right-radius: 5px;
-    -moz-border-radius-topleft: 5px;
-    -moz-border-radius-topright: 5px;
-    -moz-border-radius-bottomleft: 5px;
-    -moz-border-radius-bottomright: 5px;
-    background-color: #fff;
-    border: 1px solid #999999;
-    display: none;
-    padding: 5px;
-}
-
 code#qbeSQL {
     font-size: 15px;
     font-weight: bold;
@@ -173,7 +153,7 @@ code#qbeSQL {
 }
 
 input.qbeCheckModels {
-    display: none;
+/*    display: none;*/
     float: right;
 }
 

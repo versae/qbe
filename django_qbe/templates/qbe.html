@@ -77,14 +77,6 @@
     </div>
 
 </div>
-<div class="qbeConnectorList" id="qbeConnectorList">
-{% for app_name, app_models in models.items %}
-    <h3>{{ app_name }}</h3>
-    {% for model_name, model in app_models.items %}
-    <div><input type="checkbox" class="qbeCheckModels" value="false" id="qbeModel_{{ model_name }}" name="qbeModel_{{ model_name }}" onchange="qbe.Core.toggleModule('{{ app_name }}', '{{ model_name }}');"><label for="qbeModel_{{ model_name }}">{{ model_name }}</label></div>
-    {% endfor %}
-{% endfor %}
-</div>
 
 <div id="changelist-filter" class="qbeModelList module">
     <h2>{% trans "Models" %}</h2>
@@ -92,7 +84,7 @@
         <h3>{{ app_name }}</h3>
         <ul>
         {% for model_name, model in app_models.items %}
-        <li><input type="checkbox" class="qbeCheckModels" value="false" id="qbeModel_{{ model_name }}" name="qbeModel_{{ model_name }}" onchange="qbe.Core.toggleModule('{{ app_name }}', '{{ model_name }}');"><a href="qbeModel_{{ model_name }}">{{ model_name }}</a></li>
+        <li id="qbeModelItem_{{ model_name }}"><a id="qbeModelAnchor_{{ app_name }}.{{ model_name }}" href="javascript:void(0);" class="qbeModelAnchor">{{ model_name }}</a></li>
         {% endfor %}
         </ul>
     {% endfor %}
