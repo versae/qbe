@@ -241,10 +241,10 @@ qbe.Diagram = {};
             field = qbe.Models[appName][modelName].fields[fieldName];
             target = field.target;
             qbe.Core.addModule(target.name, target.model);
-            $("#qbeModel_"+ target.model).attr("checked", "checked");
+            $("#qbeModelAnchor_"+ target.name +"\\\."+ target.model).click();
             if (target.through && (!qbe.Models[target.through.name][target.through.model].is_auto)) {
                 qbe.Core.addModule(target.through.name, target.through.model);
-                $("#qbeModel_"+ target.through.model).attr("checked", "checked");
+                $("#qbeModelAnchor_"+ target.through.name +"\\\."+ target.through.model).click();
             }
             $(".qbeCheckModels").change();
         };
