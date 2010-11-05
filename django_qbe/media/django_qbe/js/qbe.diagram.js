@@ -74,7 +74,7 @@ qbe.Diagram = {};
          * Adds a new model box with its fields
          */
         qbe.Diagram.addBox = function (appName, modelName) {
-            var model, root, divBox, divTitle, fieldName, field, divField, divFields, divManies, primaries, countFields;
+            var model, root, divBox, divTitle, fieldName, field, divField, divFields, divManies, primaries, countFields, anchorDelete;
             primaries = [];
             model = qbe.Models[appName][modelName];
             root = $("#qbeDiagramContainer");
@@ -89,6 +89,14 @@ qbe.Diagram = {};
             divTitle = $("<DIV>");
             divTitle.addClass("title");
             qbe.Diagram.setLabel(divTitle, modelName, false);
+            anchorDelete = $("<A>");
+            anchorDelete.html("x");
+            anchorDelete.attr("href", "javascript:void(0);");
+            anchorDelete.addClass("inline-deletelink");
+            anchorDelete.click(function () {
+                $("#qbeModelAnchor_"+ appName +"\\\."+ modelName).click();
+            });
+            divTitle.append(anchorDelete);
             divFields = $("<DIV>");
             countFields = 0;
             for(fieldName in model.fields) {
