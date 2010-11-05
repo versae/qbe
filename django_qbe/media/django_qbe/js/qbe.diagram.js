@@ -88,14 +88,14 @@ qbe.Diagram = {};
             divBox.addClass("body");
             divTitle = $("<DIV>");
             divTitle.addClass("title");
-            divTitle.html(modelName);
+            qbe.Diagram.setLabel(divTitle, modelName, false);
             divFields = $("<DIV>");
             countFields = 0;
             for(fieldName in model.fields) {
                 field = model.fields[fieldName];
                 divField = $("<DIV>");
                 divField.addClass("field");
-                divField.html(field.label);
+                qbe.Diagram.setLabel(divField, field.label, field.primary);
                 divField.attr("id", "qbeBoxField_"+ appName +"."+ modelName +"."+ fieldName);
                 if (field.type == "ForeignKey") {
                     divField.addClass("foreign");
@@ -160,6 +160,22 @@ qbe.Diagram = {};
                     });
                 }
             });
+        };
+
+        /**
+         * Set the label fo the fields getting shorter and adding ellipsis
+         */
+        qbe.Diagram.setLabel = function (div, label, primary) {
+            div.html(label);
+            if (label.length > 18) {
+                if (primary) {
+                    div.html(label.substr(0, 18) +"…");
+                } else if (label.length > 21) {
+                    div.html(label.substr(0, 21) +"…");
+                }
+                div.attr("title", label);
+                div.attr("alt", label);
+            }
         };
 
         /**

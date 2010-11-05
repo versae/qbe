@@ -64,6 +64,7 @@ option.field,div.qbeDiagram div.field {
     height: 20px;
     font-size: 12px;
     padding: 2px 5px 2px 5px;
+    overflow: hidden;
 }
 
 option.primary,div.qbeDiagram div.primary {
