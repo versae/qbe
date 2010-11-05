@@ -31,6 +31,8 @@
     .footer { text-align:center; padding-top:30px; font-style: italic; }
 	</style>
 	
+	<link href="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js"></script>
 </head>
 
 <body>
@@ -45,7 +47,7 @@
         <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
     </div>
 
-    <h1><a href="http://github.com/versae/qbe">django-qbe</a>
+    <h1><a href="http://github.com/versae/qbe">django-qbe</a><br/>
       <span class="small">by <a href="http://github.com/versae">versae</a></span></h1>
 
     <div class="description">
@@ -59,46 +61,47 @@ Based on QBE proposal from IBM®, django-qbe is intended to remove the limitatio
 <p>All in box.</p>
 <h2>Install</h2>
 <p>There's no setup.py script, neither easy_install yet, but I hope yes in the
-near future. By the moment, you must download the *django_qbe* directory using
-git::
+near future. By the moment, you must download the <em>django_qbe</em> directory using
+git:</p>
+<pre class="prettyprint">$ git clone git://github.com/versae/qbe.git
+$ cp -r qbe/django_qbe /path/to/your/project
+</pre>
+<p>Adding to the project settings:</p>
+<pre class="prettyprint">INSTALLED_APPS = (
+    # [...] django builtins applications
+    'django_qbe',
+    # [...] Any other application
+)
+</pre>
+<p>And adding the urlconf in your project urls.py:</p>
+<pre class="prettyprint"># qbe
+url(r'^qbe/', include('django_qbe.urls')),
+</pre>
 
-  $ git clone git://github.com/versae/qbe.git
-  $ cp -r qbe/django_qbe /path/to/your/project
-
-Adding to the project settings::
-
-  INSTALLED_APPS = (
-      # [...] django builtins applications
-      'django_qbe',
-      # [...] Any other application
-  )
-
-And adding the urlconf in your project urls.py::
-
-    # qbe
-    url(r'^qbe/', include('django_qbe.urls')),
-
-You must not forgive link or copy the *django_qbe/media/django_qbe*
-directory in your project media directory::
-
-  $ ln -s django_qbe/media/django_qbe /path/to/your/project/media/
-
-That's all. Then you can access to http://host:port/qbe
+<p>You must not forgive link or copy the <em>django_qbe/media/django_qbe</em>
+directory in your project media directory:</p>
+<pre class="prettyprint">$ ln -s django_qbe/media/django_qbe /path/to/your/project/media/
+</pre>
+<p>That's all. Then you can access to <a href="http://host:port/qbe">http://host:port/qbe</a>
 However, you can add a link from your admin page changing the admin index
-template fo your AdminSite::
+template fo your AdminSite:</p>
+<pre class="prettyprint">class AdminSite(admin.AdminSite):
+    index_template = "qbe_index.html"
+</pre>
+<p>Or adding in your custom admin index template the next javascript:</p>
+<pre class="prettyprint">&lt;script type="text/javascript" src="{% url qbe_js %}"&gt;&lt;/script&gt;</pre>
 
-  class AdminSite(admin.AdminSite):
-      index_template = "qbe_index.html"
 
-Or adding in your custom admin index template the next javascript::
 
-  <script type="text/javascript" src="{% url qbe_js %}"></script></p>
 <h2>License</h2>
 <p>AGPL</p>
 <h2>Authors</h2>
-<p>Javier de la Rosa (versae@gmail.com)<br/><br/>      </p>
+<p>Javier de la Rosa (versae@gmail.com)
+<br/>
+<br/>      </p>
 <h2>Contact</h2>
-<p>Javier de la Rosa (versae@gmail.com)<br/>      </p>
+<p>Javier de la Rosa (versae@gmail.com)
+<br/>      </p>
 
 
     <h2>Download</h2>
@@ -109,7 +112,7 @@ Or adding in your custom admin index template the next javascript::
     </p>
     <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
       by running:
-      <pre>$ git clone git://github.com/versae/qbe</pre>
+      <pre class="prettyprint">$ git clone git://github.com/versae/qbe</pre>
     </p>
 
     <div class="footer">
