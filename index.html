@@ -1,37 +1,37 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-	<title>versae/qbe @ GitHub</title>
-	
-	<style type="text/css">
-		body {
-  		margin-top: 1.0em;
-  		background-color: #53a09a;
-		  font-family: "Helvetica,Arial,FreeSans";
-  		color: #000000;
+    <title>versae: django-qbe @ GitHub</title>
+    
+    <style type="text/css">
+        body {
+          margin-top: 1.0em;
+        background-color:#D5D5D5;
+        color:#333333;
+        font-family: "Georgia,Helvetica,Arial,FreeSans";
     }
     #container {
       margin: 0 auto;
       width: 700px;
     }
-		h1 { font-size: 3.8em; color: #ac5f65; margin-bottom: 3px; }
-		h1 .small { font-size: 0.4em; }
-		h1 a { text-decoration: none }
-		h2 { font-size: 1.5em; color: #ac5f65; }
-    h3 { text-align: center; color: #ac5f65; }
-    a { color: #ac5f65; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
+        h1 { font-size: 3.8em; color: ##6633CC; margin-bottom: 3px; font-style: italic; text-shadow:2px 2px 2px #555555;}
+        h1 .small { font-size: 0.4em; color:#6633CC; text-shadow: 1px 1px 1px #555555;}
+        h1 a { text-decoration: none }
+        h2 { font-size: 1.5em; color: #663366; }
+    h3 { text-align: center; color: #663366; }
+    a { color: #6633CC; }
+    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic; font-weight:bold;}
     .download { float: right; }
-		pre { background: #000; color: #fff; padding: 15px;}
+        pre { background: #000; color: #fff; padding: 15px;}
     hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
     .footer { text-align:center; padding-top:30px; font-style: italic; }
-	</style>
-	
-	<link href="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.css" type="text/css" rel="stylesheet" />
+    </style>
+    
+    <link href="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.css" type="text/css" rel="stylesheet" />
 <script type="text/javascript" src="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js"></script>
 </head>
 
@@ -55,10 +55,10 @@
     </div>
 
     <p>Admin tool in order to get custom reports.
-The objective of django-qbe is provide a assited and interactive way of making complex queries with no technical knowledge (or minimal) to get custom reports from the objects of Django models.
+The objective of <em>django_qbe</em> is provide a assited and interactive way of making complex queries with no technical knowledge (or minimal) to get custom reports from the objects of Django models.
 
-Based on QBE proposal from IBM®, django-qbe is intended to remove the limitations of Django QuerySets objects and to use the whole expresive power of the subjacent SQL.</p><h2>Dependencies</h2>
-<p>All in box.</p>
+Based on <a href="http://www.google.com/url?sa=t&source=web&ct=res&cd=2&ved=0CB4QFjAB&url=http%3A%2F%2Fpages.cs.wisc.edu%2F~dbbook%2FopenAccess%2FthirdEdition%2Fqbe.pdf&ei=_UD5S5WSBYP5-Qb-18i8CA&usg=AFQjCNHMv-Pua285zhWT8DevuZFj2gfYKA&sig2=-sTEDWjJhnTaixh2iJfsAw">QBE proposal from IBM®</a>, django-qbe is intended to remove the limitations of Django QuerySets objects and to use the whole expresive power of the subjacent SQL.</p><h2>Dependencies</h2>
+<p>Hopefully all in box.</p>
 <h2>Install</h2>
 <p>There's no setup.py script, neither easy_install yet, but I hope yes in the
 near future. By the moment, you must download the <em>django_qbe</em> directory using
@@ -93,15 +93,7 @@ template fo your AdminSite:</p>
 
 
 
-<h2>License</h2>
-<p>AGPL</p>
-<h2>Authors</h2>
-<p>Javier de la Rosa (versae@gmail.com)
-<br/>
-<br/>      </p>
-<h2>Contact</h2>
-<p>Javier de la Rosa (versae@gmail.com)
-<br/>      </p>
+
 
 
     <h2>Download</h2>
@@ -115,12 +107,43 @@ template fo your AdminSite:</p>
       <pre class="prettyprint">$ git clone git://github.com/versae/qbe</pre>
     </p>
 
+<h2>Settings</h2>
+<p>The next lines show de available settings and its default values.</p>
+<p>Enable autocompletion tool (work in progress, not enabled yet):</p>
+<pre>QBE_AUTOCOMPLETE = True
+</pre>
+<p>Enable an Exhibit faceted navigation for results (not yet implemented):</p>
+<pre>QBE_EXHIBIT = False
+</pre>
+<p>Admin module name to add admin urls in results:</p>
+
+<pre>QBE_ADMIN = "admin"
+</pre>
+<p>Function to control to users with access to QBE:</p>
+<pre>QBE_ACCESS_FOR = lambda user: user.is_staff
+</pre>
+<p>Path to QBE formats export file, in order to add custom export formats:</p>
+<pre>QBE_FORMATS_EXPORT = "qbe_formats"
+</pre>
+
+<h2>License</h2>
+<p><a href="http://www.gnu.org">GNU</a> <a href="http://www.gnu.org/licenses/agpl.html">Affero General Public License</a>
+<img style="float: right;" alt="" src="http://www.gnu.org/graphics/agplv3-155x51.png">
+</p>
+<h2>Authors</h2>
+<p>Javier de la Rosa (<a href="http://twitter.com/versae">@versae</a>)<br/>
+With the funding of <a href="http://cultureplex.ca/">Cultureplex</a>, the Cultural Complexity Lab @ <a href="http://uwo.ca">UWO</a>.
+</p>
+<br/>
+
+
     <div class="footer">
       get the source code on GitHub : <a href="http://github.com/versae/qbe">versae/qbe</a>
     </div>
 
   </div>
 
-  
+
+
 </body>
 </html>
