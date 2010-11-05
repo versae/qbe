@@ -57,7 +57,7 @@ Settings
 
 The next lines show de available settings and its default values.
 
-Enable autocompletion tool::
+Enable autocompletion tool (work in progress, not enabled yet)::
 
   QBE_AUTOCOMPLETE = True
 
