@@ -18,12 +18,12 @@ qbe.Core = function() {};
         qbe.Core.loadData = function(data) {
             var initialForms, maxForms, totalForms;
             _loadingData = true;
-            initialForms = parseInt(data["form-INITIAL_FORMS"][0]);
-            maxForms = parseInt(data["form-MAX_NUM_FORMS"][0]);
-            totalForms = parseInt(data["form-TOTAL_FORMS"][0]);
+            initialForms = parseInt(data["form-INITIAL_FORMS"]);
+            maxForms = parseInt(data["form-MAX_NUM_FORMS"]);
+            totalForms = parseInt(data["form-TOTAL_FORMS"]);
             for(var i=initialForms; i<totalForms; i++) {
                 var appModel, splits, show, model, field, sorted;
-                appModel = data["form-"+ i +"-model"][0];
+                appModel = data["form-"+ i +"-model"];
                 if (!(appModel in qbe.CurrentModels)) {
                     splits = appModel.split(".");
                     app = splits[0];
@@ -33,14 +33,14 @@ qbe.Core = function() {};
                 qbe.Core.updateModels();
                 $("#id_form-"+ i +"-model").val(appModel);
                 $("#id_form-"+ i +"-model").change();
-                field = data["form-"+ i +"-field"][0];
+                field = data["form-"+ i +"-field"];
                 $("#id_form-"+ i +"-field").val(field);
                 $("#id_form-"+ i +"-field").change();
-                sorted = data["form-"+ i +"-sort"][0];
+                sorted = data["form-"+ i +"-sort"];
                 $("#id_form-"+ i +"-sort").val(sorted);
                 $("#id_form-"+ i +"-show").remove("checked");
                 if (data["form-"+ i +"-show"]) {
-                    show = data["form-"+ i +"-show"][0];
+                    show = data["form-"+ i +"-show"];
                     if (show && show == "on") {
                         $("#id_form-"+ i +"-show").attr("checked", "checked");
                     }
@@ -48,13 +48,13 @@ qbe.Core = function() {};
                 c = 0;
                 criteria = data["form-"+ i +"-criteria_"+ c];
                 while(criteria) {
-                    $("#id_form-"+ i +"-criteria_"+ c).val(criteria[0]);
+                    $("#id_form-"+ i +"-criteria_"+ c).val(criteria);
                     criteria = data["form-"+ i +"-criteria_"+ ++c];
                 }
             }
-            $("#id_form_limit").val(data["limit"][0]);
+            $("#id_form_limit").val(data["limit"]);
             var positions, positionSplits, splits, appModel, appName, modelName;
-            positions = data["positions"][0].split("|");
+            positions = data["positions"].split("|");
             for(var i=0; i<positions.length; i++) {
                 splits = positions[i].split("@");
                 appModel = splits[0].split(".");
@@ -62,6 +62,7 @@ qbe.Core = function() {};
                 modelName = appModel[1];
                 positionSplits = splits[1].split(";");
                 if (!(appModel in qbe.CurrentModels)) {
+                    $("#qbeModelItem_"+ modelName).toggleClass("selected");
                     qbe.Core.addModule(appName, modelName);
                 }
                 $("#qbeBox_"+ modelName).css({
@@ -69,7 +70,7 @@ qbe.Core = function() {};
                     top: positionSplits[1]
                 });
             }
-            $("#id_positions").val(data["positions"][0]);
+            $("#id_positions").val(data["positions"]);
             _loadingData = false;
         };
 
