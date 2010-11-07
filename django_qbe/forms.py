@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django import forms
 from django.db import connection
+from django.db.models.fields import Field
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.forms.formsets import BaseFormSet, formset_factory
@@ -135,7 +136,8 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                 elif operator in OPERATORS:
                     # db_operator = OPERATORS[operator] % over
                     db_operator = OPERATORS[operator]
-                    params.append(over)
+                    lookup = self._get_lookup(operator, over)
+                    params.append(lookup)
                     wheres.append(u"%s %s" % (db_field, db_operator))
             if model not in froms and model in TABLE_NAMES:
                 froms.append(model)
@@ -180,7 +182,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                  limits,
                  offsets)
         if add_params:
-            return u"%s # %s" % (sql, ", ".join(self._params))
+            return u"%s /* %s */" % (sql, ", ".join(self._params))
         else:
             return sql
 
@@ -198,7 +200,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         if settings.DEBUG:
             print sql
         cursor = connection.cursor()
-        cursor.execute(sql, self._params)
+        cursor.execute(sql, tuple(self._params))
         query_results = cursor.fetchall()
         if admin_name:
             selects = self._get_selects_with_extra_ids()
@@ -260,6 +262,17 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                                         label_splits[2].capitalize())
                 labels.append(label)
         return labels
+
+    def _get_lookup(self, operator, over):
+        lookup = Field().get_db_prep_lookup(operator, over,
+                                            connection=connection,
+                                            prepared=True)
+        string_related_operators = ('exact', 'contains', 'regex', 'startswith', 
+                                    'endswith', 'iexact', 'endswith', 'iregex',
+                                    'istartswith','icontains')
+        if isinstance(lookup, (tuple, list)):
+            return lookup[0]
+        return lookup
 
     def _get_selects_with_extra_ids(self):
         selects = []
