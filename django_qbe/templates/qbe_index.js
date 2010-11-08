@@ -1,3 +1,4 @@
+{% if user_passes_test %}
 window.onload = function() {
 //    var divUserTools = document.getElementById("user-tools");
 //    var aQBE = document.createElement("a");
@@ -24,3 +25,4 @@ window.onload = function() {
     divQBE.setAttribute("class", "module");
     divContentRelated.appendChild(divQBE);
 }
+{% endif %}

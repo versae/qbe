@@ -141,12 +141,14 @@ def qbe_export(request, format=None):
     return HttpResponseRedirect(reverse("qbe_form"))
 
 
-@user_passes_test(qbe_access_for)
+# @user_passes_test(qbe_access_for)
 def qbe_js(request):
+    user_passed_test = request.user and qbe_access_for(request.user)
     return render_to_response('qbe_index.js',
                               {'qbe_url': reverse("qbe_form"),
                                'reports_label': _(u"Reports"),
-                               'qbe_label': _(u"Query by Example")},
+                               'qbe_label': _(u"Query by Example"),
+                               'user_passes_test': user_passed_test},
                               context_instance=RequestContext(request))
 
 
