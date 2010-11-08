@@ -56,7 +56,7 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
             'name': field.name,
             'type': type(field).__name__,
             'blank': field.blank,
-            'label': u"%s" % field.verbose_name.capitalize(),
+            'label': u"%s" % field.verbose_name.lower().capitalize(),
             'primary': field.primary_key,
         }}
 
@@ -64,7 +64,7 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
         # Deprecated
         through_fields = []
         for through_field in field.rel.through._meta.fields:
-            label = through_field.verbose_name.capitalize()
+            label = through_field.verbose_name.lower().capitalize()
             through_fields_dic = {
                 'name': through_field.name,
                 'type': type(through_field).__name__,
@@ -74,7 +74,7 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
             if hasattr(through_field.rel, "to"):
                 through_rel = through_field.rel
                 through_mod = through_rel.to.__module__.split(".")[-2]
-                through_name = through_mod.capitalize()
+                through_name = through_mod.lower().capitalize()
                 through_target = {
                     'name': through_name,
                     'model': through_rel.to.__name__,
@@ -87,16 +87,17 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
         return through_fields
 
     def get_target(field):
+        name = field.rel.to.__module__.split(".")[-2].lower().capitalize()
         target = {
-            'name': field.rel.to.__module__.split(".")[-2].capitalize(),
+            'name': name,
             'model': field.rel.to.__name__,
             'field': field.rel.to._meta.pk.name,
         }
         if hasattr(field.rel, 'through'):
-            name = field.rel.through.__module__.split(".")[-2].capitalize()
+            name = field.rel.through.__module__.split(".")[-2]
             target.update({
                 'through': {
-                    'name': name,
+                    'name': name.lower().capitalize(),
                     'model': field.rel.through.__name__,
                     'field': field.rel.through._meta.pk.name,
                 }
@@ -152,7 +153,7 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
                                 # [arrowhead=normal arrowtail=normal]'
                     model = add_relation(model, field, extras=extras)
 
-        app_title = app_model._meta.app_label.title()
+        app_title = app_model._meta.app_label.title().lower().capitalize()
         if app_title not in graphs:
             graphs[app_title] = {}
         graphs[app_title].update({app_model.__name__: model})

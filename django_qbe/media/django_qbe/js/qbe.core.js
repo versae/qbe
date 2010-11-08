@@ -322,7 +322,7 @@ qbe.Core = function() {};
                     targetFieldName = targetModel.field;
                     sourceField = $("#qbeBoxField_"+ sourceAppName +"\\."+ sourceModelName +"\\."+ sourceFieldName);
                     targetField = $("#qbeBoxField_"+ targetAppName +"\\."+ targetModelName +"\\."+ targetFieldName);
-                    if (sourceModel && targetModel
+                    if (sourceField.length && targetField.length
                         && !qbe.Diagram.hasConnection(sourceField, targetField)) {
                         sourceId = "qbeBox_"+ sourceModelName;
                         targetId = "qbeBox_"+ targetModelName;
