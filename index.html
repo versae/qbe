@@ -60,16 +60,23 @@ The objective of <em>django-qbe</em> is provide a assited and interactive way of
 Based on <a href="http://www.google.com/url?sa=t&source=web&ct=res&cd=2&ved=0CB4QFjAB&url=http%3A%2F%2Fpages.cs.wisc.edu%2F~dbbook%2FopenAccess%2FthirdEdition%2Fqbe.pdf&ei=_UD5S5WSBYP5-Qb-18i8CA&usg=AFQjCNHMv-Pua285zhWT8DevuZFj2gfYKA&sig2=-sTEDWjJhnTaixh2iJfsAw">QBE proposal from IBM®</a>, <em>django-qbe</em> is intended to remove the limitations of Django QuerySets objects and to use the whole expresive power of the subjacent SQL.</p>
 <h2>Features</h2>
 <ul>
-    <li>View and autodiscover relations among the models in a visual way (<pre class="prettyprint">ForeignKey</pre> fields are green and <pre class="prettyprint">ManyToMany</pre> ones are red).</li>
-    <li>Tabular creation of queries with fields to show, criterias, lookups and order (only <pre class="prettyprint">AND</pre> conditions by now).</li>
-    <li>Auto adition of right fields when <pre class="prettyprint">ForeignKey</pre> or <pre class="prettyprint">ManyToMany</pre> fields are selected.</li>
-    <li>No models in the project, so you can add <em>django-qbe</em> whenever you want with no <pre class="prettyprint">syncdb<pre>.</li>
+    <li>View and autodiscover relations among the models in a visual way (<code>ForeignKey</code> fields are green and <code>ManyToMany</code> ones are red).</li>
+    <li>Tabular creation of queries with fields to show, criterias, lookups and order (only <code>AND</code> conditions by now).</li>
+    <li>Auto adition of right fields when <code>ForeignKey</code> or <code>ManyToMany</code> fields are selected.</li>
+    <li>No models in the project, so you can add <em>django-qbe</em> whenever you want with no <code>syncdb</code>.</li>
     <li>Pagination of results.</li>
     <li>Bookmarklet to save and share the queries.</li>
-    <li>Export queries to .csv, .odt and .xls, but it's extensible by the user.</li>
+    <li>Export results to .csv, .odt and .xls, but it's extensible by the user.</li>
+    <li>Access restricted to users through a customizable function.</li>
+    <li>Links to admin views (if available) in the results objects.</li>
 </ul>
 <h2>Screenshots</h2>
-<p>Coming soon.</p>
+<em>Tabular creation of queries.</em>
+<a href="img/qbe.tabular.1.jpg"><img src="img/qbe.tabular.1.t.jpg" /></a>
+<em>Diagram of models and relations.</em>
+<a href="img/qbe.diagram.1.jpg"><img src="img/qbe.diagram.1.t.jpg" /></a>
+<em>Paginated results view.</em>
+<a href="img/qbe.results.1.jpg"><img src="img/qbe.results.1.t.jpg" /></a>
 <h2>Dependencies</h2>
 <p>Hopefully all in box.</p>
 <h2>Install</h2>
@@ -103,12 +110,6 @@ template fo your AdminSite:</p>
 </pre>
 <p>Or adding in your custom admin index template the next javascript:</p>
 <pre class="prettyprint">&lt;script type="text/javascript" src="{% url qbe_js %}"&gt;&lt;/script&gt;</pre>
-
-
-
-
-
-
     <h2>Download</h2>
     <p>
       You can download this project in either
@@ -140,7 +141,7 @@ template fo your AdminSite:</p>
 </pre>
 
 <h2>License</h2>
-<p><a href="http://www.gnu.org">GNU</a> <a href="http://www.gnu.org/licenses/agpl.html">Affero General Public License</a>
+<p>Free software distributted under the <a href="http://www.gnu.org">GNU</a> <a href="http://www.gnu.org/licenses/agpl.html">Affero General Public License</a>.
 <img style="float: right;" alt="" src="http://www.gnu.org/graphics/agplv3-155x51.png">
 </p>
 <h2>Authors</h2>
