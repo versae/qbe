@@ -31,8 +31,8 @@
     .footer { text-align:center; padding-top:30px; font-style: italic; }
     </style>
     
-    <link href="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.css" type="text/css" rel="stylesheet" />
-<script type="text/javascript" src="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js"></script>
+<link type="text/css" rel="stylesheet" href="/css/prettify.css"/>
+<script type="text/javascript" src="/js/prettify.js"></script>
 </head>
 
 <body>
@@ -55,9 +55,22 @@
     </div>
 
     <p>Admin tool in order to get custom reports.
-The objective of <em>django_qbe</em> is provide a assited and interactive way of making complex queries with no technical knowledge (or minimal) to get custom reports from the objects of Django models.
+The objective of <em>django-qbe</em> is provide a assited and interactive way of making complex queries with no technical knowledge (or minimal) to get custom reports from the objects of Django models.
 
-Based on <a href="http://www.google.com/url?sa=t&source=web&ct=res&cd=2&ved=0CB4QFjAB&url=http%3A%2F%2Fpages.cs.wisc.edu%2F~dbbook%2FopenAccess%2FthirdEdition%2Fqbe.pdf&ei=_UD5S5WSBYP5-Qb-18i8CA&usg=AFQjCNHMv-Pua285zhWT8DevuZFj2gfYKA&sig2=-sTEDWjJhnTaixh2iJfsAw">QBE proposal from IBM®</a>, django-qbe is intended to remove the limitations of Django QuerySets objects and to use the whole expresive power of the subjacent SQL.</p><h2>Dependencies</h2>
+Based on <a href="http://www.google.com/url?sa=t&source=web&ct=res&cd=2&ved=0CB4QFjAB&url=http%3A%2F%2Fpages.cs.wisc.edu%2F~dbbook%2FopenAccess%2FthirdEdition%2Fqbe.pdf&ei=_UD5S5WSBYP5-Qb-18i8CA&usg=AFQjCNHMv-Pua285zhWT8DevuZFj2gfYKA&sig2=-sTEDWjJhnTaixh2iJfsAw">QBE proposal from IBM®</a>, <em>django-qbe</em> is intended to remove the limitations of Django QuerySets objects and to use the whole expresive power of the subjacent SQL.</p>
+<h2>Features</h2>
+<ul>
+    <li>View and autodiscover relations among the models in a visual way (<pre class="prettyprint">ForeignKey</pre> fields are green and <pre class="prettyprint">ManyToMany</pre> ones are red).</li>
+    <li>Tabular creation of queries with fields to show, criterias, lookups and order (only <pre class="prettyprint">AND</pre> conditions by now).</li>
+    <li>Auto adition of right fields when <pre class="prettyprint">ForeignKey</pre> or <pre class="prettyprint">ManyToMany</pre> fields are selected.</li>
+    <li>No models in the project, so you can add <em>django-qbe</em> whenever you want with no <pre class="prettyprint">syncdb<pre>.</li>
+    <li>Pagination of results.</li>
+    <li>Bookmarklet to save and share the queries.</li>
+    <li>Export queries to .csv, .odt and .xls, but it's extensible by the user.</li>
+</ul>
+<h2>Screenshots</h2>
+<p>Coming soon.</p>
+<h2>Dependencies</h2>
 <p>Hopefully all in box.</p>
 <h2>Install</h2>
 <p>There's no setup.py script, neither easy_install yet, but I hope yes in the
