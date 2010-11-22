@@ -1,0 +1,11 @@
+2010-11-22 Release 0.1.0
+Features:
+  * View and autodiscover relations among the models in a visual way (ForeignKey fields are green and ManyToMany ones are red).
+  * Tabular creation of queries with fields to show, criterias, lookups and order (only AND conditions by now).
+  * Auto adition of right fields when ForeignKey or ManyToMany fields are selected.
+  * No models in the project, so you can add django-qbe whenever you want with no syncdb.
+  * Pagination of results.
+  * Bookmarklet to save and share the queries.
+  * Export results to .csv, .odt and .xls, but it's extensible by the user.
+  * Access restricted to users through a customizable function.
+  * Links to admin views (if available) in the results objects.

@@ -1,0 +1,15 @@
+The PRIMARY AUTHORS are (ordered by aproximated LOC number):
+
+    * Javier de la Rosa <versae@gmail.com>
+
+APPRECIATED CONTRIBUTORS:
+
+    * Lorenzo Gil <lorenzo.gil.sanchez@gmail.com>, adding the setuptools support: https://github.com/versae/qbe/pull/1
+
+And a big THANK YOU goes to:
+
+    * University of Western Ontario and CulturePlex Lab for the funding to django-qbe.
+    * Simon Porritt, author of jsPlumb.
+    * John Resig for the great library jQuery.
+    * Adrian Holovaty, Simon Willison and Jacob Kaplan-Moss for creating Django.
+    * Guido van Rossum for creating Python.
