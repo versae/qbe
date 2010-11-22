@@ -67,7 +67,7 @@ qbe.Diagram = {};
             }
         }
 
-        jsPlumb.Defaults.DragOptions = {cursor: 'pointer', zIndex:2000};
+        jsPlumb.Defaults.DragOptions = {cursor: 'pointer', zIndex: 2000};
         jsPlumb.Defaults.Container = "qbeDiagramContainer";
 
         /**
@@ -310,7 +310,7 @@ qbe.Diagram = {};
         };
 
         /**
-         *
+         * Repaint the models and relations among them
          */
         qbe.Diagram.repaintAll = function () {
             var appModel, splits;

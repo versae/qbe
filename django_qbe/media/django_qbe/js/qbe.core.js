@@ -141,6 +141,7 @@ qbe.Core = function() {};
                 var appModel = appModels[i];
                 var splits = appModel.split(".");
                 qbe.Core.addModule(splits[0], splits[1]);
+                $("#qbeModelItem_"+ splits[1]).addClass("selected");
                 $("#qbeForm .add-row").click();
                 $(".qbeFillModels:last").val(splits[0] +"."+ splits[1]);
                 $(".qbeFillModels:last").change();
@@ -246,7 +247,7 @@ qbe.Core = function() {};
         };
 
         /**
-         * Adds a qbe.Core to the layer
+         * Adds a model to the layer
          */
         qbe.Core.addModule = function (appName, modelName) {
             var appModel, model, target1, target2;
@@ -267,7 +268,7 @@ qbe.Core = function() {};
         };
 
         /*
-         * Removes a qbe Node from the layer
+         * Removes a model from the layer
          */
         qbe.Core.removeModule = function(appName, modelName) {
             var appModel = appName +"."+ modelName;
