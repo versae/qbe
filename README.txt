@@ -15,9 +15,15 @@ the subjacent SQL.
 Installation
 ------------
 
-There's no setup.py script, neither easy_install yet, but I hope yes in the
-near future. By the moment, you must download the *django_qbe* directory using
-git::
+Using the Python Package Index (PyPI_) and easy_install script::
+
+  $ easy_install django_qbe
+
+Or through pip::
+
+  $ pip install django_qbe
+
+But you also can download the *django_qbe* directory using git::
 
   $ git clone git://github.com/versae/qbe.git
   $ cp -r qbe/django_qbe /path/to/your/project
@@ -79,3 +85,4 @@ Path to QBE formats export file, in order to add custom export formats::
 
 
 .. _QBE: http://www.google.com/url?sa=t&source=web&ct=res&cd=2&ved=0CB4QFjAB&url=http%3A%2F%2Fpages.cs.wisc.edu%2F~dbbook%2FopenAccess%2FthirdEdition%2Fqbe.pdf&ei=_UD5S5WSBYP5-Qb-18i8CA&usg=AFQjCNHMv-Pua285zhWT8DevuZFj2gfYKA&sig2=-sTEDWjJhnTaixh2iJfsAw
+.. _PyPI: http://pypi.python.org/pypi/django_qbe/0.1.0
