@@ -62,7 +62,11 @@
         <tr class="{% cycle 'row1' 'row2' %}">
         {% if admin_urls %}
             {% for result, url in result_tuple %}
+                {% if url %}
                 <td><a href={{ url }}>{{ result }}</a></td>
+                {% else %}
+                <td>{{ result }}</td>
+                {% endif %}
             {% endfor %}
         {% else %}
             {% for result in result_tuple %}

@@ -2,12 +2,13 @@
 from django import forms
 from django.db import connection
 from django.db.models.fields import Field
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.conf import settings
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.utils.importlib import import_module
 from django.utils.translation import ugettext as _
 
+from django_qbe.utils import get_models
 from django_qbe.widgets import CriteriaInput
 
 try:
@@ -75,6 +76,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
     _wheres = []
     _sorts = []
     _params = []
+    _models = {}
     _raw_query = None
 
     def clean(self):
@@ -104,10 +106,23 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         wheres = []
         sorts = []
         params = []
+        app_model_labels = None
         for data in self.cleaned_data:
             if not ("model" in data and "field" in data):
                 break
             model = data["model"]
+            # HACK: Workaround to handle tables created
+            #       by django for its own
+            if not app_model_labels:
+                app_models = get_models(include_auto_created=True,
+                                        include_deferred=True)
+                app_model_labels = [u"%s_%s" % (a._meta.app_label,
+                                                a._meta.module_name)
+                                    for a in app_models]
+            if model in app_model_labels:
+                position = app_model_labels.index(model)
+                model = app_models[position]._meta.db_table
+                self._models[model] = app_models[position]
             field = data["field"]
             show = data["show"]
             criteria = data["criteria"]
@@ -124,8 +139,14 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                     over_split = over.lower().rsplit(".", 1)
                     join_model = over_split[0].replace(".", "_")
                     join_field = over_split[1]
-                    join = u"%s.%s = %s_id" \
-                           % (join_model, join_field, db_field)
+                    if model in self._models:
+                        _field = self._models[model]._meta.get_field(field)
+                        join = u"%s.%s = %s.%s" \
+                               % (join_model, join_field, model,
+                                  _field.attname)
+                    else:
+                        join = u"%s.%s = %s_id" \
+                               % (join_model, join_field, db_field)
                     if join not in wheres and join_model in TABLE_NAMES:
                         wheres.append(join)
                         if join_model not in froms:
@@ -218,9 +239,18 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                     result = []
                 while i < l:
                     appmodel, field = selects[i].split(".")
-                    admin_url = reverse("%s:%s_change" % (admin_name,
-                                                           appmodel),
-                                         args=[row[i + 1]])
+                    try:
+                        if appmodel in self._models:
+                            _model = self._models[appmodel]
+                            _appmodel = u"%s_%s" % (_model._meta.app_label,
+                                                    _model._meta.module_name)
+                        else:
+                            _appmodel = appmodel
+                        admin_url = reverse("%s:%s_change" % (admin_name,
+                                                              _appmodel),
+                                             args=[row[i + 1]])
+                    except NoReverseMatch:
+                        admin_url = None
                     result.append((row[i], admin_url))
                     i += 2
                 results.append(result)
@@ -257,9 +287,10 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         if selects and isinstance(selects, (tuple, list)):
             for select in selects:
                 label_splits = select.replace("_", ".").split(".")
+                label_splits_field = " ".join(label_splits[2:]).capitalize()
                 label = u"%s.%s: %s" % (label_splits[0].capitalize(),
                                         label_splits[1].capitalize(),
-                                        label_splits[2].capitalize())
+                                        label_splits_field)
                 labels.append(label)
         return labels
 
@@ -267,10 +298,10 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         lookup = Field().get_db_prep_lookup(operator, over,
                                             connection=connection,
                                             prepared=True)
-        string_related_operators = ('exact', 'contains', 'regex', 'startswith', 
+        string_related_operators = ('exact', 'contains', 'regex', 'startswith',
                                     'endswith', 'iexact', 'endswith', 'iregex',
-                                    'istartswith','icontains')
-        if isinstance(lookup, (tuple, list)):
+                                    'istartswith', 'icontains')
+        if isinstance(lookup, (tuple, list)) and string_related_operators:
             return lookup[0]
         return lookup
 
@@ -279,7 +310,11 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         for select in self._selects:
             appmodel, field = select.split(".")
             selects.append(select)
-            selects.append("%s.id" % appmodel)
+            if appmodel in self._models:
+                pk_name = self._models[appmodel]._meta.pk.name
+                selects.append("%s.%s" % (appmodel, pk_name))
+            else:
+                selects.append("%s.id" % appmodel)
         return selects
 
 QueryByExampleFormSet = formset_factory(QueryByExampleForm,

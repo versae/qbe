@@ -36,7 +36,7 @@ try:
     formats = import_module(qbe_formats).formats
 except ImportError:
     from django_qbe.exports import formats
-formats # Makes pyflakes happy
+formats  # Makes pyflakes happy
 
 
 def qbe_models(admin_site=None, only_admin_models=False, json=False):
@@ -138,7 +138,7 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
             if isinstance(field, ForeignKey):
                 model = add_relation(model, field)
             elif isinstance(field, OneToOneField):
-                extras = "" # "[arrowhead=none arrowtail=none]"
+                extras = ""  # "[arrowhead=none arrowtail=none]"
                 model = add_relation(model, field, extras=extras)
 
         if app_model._meta.many_to_many:
@@ -146,11 +146,11 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
                 field_attributes = get_field_attributes(field)
                 model['fields'].update(field_attributes)
                 if isinstance(field, ManyToManyField):
-                    extras = "" # "[arrowhead=normal arrowtail=normal]"
+                    extras = ""  # "[arrowhead=normal arrowtail=normal]"
                     model = add_relation(model, field, extras=extras)
                 elif isinstance(field, GenericRelation):
-                    extras = "" # '[style="dotted"]
-                                # [arrowhead=normal arrowtail=normal]'
+                    extras = ""  # '[style="dotted"]
+                                 # [arrowhead=normal arrowtail=normal]'
                     model = add_relation(model, field, extras=extras)
 
         app_title = app_model._meta.app_label.title().lower().capitalize()
