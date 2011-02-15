@@ -15,7 +15,16 @@ from django_qbe.forms import QueryByExampleFormSet
 from django_qbe.utils import (autocomplete_graph, qbe_models, formats,
                               pickle_encode, pickle_decode)
 
-from admin import admin_site
+try:
+    from django.utils.importlib import import_module
+    # Default value to backwards compatibility
+    qbe_admin_site = getattr(settings, "QBE_ADMIN_SITE", "admin.admin_site")
+    qbe_admin_site_splits = qbe_admin_site.rsplit(".", 1)
+    qbe_admin_module = qbe_admin_site_splits[0]
+    qbe_admin_object = qbe_admin_site_splits[1]
+    admin_site = getattr(import_module(qbe_admin_module), qbe_admin_object)
+except (AttributeError, ImportError):
+    from django.contrib.admin import site as admin_site
 
 qbe_access_for = getattr(settings, "QBE_ACCESS_FOR", lambda u: u.is_staff)
 
