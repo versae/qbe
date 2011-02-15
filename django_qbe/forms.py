@@ -11,15 +11,29 @@ from django.utils.translation import ugettext as _
 from django_qbe.utils import get_models
 from django_qbe.widgets import CriteriaInput
 
+OPERATORS = {}
+TABLE_NAMES = []
+DATABASES = None
 try:
-    module = "django.db.backends.%s" % settings.DATABASE_ENGINE
-    base_mod = import_module("%s.base" % module)
-    OPERATORS = base_mod.DatabaseWrapper.operators
-    intros_mod = import_module("%s.introspection" % module)
-    TABLE_NAMES = intros_mod.DatabaseIntrospection(connection).table_names()
-except ImportError:
-    OPERATORS = {}
-    TABLE_NAMES = []
+    DATABASES = settings.DATABASES
+except AttributeError:
+    # Backwards compatibility for Django versions prior to 1.1.
+    DATABASES = {
+        'default': {
+            'ENGINE': "django.db.backends.%s" % settings.DATABASE_ENGINE,
+            'NAME': settings.DATABASE_NAME,
+        }
+    }
+for database, database_properties in DATABASES.items():
+    module = database_properties['ENGINE']
+    try:
+        base_mod = import_module("%s.base" % module)
+        intros_mod = import_module("%s.introspection" % module)
+        table_names = intros_mod.DatabaseIntrospection(connection).table_names()
+        OPERATORS.update(base_mod.DatabaseWrapper.operators)
+        TABLE_NAMES.extend(table_names)
+    except ImportError:
+        pass
 
 SORT_CHOICES = (
     ("", ""),
