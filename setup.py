@@ -23,7 +23,7 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU Affero General Public License v3',
         'Operating System :: OS Independent',
-        'Programming Language :: Javascript',
+        'Programming Language :: JavaScript',
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP',
         ],
