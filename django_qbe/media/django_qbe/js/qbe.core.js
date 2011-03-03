@@ -216,7 +216,7 @@ qbe.Core = function() {};
                     $("#"+ domTo).attr("disabled", "disabled");
                     $("#"+ domTo).val("");
                 }
-                if ($("#"+ domTo).is("input")) {
+                if ($("#"+ domTo).is('input[type="text"]')) {
                     appModel = $("#"+ prefix +"-model").val();
                     appModelSplits = appModel.split(".");
                     fields = qbe.Models[appModelSplits[0]][appModelSplits[1]].fields;
