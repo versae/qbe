@@ -33,8 +33,6 @@ qbe_access_for = getattr(settings, "QBE_ACCESS_FOR", lambda u: u.is_staff)
 def qbe_form(request):
     query_hash = request.GET.get("hash", "")
     query_key = "qbe_query_%s" % query_hash
-    if "qbe_database" not in request.session:
-        request.session["qbe_database"] = "default"
     db_alias = request.session.get("qbe_database", "default")
     formset = QueryByExampleFormSet(using=db_alias)
     json_data = None
@@ -55,6 +53,7 @@ def qbe_form(request):
                                'models': models,
                                'formset': formset,
                                'databases': DATABASES,
+                               'database_alias': db_alias,
                                'title': _(u"Query by Example"),
                                'json_models': json_models,
                                'json_data': json_data,
