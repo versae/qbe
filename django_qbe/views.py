@@ -11,7 +11,7 @@ from django.template import RequestContext
 from django.utils import simplejson
 from django.utils.translation import ugettext as _
 
-from django_qbe.forms import QueryByExampleFormSet
+from django_qbe.forms import QueryByExampleFormSet, DATABASES
 from django_qbe.utils import (autocomplete_graph, qbe_models, formats,
                               pickle_encode, pickle_decode)
 
@@ -33,13 +33,17 @@ qbe_access_for = getattr(settings, "QBE_ACCESS_FOR", lambda u: u.is_staff)
 def qbe_form(request):
     query_hash = request.GET.get("hash", "")
     query_key = "qbe_query_%s" % query_hash
-    formset = QueryByExampleFormSet()
+    if "qbe_database" not in request.session:
+        request.session["qbe_database"] = "default"
+    db_alias = request.session.get("qbe_database", "default")
+    formset = QueryByExampleFormSet(using=db_alias)
     json_data = None
     if query_key in request.session:
         data = request.session[query_key]
-        formset = QueryByExampleFormSet(data=data)
+        db_alias = data.get("database_alias", "default")
+        formset = QueryByExampleFormSet(data=data, using=db_alias)
         if not formset.is_valid():
-            formset = QueryByExampleFormSet()
+            formset = QueryByExampleFormSet(using=db_alias)
         else:
             json_data = simplejson.dumps(data)
     apps = get_apps()
@@ -50,6 +54,7 @@ def qbe_form(request):
                               {'apps': apps,
                                'models': models,
                                'formset': formset,
+                               'databases': DATABASES,
                                'title': _(u"Query by Example"),
                                'json_models': json_models,
                                'json_data': json_data,
@@ -61,7 +66,8 @@ def qbe_form(request):
 def qbe_proxy(request):
     if request.POST:
         data = request.POST.copy()
-        formset = QueryByExampleFormSet(data=data)
+        db_alias = request.session.get("qbe_database", "default")
+        formset = QueryByExampleFormSet(data=data, using=db_alias)
         if formset.is_valid():
             pickled = pickle_encode(data)
             query_hash = md5(pickled + settings.SECRET_KEY).hexdigest()
@@ -80,7 +86,12 @@ def qbe_results(request, query_hash):
         data = request.session[query_key]
     else:
         return HttpResponseRedirect(reverse("qbe_form"))
-    formset = QueryByExampleFormSet(data=data)
+    db_alias = data.get("database_alias", "default")
+    if db_alias in DATABASES:
+        request.session["qbe_database"] = db_alias
+    else:
+        db_alias = request.session.get("qbe_database", "default")
+    formset = QueryByExampleFormSet(data=data, using=db_alias)
     if formset.is_valid():
         row_number = True
         admin_name = getattr(settings, "QBE_ADMIN", "admin")
@@ -141,7 +152,8 @@ def qbe_export(request, format=None):
     query_key = "qbe_query_%s" % query_hash
     if format and format in formats and query_key in request.session:
         data = request.session[query_key]
-        formset = QueryByExampleFormSet(data=data)
+        db_alias = request.session.get("qbe_database", "default")
+        formset = QueryByExampleFormSet(data=data, using=db_alias)
         if formset.is_valid():
             labels = formset.get_labels()
             query = formset.get_raw_query()
