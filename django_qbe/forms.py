@@ -84,6 +84,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
     _db_alias = "default"
     _db_operators = {}
     _db_table_names = []
+    _db_operations = None
 
     def __init__(self, *args, **kwargs):
         self._db_alias = kwargs.pop("using", "default")
@@ -93,8 +94,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         try:
             base_mod = import_module("%s.base" % module)
             self._db_operators = base_mod.DatabaseWrapper.operators
-            operations_mod = import_module("%s.operations" % module)
-            DatabaseOperations = operations_mod.DatabaseOperations
+            DatabaseOperations = base_mod.DatabaseOperations
             self._db_operations = DatabaseOperations(self._db_connection)
             intros_mod = import_module("%s.introspection" % module)
             intros_db = intros_mod.DatabaseIntrospection(self._db_connection)
@@ -131,6 +131,9 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         sorts = []
         params = []
         app_model_labels = None
+        lookup_cast = self._db_operations.lookup_cast
+        qn = self._db_operations.quote_name
+        uqn = self._unquote_name
         for data in self.cleaned_data:
             if not ("model" in data and "field" in data):
                 break
@@ -151,7 +154,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
             show = data["show"]
             criteria = data["criteria"]
             sort = data["sort"]
-            db_field = u"%s.%s" % (model, field)
+            db_field = u"%s.%s" % (qn(model), qn(field))
             operator, over = criteria
             is_join = operator.lower() == 'join'
             if show and not is_join:
@@ -161,18 +164,19 @@ class BaseQueryByExampleFormSet(BaseFormSet):
             if all(criteria):
                 if is_join:
                     over_split = over.lower().rsplit(".", 1)
-                    join_model = over_split[0].replace(".", "_")
-                    join_field = over_split[1]
+                    join_model = qn(over_split[0].replace(".", "_"))
+                    join_field = qn(over_split[1])
                     if model in self._models:
                         _field = self._models[model]._meta.get_field(field)
                         join = u"%s.%s = %s.%s" \
-                               % (join_model, join_field, model,
-                                  _field.attname)
+                               % (join_model, join_field, qn(model),
+                                  qn(_field.attname))
                     else:
-                        join = u"%s.%s = %s_id" \
-                               % (join_model, join_field, db_field)
-                    is_in_table_names = join_model in self._db_table_names
-                    if join not in wheres and is_in_table_names:
+                        join = u"%s.%s = %s" \
+                               % (join_model, join_field,
+                                  u"%s_id" % db_field)
+                    if (join not in wheres
+                        and uqn(join_model) in self._db_table_names):
                         wheres.append(join)
                         if join_model not in froms:
                             froms.append(join_model)
@@ -184,9 +188,11 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                     db_operator = self._db_operators[operator]
                     lookup = self._get_lookup(operator, over)
                     params.append(lookup)
-                    wheres.append(u"%s %s" % (db_field, db_operator))
-            if model not in froms and model in self._db_table_names:
-                froms.append(model)
+                    wheres.append(u"%s %s" \
+                                  % (lookup_cast(operator) % db_field,
+                                     db_operator))
+            if qn(model) not in froms and model in self._db_table_names:
+                froms.append(qn(model))
         return selects, froms, wheres, sorts, params
 
     def get_raw_query(self, limit=None, offset=None, count=False,
@@ -264,6 +270,8 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                     result = []
                 while i < l:
                     appmodel, field = selects[i].split(".")
+                    appmodel = self._unquote_name(appmodel)
+                    field = self._unquote_name(field)
                     try:
                         if appmodel in self._models:
                             _model = self._models[appmodel]
@@ -319,27 +327,33 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                 labels.append(label)
         return labels
 
+    def _unquote_name(self, name):
+        quoted_space = self._db_operations.quote_name("")
+        if name.startswith(quoted_space[0]) and name.endswith(quoted_space[1]):
+            return name[1:-1]
+        return name
+
     def _get_lookup(self, operator, over):
         lookup = Field().get_db_prep_lookup(operator, over,
                                             connection=self._db_connection,
                                             prepared=True)
-        string_related_operators = ('exact', 'contains', 'regex', 'startswith',
-                                    'endswith', 'iexact', 'endswith', 'iregex',
-                                    'istartswith', 'icontains')
-        if isinstance(lookup, (tuple, list)) and string_related_operators:
+        if isinstance(lookup, (tuple, list)):
             return lookup[0]
         return lookup
 
     def _get_selects_with_extra_ids(self):
+        qn = self._db_operations.quote_name
         selects = []
         for select in self._selects:
             appmodel, field = select.split(".")
+            appmodel = self._unquote_name(appmodel)
+            field = self._unquote_name(field)
             selects.append(select)
             if appmodel in self._models:
                 pk_name = self._models[appmodel]._meta.pk.name
-                selects.append("%s.%s" % (appmodel, pk_name))
             else:
-                selects.append("%s.id" % appmodel)
+                pk_name = u"id"
+            selects.append("%s.%s" % (qn(appmodel), qn(pk_name)))
         return selects
 
 QueryByExampleFormSet = formset_factory(QueryByExampleForm,
