@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django import forms
-from django.db import connection
+from django.db import connections
 from django.db.models.fields import Field
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.conf import settings
@@ -11,8 +11,7 @@ from django.utils.translation import ugettext as _
 from django_qbe.utils import get_models
 from django_qbe.widgets import CriteriaInput
 
-OPERATORS = {}
-TABLE_NAMES = []
+
 DATABASES = None
 try:
     DATABASES = settings.DATABASES
@@ -24,16 +23,6 @@ except AttributeError:
             'NAME': settings.DATABASE_NAME,
         }
     }
-for database, database_properties in DATABASES.items():
-    module = database_properties['ENGINE']
-    try:
-        base_mod = import_module("%s.base" % module)
-        intros_mod = import_module("%s.introspection" % module)
-        table_names = intros_mod.DatabaseIntrospection(connection).table_names()
-        OPERATORS.update(base_mod.DatabaseWrapper.operators)
-        TABLE_NAMES.extend(table_names)
-    except ImportError:
-        pass
 
 SORT_CHOICES = (
     ("", ""),
@@ -92,6 +81,27 @@ class BaseQueryByExampleFormSet(BaseFormSet):
     _params = []
     _models = {}
     _raw_query = None
+    _db_alias = "default"
+    _db_operators = {}
+    _db_table_names = []
+
+    def __init__(self, *args, **kwargs):
+        self._db_alias = kwargs.pop("using", "default")
+        self._db_connection = connections["default"]
+        database_properties = DATABASES.get(self._db_alias, "default")
+        module = database_properties['ENGINE']
+        try:
+            base_mod = import_module("%s.base" % module)
+            self._db_operators = base_mod.DatabaseWrapper.operators
+            operations_mod = import_module("%s.operations" % module)
+            DatabaseOperations = operations_mod.DatabaseOperations
+            self._db_operations = DatabaseOperations(self._db_connection)
+            intros_mod = import_module("%s.introspection" % module)
+            intros_db = intros_mod.DatabaseIntrospection(self._db_connection)
+            self._db_table_names = intros_db.table_names()
+        except ImportError:
+            pass
+        super(BaseQueryByExampleFormSet, self).__init__(*args, **kwargs)
 
     def clean(self):
         """
@@ -161,20 +171,21 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                     else:
                         join = u"%s.%s = %s_id" \
                                % (join_model, join_field, db_field)
-                    if join not in wheres and join_model in TABLE_NAMES:
+                    is_in_table_names = join_model in self._db_table_names
+                    if join not in wheres and is_in_table_names:
                         wheres.append(join)
                         if join_model not in froms:
                             froms.append(join_model)
                     # join_select = u"%s.%s" % (join_model, join_field)
                     # if join_select not in selects:
                     #     selects.append(join_select)
-                elif operator in OPERATORS:
-                    # db_operator = OPERATORS[operator] % over
-                    db_operator = OPERATORS[operator]
+                elif operator in self._db_operators:
+                    # db_operator = self._db_operators[operator] % over
+                    db_operator = self._db_operators[operator]
                     lookup = self._get_lookup(operator, over)
                     params.append(lookup)
                     wheres.append(u"%s %s" % (db_field, db_operator))
-            if model not in froms and model in TABLE_NAMES:
+            if model not in froms and model in self._db_table_names:
                 froms.append(model)
         return selects, froms, wheres, sorts, params
 
@@ -234,7 +245,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
             sql = query
         if settings.DEBUG:
             print sql
-        cursor = connection.cursor()
+        cursor = self._db_connection.cursor()
         cursor.execute(sql, tuple(self._params))
         query_results = cursor.fetchall()
         if admin_name:
@@ -310,7 +321,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
 
     def _get_lookup(self, operator, over):
         lookup = Field().get_db_prep_lookup(operator, over,
-                                            connection=connection,
+                                            connection=self._db_connection,
                                             prepared=True)
         string_related_operators = ('exact', 'contains', 'regex', 'startswith',
                                     'endswith', 'iexact', 'endswith', 'iregex',

@@ -76,6 +76,20 @@
         <input type="submit" name="_save" class="default" value="{% trans "Run" %}">
     </div>
 
+    <div >
+        {% trans "Database" %}
+        <select name="database_alias" id="id_database_alias">
+        {% for db_alias, database_properties in databases.items %}
+            {% ifequal database_alias db_alias %}
+            <option value="{{ db_alias }}" selected="selected">{{ db_alias }}: {{ database_properties.NAME }} ({{ database_properties.ENGINE }})</option>
+            {% else %}
+            <option value="{{ db_alias }}">{{ db_alias }}: {{ database_properties.NAME }} ({{ database_properties.ENGINE }})</option>
+            {% endifequal %}
+        {% endfor %}
+        </select>
+    </div>
+
+
 </div>
 
 <div id="changelist-filter" class="qbeModelList module">

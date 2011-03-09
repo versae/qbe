@@ -1,2 +1,4 @@
 include *.txt
-recursive-include django_qbe *.css *.png *.jpg *.gif *.js *.html
+recursive-include django_qbe/templates *.html *.js *.json
+recursive-include django_qbe/media *.css *.png *.jpg *.gif *.js *.html *.json
+recursive-include django_qbe *.css *.png *.jpg *.gif *.js *.html *.json
