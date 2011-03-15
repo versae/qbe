@@ -1,3 +1,18 @@
+0.1.3 (2011-03-08)
+------------------
+- Preparing the widgets in order to add conditional queries.
+- Fixed error in insesitive contains lookups.
+- Improved the multi-databases support, now it's possible select the database
+  from the main form and it's saved in session.
+
+
+
+0.1.2 (2011-02-15)
+------------------
+- Initial support for multi-database.
+- Bug fixes.
+
+
 0.1.1 (2011-02-14)
 ------------------
 - Added support to inner and auto-created django models.
