@@ -75,6 +75,10 @@ Admin module name to add admin urls in results::
 
   QBE_ADMIN = "admin"
 
+Set your own admin site if it's different to usual *django.contrib.admin.site*
+
+  QBE_ADMIN_SITE ="admin.admin_site"
+
 Function to control to users with access to QBE::
 
   QBE_ACCESS_FOR = lambda user: user.is_staff
@@ -85,4 +89,4 @@ Path to QBE formats export file, in order to add custom export formats::
 
 
 .. _QBE: http://www.google.com/url?sa=t&source=web&ct=res&cd=2&ved=0CB4QFjAB&url=http%3A%2F%2Fpages.cs.wisc.edu%2F~dbbook%2FopenAccess%2FthirdEdition%2Fqbe.pdf&ei=_UD5S5WSBYP5-Qb-18i8CA&usg=AFQjCNHMv-Pua285zhWT8DevuZFj2gfYKA&sig2=-sTEDWjJhnTaixh2iJfsAw
-.. _PyPI: http://pypi.python.org/pypi/django_qbe/0.1.0
+.. _PyPI: http://pypi.python.org/pypi/django_qbe/

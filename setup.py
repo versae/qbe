@@ -9,7 +9,7 @@ def read(*rnames):
 
 setup(
     name='django_qbe',
-    version='0.1.2',
+    version='0.1.4',
     author='Javier de la Rosa',
     author_email='versae@gmail.com',
     url='http://versae.github.com/qbe/',
