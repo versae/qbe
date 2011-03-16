@@ -93,14 +93,21 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         module = database_properties['ENGINE']
         try:
             base_mod = import_module("%s.base" % module)
-            self._db_operators = base_mod.DatabaseWrapper.operators
-            DatabaseOperations = base_mod.DatabaseOperations
-            self._db_operations = DatabaseOperations(self._db_connection)
             intros_mod = import_module("%s.introspection" % module)
-            intros_db = intros_mod.DatabaseIntrospection(self._db_connection)
-            self._db_table_names = intros_db.table_names()
         except ImportError:
             pass
+        if base_mod and intros_mod:
+            self._db_operators = base_mod.DatabaseWrapper.operators
+            DatabaseOperations = base_mod.DatabaseOperations
+            try:
+                self._db_operations = DatabaseOperations(self._db_connection)
+            except TypeError:
+                # SQLite has no params to instance DatabaseOperations 
+                self._db_operations = DatabaseOperations()
+            intros_db = intros_mod.DatabaseIntrospection(self._db_connection)
+            django_table_names = intros_db.django_table_names()
+            table_names = intros_db.table_names()
+            self._db_table_names = list(django_table_names.union(table_names))
         super(BaseQueryByExampleFormSet, self).__init__(*args, **kwargs)
 
     def clean(self):
