@@ -16,7 +16,7 @@ setup(
     description='Django admin tool for custom reports',
     long_description=read('README.txt'),
     license='AGPL 3',
-    keywords='qbe django admin reports query',
+    keywords='qbe django admin reports query sql',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Framework :: Django',

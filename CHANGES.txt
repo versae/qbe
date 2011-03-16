@@ -22,9 +22,9 @@
 
 0.1.1 (2011-02-14)
 ------------------
- - Added support to inner and auto-created django models.
- - Updated jQuery and ExCanvas versions, jsPlumb remains in the same version.
- - Added a copy of README suitable for GitHub.
+- Added support to inner and auto-created django models.
+- Updated jQuery and ExCanvas versions, jsPlumb remains in the same version.
+- Added a copy of README suitable for GitHub.
 
 
 0.1.0 (2010-11-22)
