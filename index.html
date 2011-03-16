@@ -60,6 +60,7 @@ The objective of <em>django-qbe</em> is provide a assited and interactive way of
 Based on <a href="http://www.google.com/url?sa=t&source=web&ct=res&cd=2&ved=0CB4QFjAB&url=http%3A%2F%2Fpages.cs.wisc.edu%2F~dbbook%2FopenAccess%2FthirdEdition%2Fqbe.pdf&ei=_UD5S5WSBYP5-Qb-18i8CA&usg=AFQjCNHMv-Pua285zhWT8DevuZFj2gfYKA&sig2=-sTEDWjJhnTaixh2iJfsAw">QBE proposal from IBM®</a>, <em>django-qbe</em> is intended to remove the limitations of Django QuerySets objects and to use the whole expresive power of the subjacent SQL.</p>
 <h2>Features</h2>
 <ul>
+    <li>Multi-database support.</li>
     <li>View and autodiscover relations among the models in a visual way (<code>ForeignKey</code> fields are green and <code>ManyToMany</code> ones are red).</li>
     <li>Tabular creation of queries with fields to show, criterias, lookups and order (only <code>AND</code> conditions by now).</li>
     <li>Auto adition of right fields when <code>ForeignKey</code> or <code>ManyToMany</code> fields are selected.</li>
@@ -142,6 +143,10 @@ template fo your AdminSite:</p>
 
 <pre>QBE_ADMIN = "admin"
 </pre>
+<p>Set your own admin site if it's different to usual <em>django.contrib.admin.site</em>:</p>
+
+<pre>QBE_ADMIN_SITE ="admin.admin_site"
+</pre>
 <p>Function to control to users with access to QBE:</p>
 <pre>QBE_ACCESS_FOR = lambda user: user.is_staff
 </pre>
@@ -151,6 +156,9 @@ template fo your AdminSite:</p>
 
 <h2>License</h2>
 <p>Free software distributted under the <a href="http://www.gnu.org">GNU</a> <a href="http://www.gnu.org/licenses/agpl.html">Affero General Public License</a>.
+<p>Additional permission under GNU GPL version 3 section 7 allows the use of
+<em>django-qbe</em> as part of a project while retaining the requirement to contribute
+back any changes or improvements to <em>django-qbe</em>.</p>
 <img style="float: right;" alt="" src="http://www.gnu.org/graphics/agplv3-155x51.png">
 </p>
 <h2>Authors</h2>
