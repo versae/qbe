@@ -102,7 +102,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
             try:
                 self._db_operations = DatabaseOperations(self._db_connection)
             except TypeError:
-                # SQLite has no params to instance DatabaseOperations 
+                # Some engines have no params to instance DatabaseOperations 
                 self._db_operations = DatabaseOperations()
             intros_db = intros_mod.DatabaseIntrospection(self._db_connection)
             django_table_names = intros_db.django_table_names()
