@@ -75,7 +75,7 @@ Admin module name to add admin urls in results::
 
   QBE_ADMIN = "admin"
 
-Set your own admin site if it's different to usual *django.contrib.admin.site*
+Set your own admin site if it's different to usual *django.contrib.admin.site*::
 
   QBE_ADMIN_SITE ="admin.admin_site"
 
