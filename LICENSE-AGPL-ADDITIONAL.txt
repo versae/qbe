@@ -1,0 +1,3 @@
+Additional permission under GNU GPL version 3 section 7 allows the use of
+django-qbe as part of a project while retaining the requirement to contribute
+back any changes or improvements to django-qbe.
