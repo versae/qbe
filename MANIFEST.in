@@ -1,4 +1,8 @@
-include *.txt
-recursive-include django_qbe/templates *.html *.js *.json
-recursive-include django_qbe/media *.css *.png *.jpg *.gif *.js *.html *.json
-recursive-include django_qbe *.css *.png *.jpg *.gif *.js *.html *.json
+include AUTHORS.txt
+include CHANGES.txt
+include LICENSE-AGPL-ADDITIONAL.txt
+include LICENSE-AGPL.txt
+include MANIFEST.in
+include README.rst
+recursive-include django_qbe/templates *
+recursive-include django_qbe/media *
