@@ -2,12 +2,13 @@ import os
 
 from setuptools import setup, find_packages
 
+
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
 setup(
     name='django_qbe',
-    version='0.1.4',
+    version='0.1.5',
     author='Javier de la Rosa',
     author_email='versae@gmail.com',
     url='http://versae.github.com/qbe/',
@@ -27,5 +28,5 @@ setup(
         ],
     zip_safe=False,
     packages=find_packages(),
-    include_package_data = True,
+    include_package_data=True,
 )

@@ -1,3 +1,8 @@
+0.1.5 (2011-04-06)
+------------------
+ - Fixed the Python package for installation with pip or easy_install (thanks
+   to https://github.com/sebasmagri).
+
 0.1.4 (2011-03-16)
 ------------------
  - Fixed an error with DatabaseOperations with no arguments of some engines.
