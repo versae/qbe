@@ -3,16 +3,16 @@
 
 {% block extrahead %}
 <!--[if IE]>
-<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/excanvas.js"></script>
+<script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/excanvas.js"></script>
 <![endif]-->
-<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/jquery.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/jquery.ui.js"></script> 
-<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/jquery.formset.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/jquery.jsplumb.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/qbe.core.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}django_qbe/js/qbe.diagram.js"></script>
+<script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/jquery.js"></script>
+<script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/jquery.ui.js"></script> 
+<script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/jquery.formset.js"></script>
+<script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/jquery.jsplumb.js"></script>
+<script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/qbe.core.js"></script>
+<script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/qbe.diagram.js"></script>
 <link rel="stylesheet" type="text/css" href="{{ ADMIN_MEDIA_PREFIX }}css/forms.css" />
-<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}django_qbe/css/qbe.css"/>
+<link rel="stylesheet" type="text/css" href="{% firstof STATIC_URL MEDIA_URL %}django_qbe/css/qbe.css"/>
 {% endblock %}
 
 {% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url admin:index %}">{% trans 'Home' %}</a>{% if title %} &rsaquo; {{ title }}{% endif %}</div>
