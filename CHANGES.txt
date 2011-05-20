@@ -1,8 +1,11 @@
+0.1.6 (2011-04-20)
+------------------
+ - Added compatibility with Django 1.3 static files.
+
 0.1.5 (2011-04-06)
 ------------------
  - Fixed the Python package for installation with pip or easy_install (thanks
    to https://github.com/sebasmagri).
- - Added compatibility with Django 1.3 static files.
 
 0.1.4 (2011-03-16)
 ------------------
