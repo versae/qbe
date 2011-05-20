@@ -41,10 +41,16 @@ And adding the urlconf in your project urls.py::
     # qbe
     url(r'^qbe/', include('django_qbe.urls')),
 
-You must not forgive link or copy the *django_qbe/media/django_qbe*
-directory in your project media directory::
+If you are using Django 1.2 or any previous version you must link or copy the
+*django_qbe/static/django_qbe* directory in your project media directory::
 
-  $ ln -s django_qbe/media/django_qbe /path/to/your/project/media/
+  $ ln -s django_qbe/static/django_qbe /path/to/your/project/media/
+
+If you're using Django 1.3 or later the static files will be found and served
+automatically, you don't need to do anything. See the `Django documentation on
+static files`__ for details.
+
+__ staticfiles_
 
 That's all. Then you can access to http://host:port/qbe
 However, you can add a link from your admin page changing the admin index
@@ -90,3 +96,4 @@ Path to QBE formats export file, in order to add custom export formats::
 
 .. _QBE: http://www.google.com/url?sa=t&source=web&ct=res&cd=2&ved=0CB4QFjAB&url=http%3A%2F%2Fpages.cs.wisc.edu%2F~dbbook%2FopenAccess%2FthirdEdition%2Fqbe.pdf&ei=_UD5S5WSBYP5-Qb-18i8CA&usg=AFQjCNHMv-Pua285zhWT8DevuZFj2gfYKA&sig2=-sTEDWjJhnTaixh2iJfsAw
 .. _PyPI: http://pypi.python.org/pypi/django_qbe/
+.. _staticfiles: http://docs.djangoproject.com/en/dev/howto/static-files
