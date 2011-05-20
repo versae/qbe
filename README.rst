@@ -46,9 +46,25 @@ If you are using Django 1.2 or any previous version you must link or copy the
 
   $ ln -s django_qbe/static/django_qbe /path/to/your/project/media/
 
-If you're using Django 1.3 or later the static files will be found and served
-automatically, you don't need to do anything. See the `Django documentation on
-static files`__ for details.
+And enable the context processor *django.core.context_processors.media*::
+
+  TEMPLATE_CONTEXT_PROCESSORS = (
+      # [...] django context processors
+      'django.core.context_processors.media',
+      # [...] Any other context processors
+  )
+
+But if you're using Django 1.3 or later the static files will be found and served
+automatically, you don't need to do anything except adding the context processor
+*django.core.context_processors.static*::
+
+  TEMPLATE_CONTEXT_PROCESSORS = (
+      # [...] django context processors
+      'django.core.context_processors.static',
+      # [...] Any other context processors
+  )
+
+See the `Django documentation on static files`__ for details.
 
 __ staticfiles_
 
