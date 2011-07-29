@@ -1,6 +1,6 @@
 *.xml
 *.pyc
-*.save
+*.egg-info
 /artworks
 /backups
 /base

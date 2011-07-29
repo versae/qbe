@@ -93,7 +93,7 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
             'model': field.rel.to.__name__,
             'field': field.rel.to._meta.pk.name,
         }
-        if hasattr(field.rel, 'through') and hasattr(field.rel.through, '__module__'):
+        if hasattr(field.rel, 'through') and field.rel.through is not None:
             name = field.rel.through.__module__.split(".")[-2]
             target.update({
                 'through': {
