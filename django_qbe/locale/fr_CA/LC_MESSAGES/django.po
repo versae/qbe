@@ -54,7 +54,7 @@ msgstr ""
 
 #: views.py:57 views.py:118 views.py:170
 msgid "Query by Example"
-msgstr "Requête par l'exemple - QBE"
+msgstr "Constructeur de requêtes (QBE)"
 
 #: views.py:169
 msgid "Reports"

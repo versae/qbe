@@ -11,7 +11,7 @@
 
 {% block content_title %}{% if title %}
 <h1>
-    {{ title }}: {{ count|floatformat:0 }} result{{ count|floatformat:0|pluralize }}
+    {{ title }}: {{ count|floatformat:0 }} {% trans "result" %}{{ count|floatformat:0|pluralize }}
 </h1>
 {% endif %}{% endblock %}
 
