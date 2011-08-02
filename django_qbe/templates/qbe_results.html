@@ -18,9 +18,9 @@
 {% block content %}
 {% block object-tools %}
     {% ifequal limit count %}
-    Showing all {{ count|floatformat:0 }} result{{ results|length|pluralize }}
+    {% trans "Showing all" %} {{ count|floatformat:0 }} {% trans "result" %}{{ results|length|pluralize }}
     {% else %}
-    Showing from {{ offset|floatformat:0 }} to {{ offset_limit|floatformat:0 }} of {{ count|floatformat:0 }} result{{ results|length|pluralize }}
+    {% trans "Showing from" %} {{ offset|floatformat:0 }} {% trans "to" %} {{ offset_limit|floatformat:0 }} {% trans "of" %} {{ count|floatformat:0 }} {% trans "result" %}{{ results|length|pluralize }}
     {% endifequal %}
 <span id="qbeResultsOptions">
     {% ifequal limit count %}
@@ -79,7 +79,7 @@
 </table>
 <p class="paginator">
 {% qbe_paginator count limit page %}
-{{ count|floatformat:0 }} result{{ count|floatformat:0|pluralize }}
+{{ count|floatformat:0 }} {% trans "result" %}{{ count|floatformat:0|pluralize }}
 </p>
 </div>
 {% endblock %}
