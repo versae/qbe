@@ -200,7 +200,7 @@ msgstr "Modifier la requête"
 
 #: templates/qbe_results.html:32
 msgid "view query"
-msgstr "Modifier la requête"
+msgstr "Voir la requête"
 
 #: templates/qbe_results.html:36
 msgid "Save query as"
