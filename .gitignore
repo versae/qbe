@@ -1,4 +1,6 @@
 *.xml
+*.pyc
+*.save
 /artworks
 /backups
 /base
@@ -6,5 +8,6 @@
 /django_extensions
 /static
 /olwidget
+/django_qbe.egg-info
 /admin.py
 /*.sh
