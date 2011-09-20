@@ -61,9 +61,9 @@ class UnicodeWriter(object):
             self.writerow(row)
 
 
-def base_export(labels, results):
+def base_export(labels, results, dialect=csv.excel_tab):
     output = StringIO()
-    w = UnicodeWriter(output)
+    w = UnicodeWriter(output, dialect=dialect)
     w.writerow(labels)
     for row in results:
         w.writerow(row)
@@ -73,7 +73,7 @@ def base_export(labels, results):
 
 @formats.add("csv")
 def csv_format(labels, results):
-    output = base_export(labels, results)
+    output = base_export(labels, results, dialect=csv.excel)
     mimetype = "text/csv"
     return HttpResponse(output, mimetype=mimetype)
 
