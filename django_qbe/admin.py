@@ -15,7 +15,7 @@ class SavedQueryAdmin(admin.ModelAdmin):
         info = self.model._meta.app_label, self.model._meta.module_name
         pickled = pickle_encode(obj.query_data)
         query_hash = md5(pickled + settings.SECRET_KEY).hexdigest()
-        return u'<a href="%s">%s</a> | <a href="%s?hash=%s">%s</a>' % \
+        return u'<span class="nowrap"><a href="%s">%s</a> | <a href="%s?hash=%s">%s</a></span>' % \
             (reverse("admin:%s_%s_run" % info, args=(obj.pk,)), _("Run"),
              reverse("qbe_form"), query_hash, _("Edit & Run"))
     run_link.short_description = _("query")
