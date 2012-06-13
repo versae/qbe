@@ -18,45 +18,48 @@ qbe.Core = function() {};
         qbe.Core.loadData = function(data) {
             var initialForms, maxForms, totalForms;
             _loadingData = true;
-            initialForms = parseInt(data["form-INITIAL_FORMS"]);
-            maxForms = parseInt(data["form-MAX_NUM_FORMS"]);
-            totalForms = parseInt(data["form-TOTAL_FORMS"]);
-            for(var i=initialForms; i<totalForms; i++) {
-                var appModel, splits, show, model, field, sorted;
+            initialForms = parseInt(data["form-INITIAL_FORMS"], 10);
+            maxForms = parseInt(data["form-MAX_NUM_FORMS"], 10);
+            totalForms = parseInt(data["form-TOTAL_FORMS"], 10);
+            var positions, positionSplits, splits, appModel, appName, modelName;
+            var show, model, field, sorted;
+            for (var i=initialForms; i<totalForms; i++) {
                 appModel = data["form-"+ i +"-model"];
-                if (!(appModel in qbe.CurrentModels)) {
-                    splits = appModel.split(".");
-                    app = splits[0];
-                    model = splits[1];
-                    qbe.Core.addModule(app, model);
-                }
-                qbe.Core.updateModels();
-                $("#id_form-"+ i +"-model").val(appModel);
-                $("#id_form-"+ i +"-model").change();
-                field = data["form-"+ i +"-field"];
-                $("#id_form-"+ i +"-field").val(field);
-                $("#id_form-"+ i +"-field").change();
-                sorted = data["form-"+ i +"-sort"];
-                $("#id_form-"+ i +"-sort").val(sorted);
-                $("#id_form-"+ i +"-show").remove("checked");
-                if (data["form-"+ i +"-show"]) {
-                    show = data["form-"+ i +"-show"];
-                    if (show && show == "on") {
-                        $("#id_form-"+ i +"-show").attr("checked", "checked");
+                if (typeof appModel !== "undefined") {
+                    if (!(appModel in qbe.CurrentModels)) {
+                        splits = appModel.split(".");
+                        app = splits[0];
+                        model = splits[1];
+                        qbe.Core.addModule(app, model);
                     }
-                }
-                c = 0;
-                criteria = data["form-"+ i +"-criteria_"+ c];
-                while(criteria) {
-                    $("#id_form-"+ i +"-criteria_"+ c).val(criteria);
-                    criteria = data["form-"+ i +"-criteria_"+ ++c];
+                    qbe.Core.updateModels();
+                    $("#id_form-"+ i +"-model").val(appModel);
+                    $("#id_form-"+ i +"-model").change();
+                    field = data["form-"+ i +"-field"];
+                    $("#id_form-"+ i +"-field").val(field);
+                    $("#id_form-"+ i +"-field").change();
+                    sorted = data["form-"+ i +"-sort"];
+                    $("#id_form-"+ i +"-sort").val(sorted);
+                    $("#id_form-"+ i +"-show").remove("checked");
+                    if (data["form-"+ i +"-show"]) {
+                        show = data["form-"+ i +"-show"];
+                        if (show && show == "on") {
+                            $("#id_form-"+ i +"-show").attr("checked", "checked");
+                        }
+                    }
+                    c = 0;
+                    criteria = data["form-"+ i +"-criteria_"+ c];
+                    while(criteria) {
+                        $("#id_form-"+ i +"-criteria_"+ c).val(criteria);
+                        ++c;
+                        criteria = data["form-"+ i +"-criteria_"+ c];
+                    }
                 }
             }
             $("#id_form_limit").val(data["limit"]);
-            var positions, positionSplits, splits, appModel, appName, modelName;
             positions = data["positions"].split("|");
-            for(var i=0; i<positions.length; i++) {
-                splits = positions[i].split("@");
+            for (var j=0; j<positions.length; j++) {
+                splits = positions[j].split("@");
                 appModel = splits[0].split(".");
                 appName = appModel[0];
                 modelName = appModel[1];
@@ -92,7 +95,7 @@ qbe.Core = function() {};
             }
             qbe.Core.updateModels();
             return false;
-        }
+        };
 
         /**
          * Invokes the update of the each row
@@ -135,7 +138,7 @@ qbe.Core = function() {};
          * Add rows per new relation with the models list hyphen separated
          */
         qbe.Core.addRelationsFrom = function(through) {
-            var appModels
+            var appModels;
             appModels = through.split("-");
             for(var i=0; i<appModels.length; i++) {
                 var appModel = appModels[i];
@@ -162,7 +165,7 @@ qbe.Core = function() {};
                 splits = $(this).attr("id").split("-");
                 prefix = splits.splice(0, splits.length-1).join("-");
                 css = $(this).attr("class");
-                cssSplit = css.split("to:")
+                cssSplit = css.split("to:");
                 domTo = prefix +"-"+ cssSplit[cssSplit.length-1];
                 optFields = [];
                 optPrimaries = [];
@@ -174,19 +177,19 @@ qbe.Core = function() {};
                     value = fields[key].label;
                     if (fields[key].type == "ForeignKey") {
                         style = "foreign";
-                        option = '<option class="'+ style +'" value="'+ key +'">'+ value +'</option>'
+                        option = '<option class="'+ style +'" value="'+ key +'">'+ value +'</option>';
                         optForeigns.push(option);
                     } else if (fields[key].type == "ManyToManyField") {
                         style = "many";
-                        option = '<option class="'+ style +'" value="'+ key +'">'+ value +'</option>'
+                        option = '<option class="'+ style +'" value="'+ key +'">'+ value +'</option>';
                         optManies.push(option);
                     } else if (fields[key].primary) {
                         style = "primary";
-                        option = '<option class="'+ style +'" value="'+ key +'">'+ value +'</option>'
+                        option = '<option class="'+ style +'" value="'+ key +'">'+ value +'</option>';
                         optPrimaries.push(option);
                     } else {
                         style = "";
-                        option = '<option class="'+ style +'" value="'+ key +'">'+ value +'</option>'
+                        option = '<option class="'+ style +'" value="'+ key +'">'+ value +'</option>';
                         optFields.push(option);
                     }
                 }
@@ -205,7 +208,7 @@ qbe.Core = function() {};
             splits = $(this).attr("id").split("-");
             prefix = splits.splice(0, splits.length-1).join("-");
             css = $(this).attr("class");
-            cssSplit = css.split("enable:")
+            cssSplit = css.split("enable:");
             inputs = cssSplit[cssSplit.length-1].split(",");
             for(var i=0; i<inputs.length; i++) {
                 input = inputs[i];
@@ -276,7 +279,7 @@ qbe.Core = function() {};
             if (pos >= 0) {
                 qbe.CurrentModels.splice(pos, 1);
                 var model = qbe.Models[appName][modelName];
-                qbe.Diagram.removeBox(appName, modelName)
+                qbe.Diagram.removeBox(appName, modelName);
                 qbe.Diagram.removeRelations(appName, modelName);
             }
         };
@@ -323,8 +326,8 @@ qbe.Core = function() {};
                     targetFieldName = targetModel.field;
                     sourceField = $("#qbeBoxField_"+ sourceAppName +"\\."+ sourceModelName +"\\."+ sourceFieldName);
                     targetField = $("#qbeBoxField_"+ targetAppName +"\\."+ targetModelName +"\\."+ targetFieldName);
-                    if (sourceField.length && targetField.length
-                        && !qbe.Diagram.hasConnection(sourceField, targetField)) {
+                    if (sourceField.length && targetField.length &&
+                        !qbe.Diagram.hasConnection(sourceField, targetField)) {
                         sourceId = "qbeBox_"+ sourceModelName;
                         targetId = "qbeBox_"+ targetModelName;
                         divSource = document.getElementById(sourceId);
@@ -335,7 +338,6 @@ qbe.Core = function() {};
                     }
                 }
             }
-        }
-
+        };
     });
 })(jQuery.noConflict());
