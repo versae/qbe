@@ -4,7 +4,7 @@
 /base
 /creators
 /django_extensions
-/media
+/static
 /olwidget
 /admin.py
 /*.sh
