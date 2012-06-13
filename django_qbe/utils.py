@@ -93,7 +93,7 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
             'model': field.rel.to.__name__,
             'field': field.rel.to._meta.pk.name,
         }
-        if hasattr(field.rel, 'through'):
+        if hasattr(field.rel, 'through') and hasattr(field.rel.through, '__module__'):
             name = field.rel.through.__module__.split(".")[-2]
             target.update({
                 'through': {
@@ -143,6 +143,8 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
 
         if app_model._meta.many_to_many:
             for field in app_model._meta.many_to_many:
+                if not hasattr(field, 'primary_key'):
+                    continue
                 field_attributes = get_field_attributes(field)
                 model['fields'].update(field_attributes)
                 if isinstance(field, ManyToManyField):
