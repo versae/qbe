@@ -102,11 +102,11 @@ class BaseQueryByExampleFormSet(BaseFormSet):
             try:
                 self._db_operations = DatabaseOperations(self._db_connection)
             except TypeError:
-                # Some engines have no params to instance DatabaseOperations 
+                # Some engines have no params to instance DatabaseOperations
                 self._db_operations = DatabaseOperations()
             intros_db = intros_mod.DatabaseIntrospection(self._db_connection)
-            django_table_names = intros_db.django_table_names()
-            table_names = intros_db.table_names()
+            django_table_names = set(intros_db.django_table_names())
+            table_names = set(intros_db.table_names())
             self._db_table_names = list(django_table_names.union(table_names))
         super(BaseQueryByExampleFormSet, self).__init__(*args, **kwargs)
 
