@@ -11,7 +11,7 @@
 <script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/jquery.jsplumb.js"></script>
 <script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/qbe.core.js"></script>
 <script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/qbe.diagram.js"></script>
-<link rel="stylesheet" type="text/css" href="{{ ADMIN_MEDIA_PREFIX }}css/forms.css" />
+<link rel="stylesheet" type="text/css" href="{% firstof STATIC_URL MEDIA_URL %}admin/css/forms.css" />
 <link rel="stylesheet" type="text/css" href="{% firstof STATIC_URL MEDIA_URL %}django_qbe/css/qbe.css"/>
 {% endblock %}
 

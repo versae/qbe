@@ -69,19 +69,19 @@ option.field,div.qbeDiagram div.field {
 
 option.primary,div.qbeDiagram div.primary {
     font-weight: bold;
-    background: url("/media/django_qbe/img/key.gif") no-repeat center right #eee;
+    background: url("../img/key.gif") no-repeat center right #eee;
 }
 
 option.foreign,div.qbeDiagram div.foreign {
     font-style: italic;
-    background: url("/media/django_qbe/img/right_arrow.gif") no-repeat scroll right center #FAFAFA;
+    background: url("../img/right_arrow.gif") no-repeat scroll right center #FAFAFA;
     cursor: pointer;
 }
 
 option.many,div.qbeDiagram div.many {
     font-style: italic;
     text-decoration: underline;
-    background: url("/media/django_qbe/img/right_arrow_red.gif") no-repeat scroll right center #FAFAFA;
+    background: url("../img/right_arrow_red.gif") no-repeat scroll right center #FAFAFA;
     cursor: pointer;
 }
 
@@ -94,7 +94,7 @@ div.qbeDiagram #qbeDiagramContainer {
     overflow: auto;
     position: relative;
     width: 100%;
-    background: url("/media/django_qbe/img/grid.jpg") scroll left top #FAFAFA;
+    background: url("../img/grid.jpg") scroll left top #FAFAFA;
     margin-bottom: 0px;
 }
 
