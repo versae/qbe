@@ -24,6 +24,9 @@
 {% block object-tools %}
 <ul class="object-tools">
   <li>
+    <a href="{% url admin:django_qbe_savedquery_changelist %}">{% trans "Saved queries" %}</a>
+  </li>
+  <li>
     <a href="javascript:void(0);" id="qbeDiagramTab">{% trans "Diagram" %}</a>
   </li>
   <li>

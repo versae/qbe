@@ -28,7 +28,7 @@
     {% else %}
     (<a href="{% url qbe_results query_hash %}?show=all">{% trans "show all" %}</a>
     {% endifequal %}
-    | <a href="{% url qbe_form %}?hash={{ query_hash }}">{% trans "edit query" %}</a>
+    | <a href="{% url qbe_form query_hash %}">{% trans "edit query" %}</a>
     | <a href="#" onclick="jQuery('#qbeSQL').toggle();return false;">{% trans "view query" %}</a>)
 </span>
 <ul class="object-tools">
@@ -38,9 +38,12 @@
     <li>
         <a href="{% url qbe_bookmark %}?data={{ pickled }}" title="{% trans "Drag this yo your bookmarks bar to save this query" %}" id="qbeBookmarkQuery">{% trans "bookmark" %}</a>
     </li>
+    <li>
+        <a href="{% url admin:django_qbe_savedquery_add %}?hash={{ query_hash }}">model</a>
+    </li>
     {% for format in formats %}
     <li>
-        <a href="{% url qbe_export format %}?hash={{ query_hash }}" title="{% trans "Export to" %} .{{ format }}" id="qbeExport{{ format }}">.{{ format }}</a>
+        <a href="{% url qbe_export query_hash format %}" title="{% trans "Export to" %} .{{ format }}" id="qbeExport{{ format }}">.{{ format }}</a>
     </li>
     {% endfor %}
 </ul>

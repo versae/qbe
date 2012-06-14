@@ -2,9 +2,9 @@
 import base64
 import pickle
 import random
-
 from collections import deque
 from copy import copy
+from hashlib import md5
 try:
     from itertools import combinations
 except ImportError:
@@ -22,9 +22,18 @@ from django.db.models.fields.related import (ForeignKey, OneToOneField,
                                              ManyToManyField)
 from django.core.exceptions import SuspiciousOperation
 from django.conf import settings
-from django.utils.hashcompat import md5_constructor
 from django.utils.importlib import import_module
 from django.utils.simplejson import dumps
+
+try:
+    # Default value to backwards compatibility
+    qbe_admin_site = getattr(settings, "QBE_ADMIN_SITE", "admin.admin_site")
+    qbe_admin_site_splits = qbe_admin_site.rsplit(".", 1)
+    qbe_admin_module = qbe_admin_site_splits[0]
+    qbe_admin_object = qbe_admin_site_splits[1]
+    admin_site = getattr(import_module(qbe_admin_module), qbe_admin_object)
+except (AttributeError, ImportError):
+    from django.contrib.admin import site as admin_site
 
 try:
     from django.db.models.fields.generic import GenericRelation
@@ -401,8 +410,7 @@ def autocomplete_graph(admin_site, current_models, directed=False):
 def pickle_encode(session_dict):
     "Returns the given session dictionary pickled and encoded as a string."
     pickled = pickle.dumps(session_dict, pickle.HIGHEST_PROTOCOL)
-    pickled_md5 = md5_constructor(pickled + settings.SECRET_KEY).hexdigest()
-    return base64.encodestring(pickled + pickled_md5)
+    return base64.encodestring(pickled + get_query_hash(pickled))
 
 
 # Adapted from django.contrib.sessions.backends.base
@@ -414,7 +422,7 @@ def pickle_decode(session_data):
         session_data += u"="
     encoded_data = base64.decodestring(session_data)
     pickled, tamper_check = encoded_data[:-32], encoded_data[-32:]
-    pickled_md5 = md5_constructor(pickled + settings.SECRET_KEY).hexdigest()
+    pickled_md5 = get_query_hash(pickled)
     if pickled_md5 != tamper_check:
         raise SuspiciousOperation("User tampered with session cookie.")
     try:
@@ -423,3 +431,7 @@ def pickle_decode(session_data):
     # just return an empty dictionary (an empty session).
     except:
         return {}
+
+
+def get_query_hash(data):
+    return md5(data + settings.SECRET_KEY).hexdigest()
