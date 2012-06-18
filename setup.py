@@ -13,7 +13,7 @@ setup(
     author_email='versae@gmail.com',
     url='http://versae.github.com/qbe/',
     description='Django admin tool for custom reports',
-    long_description=read('README.txt'),
+    long_description=read('README.rst'),
     license='AGPL 3',
     keywords='qbe django admin reports query sql',
     classifiers=[
