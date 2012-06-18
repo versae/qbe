@@ -7,13 +7,13 @@ from django.shortcuts import redirect
 from django.utils.functional import update_wrapper
 
 from django_qbe.utils import pickle_encode, get_query_hash
-from django_qbe.models import SavedQuery
 from django_qbe.utils import admin_site
+
+from .models import SavedQuery
 
 
 class SavedQueryAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'date_created', 'run_link')
-    readonly_fields = ['query_hash']
 
     def run_link(self, obj):
         info = self.model._meta.app_label, self.model._meta.module_name
@@ -35,12 +35,6 @@ class SavedQueryAdmin(admin.ModelAdmin):
             url(r'^(.+)/run/$', wrap(self.run_view), name='%s_%s_run' % info),
         )
         return urlpatterns + super(SavedQueryAdmin, self).get_urls()
-
-    def render_change_form(self, request, context, *args, **kwargs):
-        obj = kwargs.get('obj', None)
-        if obj:
-            context.update({'query_hash': obj.query_hash})
-        return super(SavedQueryAdmin, self).render_change_form(request, context, *args, **kwargs)
 
     def save_model(self, request, obj, form, change):
         query_hash = request.GET.get("hash", "")

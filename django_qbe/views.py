@@ -44,6 +44,8 @@ def qbe_form(request, query_hash=None):
         'title': _(u"Query by Example"),
         'json_models': json_models,
         'json_data': json_data,
+        'query_hash': query_hash,
+        'savedqueries_installed': 'django_qbe.savedqueries' in settings.INSTALLED_APPS,
     }
     return render(request, 'qbe.html', context)
 
@@ -113,6 +115,7 @@ def qbe_results(request, query_hash):
             'query_hash': query_hash,
             'admin_urls': (admin_name != None),
             'formats': formats,
+            'savedqueries_installed': 'django_qbe.savedqueries' in settings.INSTALLED_APPS,
         }
         return render(request, 'qbe_results.html', context)
     return redirect("qbe_form")

@@ -38,9 +38,11 @@
     <li>
         <a href="{% url qbe_bookmark %}?data={{ pickled }}" title="{% trans "Drag this yo your bookmarks bar to save this query" %}" id="qbeBookmarkQuery">{% trans "bookmark" %}</a>
     </li>
+    {% if savedqueries_installed %}
     <li>
-        <a href="{% url admin:django_qbe_savedquery_add %}?hash={{ query_hash }}">model</a>
+        <a href="{% url admin:savedqueries_savedquery_add %}?hash={{ query_hash }}">model</a>
     </li>
+    {% endif %}
     {% for format in formats %}
     <li>
         <a href="{% url qbe_export query_hash format %}" title="{% trans "Export to" %} .{{ format }}" id="qbeExport{{ format }}">.{{ format }}</a>
