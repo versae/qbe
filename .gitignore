@@ -1,10 +1,13 @@
 *.xml
+*.pyc
+*.egg-info
 /artworks
 /backups
 /base
 /creators
 /django_extensions
-/media
+/static
 /olwidget
+/django_qbe.egg-info
 /admin.py
 /*.sh

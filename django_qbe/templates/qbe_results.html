@@ -11,16 +11,16 @@
 
 {% block content_title %}{% if title %}
 <h1>
-    {{ title }}: {{ count|floatformat:0 }} result{{ count|floatformat:0|pluralize }}
+    {{ title }}: {{ count|floatformat:0 }} {% trans "result" %}{{ count|floatformat:0|pluralize }}
 </h1>
 {% endif %}{% endblock %}
 
 {% block content %}
 {% block object-tools %}
     {% ifequal limit count %}
-    Showing all {{ count|floatformat:0 }} result{{ results|length|pluralize }}
+    {% trans "Showing all" %} {{ count|floatformat:0 }} {% trans "result" %}{{ results|length|pluralize }}
     {% else %}
-    Showing from {{ offset|floatformat:0 }} to {{ offset_limit|floatformat:0 }} of {{ count|floatformat:0 }} result{{ results|length|pluralize }}
+    {% trans "Showing from" %} {{ offset|floatformat:0 }} {% trans "to" %} {{ offset_limit|floatformat:0 }} {% trans "of" %} {{ count|floatformat:0 }} {% trans "result" %}{{ results|length|pluralize }}
     {% endifequal %}
 <span id="qbeResultsOptions">
     {% ifequal limit count %}
@@ -28,7 +28,7 @@
     {% else %}
     (<a href="{% url qbe_results query_hash %}?show=all">{% trans "show all" %}</a>
     {% endifequal %}
-    | <a href="{% url qbe_form %}?hash={{ query_hash }}">{% trans "edit query" %}</a>
+    | <a href="{% url qbe_form query_hash %}">{% trans "edit query" %}</a>
     | <a href="#" onclick="jQuery('#qbeSQL').toggle();return false;">{% trans "view query" %}</a>)
 </span>
 <ul class="object-tools">
@@ -38,9 +38,14 @@
     <li>
         <a href="{% url qbe_bookmark %}?data={{ pickled }}" title="{% trans "Drag this yo your bookmarks bar to save this query" %}" id="qbeBookmarkQuery">{% trans "bookmark" %}</a>
     </li>
+    {% if savedqueries_installed %}
+    <li>
+        <a href="{% url admin:savedqueries_savedquery_add %}?hash={{ query_hash }}">model</a>
+    </li>
+    {% endif %}
     {% for format in formats %}
     <li>
-        <a href="{% url qbe_export format %}?hash={{ query_hash }}" title="{% trans "Export to" %} .{{ format }}" id="qbeExport{{ format }}">.{{ format }}</a>
+        <a href="{% url qbe_export query_hash format %}" title="{% trans "Export to" %} .{{ format }}" id="qbeExport{{ format }}">.{{ format }}</a>
     </li>
     {% endfor %}
 </ul>
@@ -79,7 +84,7 @@
 </table>
 <p class="paginator">
 {% qbe_paginator count limit page %}
-{{ count|floatformat:0 }} result{{ count|floatformat:0|pluralize }}
+{{ count|floatformat:0 }} {% trans "result" %}{{ count|floatformat:0|pluralize }}
 </p>
 </div>
 {% endblock %}
