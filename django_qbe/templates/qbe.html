@@ -11,7 +11,7 @@
 <script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/jquery.jsplumb.js"></script>
 <script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/qbe.core.js"></script>
 <script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/qbe.diagram.js"></script>
-<link rel="stylesheet" type="text/css" href="{{ ADMIN_MEDIA_PREFIX }}css/forms.css" />
+<link rel="stylesheet" type="text/css" href="{% firstof STATIC_URL MEDIA_URL %}admin/css/forms.css" />
 <link rel="stylesheet" type="text/css" href="{% firstof STATIC_URL MEDIA_URL %}django_qbe/css/qbe.css"/>
 {% endblock %}
 
@@ -23,6 +23,15 @@
 {% block content %}
 {% block object-tools %}
 <ul class="object-tools">
+  {% if savedqueries_installed %}
+  <li>
+  {% if query_hash %}
+    <a href="{% url admin:savedqueries_savedquery_change query_hash %}">{% trans "Saved query" %}</a>
+  {% else %}
+    <a href="{% url admin:savedqueries_savedquery_changelist %}">{% trans "Saved queries" %}</a>
+  {% endif %}
+  </li>
+  {% endif %}
   <li>
     <a href="javascript:void(0);" id="qbeDiagramTab">{% trans "Diagram" %}</a>
   </li>

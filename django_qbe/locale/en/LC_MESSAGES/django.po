@@ -1,0 +1,257 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-06-18 09:25+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: forms.py:29
+msgid "Ascending"
+msgstr ""
+
+#: forms.py:30
+msgid "Descending"
+msgstr ""
+
+#: forms.py:35 templates/qbe.html:57 templates/qbe.html.py:81
+msgid "Show"
+msgstr ""
+
+#: forms.py:36 templates/qbe.html:58
+msgid "Model"
+msgstr ""
+
+#: forms.py:37 templates/qbe.html:59
+msgid "Field"
+msgstr ""
+
+#: forms.py:38 templates/qbe.html:61
+msgid "Criteria"
+msgstr ""
+
+#: forms.py:39 templates/qbe.html:60
+msgid "Sort"
+msgstr ""
+
+#: forms.py:123
+msgid "At least you must check a row to get."
+msgstr ""
+
+#: forms.py:320
+msgid "#"
+msgstr ""
+
+#: views.py:44 views.py:105 views.py:157
+msgid "Query by Example"
+msgstr ""
+
+#: views.py:156
+msgid "Reports"
+msgstr ""
+
+#: widgets.py:10
+msgid "is equal to"
+msgstr ""
+
+#: widgets.py:11
+msgid "contains"
+msgstr ""
+
+#: widgets.py:12
+msgid "matchs regex"
+msgstr ""
+
+#: widgets.py:13
+msgid "starts with"
+msgstr ""
+
+#: widgets.py:14
+msgid "ends with"
+msgstr ""
+
+#: widgets.py:15
+msgid "is greater than"
+msgstr ""
+
+#: widgets.py:16
+msgid "is greater than or equal to"
+msgstr ""
+
+#: widgets.py:17
+msgid "is less than"
+msgstr ""
+
+#: widgets.py:18
+msgid "is less than or equal to"
+msgstr ""
+
+#: widgets.py:19
+msgid "(i) is equal to"
+msgstr ""
+
+#: widgets.py:20
+msgid "(i) contains"
+msgstr ""
+
+#: widgets.py:21
+msgid "(i) matchs regex"
+msgstr ""
+
+#: widgets.py:22
+msgid "(i) starts with"
+msgstr ""
+
+#: widgets.py:23
+msgid "(i) ends with"
+msgstr ""
+
+#: widgets.py:24
+msgid "joins to"
+msgstr ""
+
+#: widgets.py:33
+msgid "Check this"
+msgstr ""
+
+#: savedqueries/admin.py:23 templates/qbe.html:85
+#: templates/admin/savedqueries/savedquery/change_form.html:5
+msgid "Run"
+msgstr ""
+
+#: savedqueries/admin.py:24
+#: templates/admin/savedqueries/savedquery/change_form.html:4
+msgid "Edit"
+msgstr ""
+
+#: savedqueries/admin.py:25
+msgid "query"
+msgstr ""
+
+#: savedqueries/models.py:15
+msgid "hash"
+msgstr ""
+
+#: savedqueries/models.py:16
+msgid "name"
+msgstr ""
+
+#: savedqueries/models.py:17
+msgid "description"
+msgstr ""
+
+#: savedqueries/models.py:19
+msgid "date created"
+msgstr ""
+
+#: savedqueries/models.py:20
+msgid "date updated"
+msgstr ""
+
+#: savedqueries/models.py:23 templates/qbe.html:29
+msgid "Saved query"
+msgstr ""
+
+#: savedqueries/models.py:24 templates/qbe.html:31
+msgid "Saved queries"
+msgstr ""
+
+#: templates/qbe.html:18 templates/qbe_results.html:9
+msgid "Home"
+msgstr ""
+
+#: templates/qbe.html:36
+msgid "Diagram"
+msgstr ""
+
+#: templates/qbe.html:39
+msgid "Tabular"
+msgstr ""
+
+#: templates/qbe.html:42 templates/qbe.html.py:105
+msgid "Models"
+msgstr ""
+
+#: templates/qbe.html:62
+msgid "Delete"
+msgstr ""
+
+#: templates/qbe.html:81
+msgid "rows"
+msgstr ""
+
+#: templates/qbe.html:83
+msgid "Auto complete"
+msgstr ""
+
+#: templates/qbe.html:89
+msgid "Database"
+msgstr ""
+
+#: templates/qbe_results.html:9
+msgid "Results"
+msgstr ""
+
+#: templates/qbe_results.html:14 templates/qbe_results.html.py:21
+#: templates/qbe_results.html:23 templates/qbe_results.html.py:87
+msgid "result"
+msgstr ""
+
+#: templates/qbe_results.html:21
+msgid "Showing all"
+msgstr ""
+
+#: templates/qbe_results.html:23
+msgid "Showing from"
+msgstr ""
+
+#: templates/qbe_results.html:23
+msgid "to"
+msgstr ""
+
+#: templates/qbe_results.html:23
+msgid "of"
+msgstr ""
+
+#: templates/qbe_results.html:27
+msgid "show first ones"
+msgstr ""
+
+#: templates/qbe_results.html:29
+msgid "show all"
+msgstr ""
+
+#: templates/qbe_results.html:31
+msgid "edit query"
+msgstr ""
+
+#: templates/qbe_results.html:32
+msgid "view query"
+msgstr ""
+
+#: templates/qbe_results.html:36
+msgid "Save query as"
+msgstr ""
+
+#: templates/qbe_results.html:39
+msgid "Drag this yo your bookmarks bar to save this query"
+msgstr ""
+
+#: templates/qbe_results.html:39
+msgid "bookmark"
+msgstr ""
+
+#: templates/qbe_results.html:48
+msgid "Export to"
+msgstr ""

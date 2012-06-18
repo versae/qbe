@@ -1,6 +1,7 @@
 The PRIMARY AUTHORS are (ordered by aproximated LOC number):
 
     * Javier de la Rosa <versae@gmail.com>
+    * Jannis Leidel <jannis@leidel.info>
 
 APPRECIATED CONTRIBUTORS:
 

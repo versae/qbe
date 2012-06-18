@@ -23,7 +23,7 @@ Or through pip::
 
   $ pip install django_qbe
 
-But you also can download the *django_qbe* directory using git::
+But you also can download the ``django_qbe`` directory using git::
 
   $ git clone git://github.com/versae/qbe.git
   $ cp -r qbe/django_qbe /path/to/your/project
@@ -41,22 +41,7 @@ And adding the urlconf in your project urls.py::
     # qbe
     url(r'^qbe/', include('django_qbe.urls')),
 
-If you are using Django 1.2 or any previous version you must link or copy the
-*django_qbe/static/django_qbe* directory in your project media directory::
-
-  $ ln -s django_qbe/static/django_qbe /path/to/your/project/media/
-
-And enable the context processor *django.core.context_processors.media*::
-
-  TEMPLATE_CONTEXT_PROCESSORS = (
-      # [...] django context processors
-      'django.core.context_processors.media',
-      # [...] Any other context processors
-  )
-
-But if you're using Django 1.3 or later the static files will be found and served
-automatically, you don't need to do anything except adding the context processor
-*django.core.context_processors.static*::
+Add the context processor ``django.core.context_processors.static``::
 
   TEMPLATE_CONTEXT_PROCESSORS = (
       # [...] django context processors
@@ -79,6 +64,26 @@ Or adding in your custom admin index template the next javascript::
 
   <script type="text/javascript" src="{% url qbe_js %}"></script>
 
+Saved queries
+^^^^^^^^^^^^^
+
+If you optionally want to store queries in your database, feel free to
+install the also included app ``django_qbe.savedqueries``::
+
+  INSTALLED_APPS = (
+      # [...] django builtins applications
+      'django_qbe',
+      'django_qbe.savedqueries',
+      # [...] Any other application
+  )
+
+Then run the ``syncdb`` or optionally South_'s ``migrate`` management command
+to create the ``savedqueries_saved_query`` table.
+
+After that there will be a new option to save a query in a model instance and
+an admin interface to browse the saved queries.
+
+.. _South: http://south.readthedocs.org/
 
 Settings
 --------
@@ -112,4 +117,4 @@ Path to QBE formats export file, in order to add custom export formats::
 
 .. _QBE: http://www.google.com/url?sa=t&source=web&ct=res&cd=2&ved=0CB4QFjAB&url=http%3A%2F%2Fpages.cs.wisc.edu%2F~dbbook%2FopenAccess%2FthirdEdition%2Fqbe.pdf&ei=_UD5S5WSBYP5-Qb-18i8CA&usg=AFQjCNHMv-Pua285zhWT8DevuZFj2gfYKA&sig2=-sTEDWjJhnTaixh2iJfsAw
 .. _PyPI: http://pypi.python.org/pypi/django_qbe/
-.. _staticfiles: http://docs.djangoproject.com/en/dev/howto/static-files
+.. _staticfiles: http://docs.djangoproject.com/en/dev/howto/static-files/

@@ -1,3 +1,22 @@
+0.2.0 (in development)
+----------------------
+
+- Fixed compatibility with Django 1.4 database introspection.
+
+- Fixed relative paths of static files.
+
+- Fixed a regression with JavaScript formsets.
+
+- Added SavedQuery model (including South migrations) to save queries in the
+  database.
+
+- Fixed proxy model support (and other odd scenarios like django-taggit).
+
+- Added English base translation files, and an initial Canadian French
+  translation (by Olivier Larchevêque).
+
+- Fixed packaging manifest template.
+
 0.1.6 (2011-04-20)
 ------------------
  - Added compatibility with Django 1.3 static files.
