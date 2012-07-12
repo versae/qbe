@@ -175,9 +175,14 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                     join_field = qn(over_split[1])
                     if model in self._models:
                         _field = self._models[model]._meta.get_field(field)
+                        # Backwards compatibility for Django 1.3
+                        if hasattr(_field, "db_column") and _field.db_column:
+                            _field_db_column = _field.db_column
+                        else:
+                            _field_db_column = _field.attname
                         join = u"%s.%s = %s.%s" \
                                % (join_model, join_field, qn(model),
-                                  qn(_field.db_column))
+                                  qn(_field_db_column))
                     else:
                         join = u"%s.%s = %s" \
                                % (join_model, join_field,
