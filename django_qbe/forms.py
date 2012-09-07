@@ -30,6 +30,13 @@ SORT_CHOICES = (
     ("des", _("Descending")),
 )
 
+BACKEND_TO_OPERATIONS = {
+    'mysql': 'MySQLOperations',
+    'oracle': 'OracleOperations',
+    'postgis': 'PostGISOperations',
+    'spatialite': 'SpatiaLiteOperations',
+}
+
 
 class QueryByExampleForm(forms.Form):
     show = forms.BooleanField(label=_("Show"), required=False)
@@ -98,7 +105,10 @@ class BaseQueryByExampleFormSet(BaseFormSet):
             pass
         if base_mod and intros_mod:
             self._db_operators = base_mod.DatabaseWrapper.operators
-            DatabaseOperations = base_mod.DatabaseOperations
+            if module.startswith('django.contrib.gis'):
+                DatabaseOperations = getattr(base_mod, BACKEND_TO_OPERATIONS[module.split('.')[-1]])
+            else:
+                DatabaseOperations = base_mod.DatabaseOperations
             try:
                 self._db_operations = DatabaseOperations(self._db_connection)
             except TypeError:
