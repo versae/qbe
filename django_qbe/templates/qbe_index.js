@@ -23,6 +23,8 @@ window.onload = function() {
     h3QBE.appendChild(aQBE);
     divQBE.appendChild(h3QBE);
     divQBE.setAttribute("class", "module");
-    divContentRelated.appendChild(divQBE);
+    if (divContentRelated !== null) {
+        divContentRelated.appendChild(divQBE);
+    }
 }
 {% endif %}
