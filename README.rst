@@ -81,7 +81,14 @@ Then run the ``syncdb`` or optionally South_'s ``migrate`` management command
 to create the ``savedqueries_saved_query`` table.
 
 After that there will be a new option to save a query in a model instance and
-an admin interface to browse the saved queries.
+an admin interface to browse the saved queries, or direclty from the command
+line using the command ``qbe_export``::
+
+  $ python manage.py help qbe_export
+  $ python manage.py qbe_export <query_hash>
+  $ python manage.py qbe_export <query_hash> --output test.csv
+  $ python manage.py qbe_export <query_hash> --output test.xls --format xls
+  $ python manage.py qbe_export <query_hash> --output test.xls --format xls --db-alias default
 
 .. _South: http://south.readthedocs.org/
 
