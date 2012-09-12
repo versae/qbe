@@ -13,7 +13,8 @@ from .models import SavedQuery
 
 
 class SavedQueryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'date_created', 'run_link')
+    list_display = ('name', 'description', 'date_created', 'query_hash',
+                    'run_link')
 
     def run_link(self, obj):
         info = self.model._meta.app_label, self.model._meta.module_name
