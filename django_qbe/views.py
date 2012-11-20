@@ -46,6 +46,7 @@ def qbe_form(request, query_hash=None):
         'json_data': json_data,
         'query_hash': query_hash,
         'savedqueries_installed': 'django_qbe.savedqueries' in settings.INSTALLED_APPS,
+        'aliases_enabled': getattr(settings, 'QBE_ALIASES', False),
     }
     return render(request, 'qbe.html', context)
 
@@ -80,9 +81,10 @@ def qbe_results(request, query_hash):
         db_alias = request.session.get("qbe_database", "default")
     formset = QueryByExampleFormSet(data=data, using=db_alias)
     if formset.is_valid():
-        row_number = True
+        row_number = getattr(settings, 'QBE_SHOW_ROW_NUMBER', True)
         admin_name = getattr(settings, "QBE_ADMIN", "admin")
-        labels = formset.get_labels(row_number=row_number)
+        aliases = getattr(settings, 'QBE_ALIASES', False)
+        labels = formset.get_labels(row_number=row_number, aliases=aliases)
         count = formset.get_count()
         limit = count
         try:
@@ -141,7 +143,8 @@ def qbe_export(request, query_hash, format):
         db_alias = request.session.get("qbe_database", "default")
         formset = QueryByExampleFormSet(data=data, using=db_alias)
         if formset.is_valid():
-            labels = formset.get_labels()
+            aliases = getattr(settings, 'QBE_ALIASES', False)
+            labels = formset.get_labels(aliases=aliases)
             query = formset.get_raw_query()
             results = formset.get_results(query)
             return formats[format](labels, results)
