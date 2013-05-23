@@ -23,7 +23,8 @@ class OperatorMount(type):
             # This must be a operator implementation, which should be registered.
             # Simply appending it to the list is all that's needed to keep
             # track of it later.
-            cls.operators[cls.slug] = cls
+            if hasattr(cls, 'slug') and hasattr(cls, 'label'):
+                cls.operators[cls.slug] = cls
 
     def get_operators(self):
         return self.operators
