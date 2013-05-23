@@ -217,8 +217,8 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                                   % (lookup_cast(operator) % db_field,
                                      db_operator))
                 elif operator in self._custom_operators.keys():
-                    CustomOperator = self._custom_operators[operator]
-                    custom_operator = CustomOperator(db_field, operator, over)
+                    CustOperator = self._custom_operators[operator]
+                    custom_operator = CustOperator(db_field, operator, over)
 
                     # make sure the operators params are iterable:
                     custom_params = custom_operator.get_params()
