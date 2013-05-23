@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import collections
 from django import forms
 from django.db import connections
 from django.db.models.fields import Field
@@ -8,6 +9,7 @@ from django.forms.formsets import BaseFormSet, formset_factory
 from django.utils.importlib import import_module
 from django.utils.translation import ugettext as _
 
+from django_qbe.operators import CustomOperator
 from django_qbe.utils import get_models
 from django_qbe.widgets import CriteriaInput
 
@@ -92,6 +94,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
     _db_operators = {}
     _db_table_names = []
     _db_operations = None
+    _custom_operators = CustomOperator.get_operators()
 
     def __init__(self, *args, **kwargs):
         self._db_alias = kwargs.pop("using", "default")
@@ -213,6 +216,24 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                     wheres.append(u"%s %s" \
                                   % (lookup_cast(operator) % db_field,
                                      db_operator))
+                elif operator in self._custom_operators.keys():
+                    CustomOperator = self._custom_operators[operator]
+                    custom_operator = CustomOperator(db_field, operator, over)
+
+                    # make sure the operators params are iterable:
+                    custom_params = custom_operator.get_params()
+                    if isinstance(custom_params, collections.Iterable):
+                        params += custom_params
+                    else:
+                        params += [custom_params,]
+
+                    # make sure the operators wheres are iterable:
+                    custom_wheres = custom_operator.get_wheres()
+                    if isinstance(custom_wheres, collections.Iterable):
+                        wheres += custom_wheres
+                    else:
+                        wheres += [custom_wheres,]
+
             if qn(model) not in froms and model in self._db_table_names:
                 froms.append(qn(model))
         return selects, froms, wheres, sorts, params

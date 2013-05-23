@@ -4,6 +4,7 @@ from django.forms.widgets import MultiWidget, Select, TextInput, Widget
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
+from django_qbe.operators import CustomOperator
 
 OPERATOR_CHOICES = (
     ('', ''),
@@ -57,7 +58,14 @@ class CriteriaInput(MultiWidget):
         # widgets = [CheckboxLabelWidget(label=_("Inverse")),
         #            Select(choices=OPERATOR_CHOICES), TextInput(),
         #            CheckboxLabelWidget(label=_("Nothing"))]
-        widgets = [Select(choices=OPERATOR_CHOICES), TextInput()]
+        custom_operators = CustomOperator.get_operators()
+
+        # inject custom operators
+        ALL_OPERATOR_CHOICES = OPERATOR_CHOICES
+        for operator_slug, operator in custom_operators.items():
+            ALL_OPERATOR_CHOICES += ((operator_slug, operator.label),)
+
+        widgets = [Select(choices=ALL_OPERATOR_CHOICES), TextInput()]
         super(CriteriaInput, self).__init__(widgets=widgets, *args, **kwargs)
 
     def decompress(self, value):
