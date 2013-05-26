@@ -48,6 +48,12 @@ except ImportError:
     from django_qbe.exports import formats
 formats  # Makes pyflakes happy
 
+try:
+    qbe_operators = getattr(settings, "QBE_CUSTOM_OPERATORS", "qbe_operators")
+    import_module(qbe_operators)
+except ImportError:
+    pass
+
 
 def qbe_models(admin_site=None, only_admin_models=False, json=False):
     app_models = get_models(include_auto_created=True, include_deferred=True)
