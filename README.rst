@@ -121,6 +121,58 @@ Path to QBE formats export file, in order to add custom export formats::
 
   QBE_FORMATS_EXPORT = "qbe_formats"
 
+Custom Operators
+--------
+
+Use Custom Operators only if you know what you are doing and at your own risks!
+
+If you need to define custom operators, in one of your ``models.py``, you need to create a new class that extends ``django_qbe.operators.CustomOperator``::
+
+  import datetime
+  from django.utils import timezone
+  from django_qbe.operators import CustomOperator
+  
+  class SinceDaysAgo(CustomOperator):
+      slug = 'since-days-ago' # REQUIRED and must be unique
+      label = 'Since Days Ago' # REQUIRED
+  
+      def get_params(self):
+          if len(self.params):
+              return self.params
+  
+          now = timezone.now()
+          today = now.replace(hour=0, minute=0, second=0, microsecond=0)
+          tomorrow = today + datetime.timedelta(days=1)
+  
+          date_since = today - datetime.timedelta(days=int(self.value))
+  
+          operator = "gt"
+          lookup_since = self._get_lookup(operator, str(date_since))
+          lookup_until = self._get_lookup(operator, str(tomorrow))
+  
+          self.params.append(lookup_since)
+          self.params.append(lookup_until)
+  
+          return self.params
+  
+      def get_wheres(self):
+          if len(self.wheres):
+              return self.wheres
+  
+          lookup_cast = self._db_operations.lookup_cast
+          for operator in ["gte", "lt"]:
+              db_operator = self._db_operators[operator]
+              self.wheres.append(u"%s %s" \
+                  % (lookup_cast(operator) % self.db_field,
+                     db_operator))
+  
+          return self.wheres
+
+Your custom operator must have 2 attributes, ``slug`` and ``label`` in order to be displayed in the Criteria dropdown.
+
+The ``get_params`` and ``get_wheres`` methods must return an iterable instance (eg. list), otherwise it gets converted to a list.
+
+If you dont want to write it in your ``models.py`` make sure that it is imported in one of the files that are evaluated at runtime (eg. ``models.py`` or ``urls.py``) in order to register your Custom Operator.
 
 .. _QBE: http://www.google.com/url?sa=t&source=web&ct=res&cd=2&ved=0CB4QFjAB&url=http%3A%2F%2Fpages.cs.wisc.edu%2F~dbbook%2FopenAccess%2FthirdEdition%2Fqbe.pdf&ei=_UD5S5WSBYP5-Qb-18i8CA&usg=AFQjCNHMv-Pua285zhWT8DevuZFj2gfYKA&sig2=-sTEDWjJhnTaixh2iJfsAw
 .. _PyPI: http://pypi.python.org/pypi/django_qbe/
