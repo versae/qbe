@@ -76,7 +76,7 @@ qbe.Containers = [];
                 }
             });
             $.ajax({
-                url: "{% url django_qbe.views.qbe_autocomplete %}",
+                url: "{% url "django_qbe.views.qbe_autocomplete" %}",
                 dataType: 'json',
                 data: "models="+ models.join(","),
                 type: 'post',

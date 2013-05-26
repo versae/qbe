@@ -6,7 +6,7 @@
 <link rel="stylesheet" type="text/css" href="{% firstof STATIC_URL MEDIA_URL %}django_qbe/css/qbe.css" />
 {% endblock %}
 
-{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url admin:index %}">{% trans 'Home' %}</a>{% if title %} &rsaquo; <a href="{% url qbe_form %}">{{ title }}</a> &rsaquo; {% trans "Results" %}{% endif %}</div>
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url "admin:index" %}">{% trans 'Home' %}</a>{% if title %} &rsaquo; <a href="{% url "qbe_form" %}">{{ title }}</a> &rsaquo; {% trans "Results" %}{% endif %}</div>
 {% endblock %}
 
 {% block content_title %}{% if title %}
@@ -24,11 +24,11 @@
     {% endifequal %}
 <span id="qbeResultsOptions">
     {% ifequal limit count %}
-    (<a href="{% url qbe_results query_hash %}">{% trans "show first ones" %}</a>
+    (<a href="{% url "qbe_results" query_hash %}">{% trans "show first ones" %}</a>
     {% else %}
-    (<a href="{% url qbe_results query_hash %}?show=all">{% trans "show all" %}</a>
+    (<a href="{% url "qbe_results" query_hash %}?show=all">{% trans "show all" %}</a>
     {% endifequal %}
-    | <a href="{% url qbe_form query_hash %}">{% trans "edit query" %}</a>
+    | <a href="{% url "qbe_form" query_hash %}">{% trans "edit query" %}</a>
     | <a href="#" onclick="jQuery('#qbeSQL').toggle();return false;">{% trans "view query" %}</a>)
 </span>
 <ul class="object-tools">
@@ -36,16 +36,16 @@
         {% trans "Save query as" %}
     </li>
     <li>
-        <a href="{% url qbe_bookmark %}?data={{ pickled }}" title="{% trans "Drag this yo your bookmarks bar to save this query" %}" id="qbeBookmarkQuery">{% trans "bookmark" %}</a>
+        <a href="{% url "qbe_bookmark" %}?data={{ pickled }}" title="{% trans "Drag this yo your bookmarks bar to save this query" %}" id="qbeBookmarkQuery">{% trans "bookmark" %}</a>
     </li>
     {% if savedqueries_installed %}
     <li>
-        <a href="{% url admin:savedqueries_savedquery_add %}?hash={{ query_hash }}">model</a>
+        <a href="{% url "admin:savedqueries_savedquery_add" %}?hash={{ query_hash }}">model</a>
     </li>
     {% endif %}
     {% for format in formats %}
     <li>
-        <a href="{% url qbe_export query_hash format %}" title="{% trans "Export to" %} .{{ format }}" id="qbeExport{{ format }}">.{{ format }}</a>
+        <a href="{% url "qbe_export" query_hash format %}" title="{% trans "Export to" %} .{{ format }}" id="qbeExport{{ format }}">.{{ format }}</a>
     </li>
     {% endfor %}
 </ul>

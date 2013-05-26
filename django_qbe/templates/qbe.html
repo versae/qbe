@@ -6,7 +6,7 @@
 <script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/excanvas.js"></script>
 <![endif]-->
 <script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/jquery.js"></script>
-<script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/jquery.ui.js"></script> 
+<script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/jquery.ui.js"></script>
 <script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/jquery.formset.js"></script>
 <script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/jquery.jsplumb.js"></script>
 <script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/qbe.core.js"></script>
@@ -15,7 +15,7 @@
 <link rel="stylesheet" type="text/css" href="{% firstof STATIC_URL MEDIA_URL %}django_qbe/css/qbe.css"/>
 {% endblock %}
 
-{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url admin:index %}">{% trans 'Home' %}</a>{% if title %} &rsaquo; {{ title }}{% endif %}</div>
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url "admin:index" %}">{% trans 'Home' %}</a>{% if title %} &rsaquo; {{ title }}{% endif %}</div>
 {% endblock %}
 
 {% block pretitle %}{% endblock %}
@@ -26,9 +26,9 @@
   {% if savedqueries_installed %}
   <li>
   {% if query_hash %}
-    <a href="{% url admin:savedqueries_savedquery_change query_hash %}">{% trans "Saved query" %}</a>
+    <a href="{% url "admin:savedqueries_savedquery_change" query_hash %}">{% trans "Saved query" %}</a>
   {% else %}
-    <a href="{% url admin:savedqueries_savedquery_changelist %}">{% trans "Saved queries" %}</a>
+    <a href="{% url "admin:savedqueries_savedquery_changelist" %}">{% trans "Saved queries" %}</a>
   {% endif %}
   </li>
   {% endif %}
@@ -44,7 +44,7 @@
 </ul>
 {% endblock %}
 
-<form id="qbeForm" method="post" action="{% url qbe_proxy %}">
+<form id="qbeForm" method="post" action="{% url "qbe_proxy" %}">
 {% csrf_token %}
 <div class="qbeContainer qbeDiagram" id="qbeDiagram" style="display: none;">
     <div id="qbeDiagramContainer"></div>
