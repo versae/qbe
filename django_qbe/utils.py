@@ -34,6 +34,7 @@ try:
     admin_site = getattr(import_module(qbe_admin_module), qbe_admin_object)
 except (AttributeError, ImportError):
     from django.contrib.admin import site as admin_site
+admin_site
 
 try:
     from django.db.models.fields.generic import GenericRelation
@@ -254,7 +255,7 @@ def remove_leafs(tree, nodes):
 
     def get_leafs(tree, nodes):
         return [node for node, edges in tree.items()
-                     if len(edges) < 2 and node not in nodes]
+                if len(edges) < 2 and node not in nodes]
 
     def delete_edge_leafs(tree, leaf):
         for node, edges in tree.items():

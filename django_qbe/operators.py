@@ -1,4 +1,3 @@
-import abc
 from django.conf import settings
 from django.db import connections
 from django.db.models.fields import Field
@@ -6,21 +5,31 @@ from django.utils.importlib import import_module
 
 DATABASES = settings.DATABASES
 
+BACKEND_TO_OPERATIONS = {
+    'mysql': 'MySQLOperations',
+    'oracle': 'OracleOperations',
+    'postgis': 'PostGISOperations',
+    'spatialite': 'SpatiaLiteOperations',
+}
+
+
 """
 Plugin infrastructure based on
 http://martyalchin.com/2008/jan/10/simple-plugin-framework/
 """
 
+
 class OperatorMount(type):
     def __init__(cls, *args, **kwargs):
         if not hasattr(cls, 'operators'):
             # This branch only executes when processing the mount point itself.
-            # So, since this is a new operator type, not an implementation, this
-            # class shouldn't be registered as a operator. Instead, it sets up a
-            # list where operators can be registered later.
+            # So, since this is a new operator type, not an implementation,
+            # this class shouldn't be registered as a operator. Instead, it
+            # sets up a list where operators can be registered later.
             cls.operators = {}
         else:
-            # This must be a operator implementation, which should be registered.
+            # This must be a operator implementation, which should be
+            # registered.
             # Simply appending it to the list is all that's needed to keep
             # track of it later.
             if hasattr(cls, 'slug') and hasattr(cls, 'label'):
@@ -29,11 +38,13 @@ class OperatorMount(type):
     def get_operators(self):
         return self.operators
 
+
 class CustomOperator:
     """
     Mount point for operators which refer to actions that can be performed.
 
-    Operators implementing this reference should provide the following attributes:
+    Operators implementing this reference should provide the following
+    attributes:
 
     ========  ========================================================
     slug      A unique slug that must identify this operator
@@ -64,7 +75,8 @@ class CustomOperator:
         if base_mod and intros_mod:
             self._db_operators = base_mod.DatabaseWrapper.operators
             if module.startswith('django.contrib.gis'):
-                DatabaseOperations = getattr(base_mod, BACKEND_TO_OPERATIONS[module.split('.')[-1]])
+                operations_name = BACKEND_TO_OPERATIONS[module.split('.')[-1]]
+                DatabaseOperations = getattr(base_mod, operations_name)
             else:
                 DatabaseOperations = base_mod.DatabaseOperations
             try:
@@ -93,7 +105,7 @@ class CustomOperator:
         """
         returns a list
         """
-        self.wheres.append(u"%s %s" \
+        self.wheres.append(u"%s %s"
                            % (lookup_cast(operator) % self.db_field,
                               self.operator))
         return self.wheres

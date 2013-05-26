@@ -9,7 +9,7 @@ from django.forms.formsets import BaseFormSet, formset_factory
 from django.utils.importlib import import_module
 from django.utils.translation import ugettext as _
 
-from django_qbe.operators import CustomOperator
+from django_qbe.operators import CustomOperator, BACKEND_TO_OPERATIONS
 from django_qbe.utils import get_models
 from django_qbe.widgets import CriteriaInput
 
@@ -31,13 +31,6 @@ SORT_CHOICES = (
     ("asc", _("Ascending")),
     ("des", _("Descending")),
 )
-
-BACKEND_TO_OPERATIONS = {
-    'mysql': 'MySQLOperations',
-    'oracle': 'OracleOperations',
-    'postgis': 'PostGISOperations',
-    'spatialite': 'SpatiaLiteOperations',
-}
 
 
 class QueryByExampleForm(forms.Form):
@@ -109,7 +102,8 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         if base_mod and intros_mod:
             self._db_operators = base_mod.DatabaseWrapper.operators
             if module.startswith('django.contrib.gis'):
-                DatabaseOperations = getattr(base_mod, BACKEND_TO_OPERATIONS[module.split('.')[-1]])
+                operations_name = BACKEND_TO_OPERATIONS[module.split('.')[-1]]
+                DatabaseOperations = getattr(base_mod, operations_name)
             else:
                 DatabaseOperations = base_mod.DatabaseOperations
             try:
@@ -201,7 +195,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                                % (join_model, join_field,
                                   u"%s_id" % db_field)
                     if (join not in wheres
-                        and uqn(join_model) in self._db_table_names):
+                            and uqn(join_model) in self._db_table_names):
                         wheres.append(join)
                         if join_model not in froms:
                             froms.append(join_model)
@@ -213,7 +207,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                     db_operator = self._db_operators[operator]
                     lookup = self._get_lookup(operator, over)
                     params.append(lookup)
-                    wheres.append(u"%s %s" \
+                    wheres.append(u"%s %s"
                                   % (lookup_cast(operator) % db_field,
                                      db_operator))
                 elif operator in self._custom_operators.keys():
@@ -225,14 +219,14 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                     if isinstance(custom_params, collections.Iterable):
                         params += custom_params
                     else:
-                        params += [custom_params,]
+                        params += [custom_params, ]
 
                     # make sure the operators wheres are iterable:
                     custom_wheres = custom_operator.get_wheres()
                     if isinstance(custom_wheres, collections.Iterable):
                         wheres += custom_wheres
                     else:
-                        wheres += [custom_wheres,]
+                        wheres += [custom_wheres, ]
 
             if qn(model) not in froms and model in self._db_table_names:
                 froms.append(qn(model))
@@ -286,7 +280,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         """
         Fetch all results after perform SQL query and
         """
-        add_extra_ids = (admin_name != None)
+        add_extra_ids = (admin_name is not None)
         if not query:
             sql = self.get_raw_query(limit=limit, offset=offset,
                                      add_extra_ids=add_extra_ids)
@@ -322,9 +316,11 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                                                     _model._meta.module_name)
                         else:
                             _appmodel = appmodel
-                        admin_url = reverse("%s:%s_change" % (admin_name,
-                                                              _appmodel),
-                                             args=[row[i + 1]])
+                        admin_url = reverse("%s:%s_change" % (
+                            admin_name,
+                            _appmodel),
+                            args=[row[i + 1]]
+                        )
                     except NoReverseMatch:
                         admin_url = None
                     result.append((row[i], admin_url))
