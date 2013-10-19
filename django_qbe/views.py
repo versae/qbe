@@ -47,6 +47,7 @@ def qbe_form(request, query_hash=None):
         'query_hash': query_hash,
         'savedqueries_installed': 'django_qbe.savedqueries' in settings.INSTALLED_APPS,
         'aliases_enabled': getattr(settings, 'QBE_ALIASES', False),
+        'group_by_enabled': getattr(settings, 'QBE_GROUP_BY', False),
     }
     return render(request, 'qbe.html', context)
 
@@ -115,7 +116,7 @@ def qbe_results(request, query_hash):
             'offset_limit': offset + limit,
             'pickled': pickled,
             'query_hash': query_hash,
-            'admin_urls': (admin_name != None),
+            'admin_urls': (admin_name != None and formset.has_admin_urls()),
             'formats': formats,
             'savedqueries_installed': 'django_qbe.savedqueries' in settings.INSTALLED_APPS,
         }

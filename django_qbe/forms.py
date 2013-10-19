@@ -41,6 +41,7 @@ class QueryByExampleForm(forms.Form):
     criteria = forms.CharField(label=_("Criteria"), required=False)
     sort = forms.ChoiceField(label=_("Sort"), choices=SORT_CHOICES,
                              required=False)
+    group_by = forms.BooleanField(label=_("Group by"), required=False)
 
     def __init__(self, *args, **kwargs):
         super(QueryByExampleForm, self).__init__(*args, **kwargs)
@@ -82,6 +83,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
     _froms = []
     _wheres = []
     _sorts = []
+    _groups_by = []
     _params = []
     _models = {}
     _raw_query = None
@@ -127,7 +129,8 @@ class BaseQueryByExampleFormSet(BaseFormSet):
             # Don't bother validating the formset unless each form is valid on
             # its own
             return
-        selects, aliases, froms, wheres, sorts, params = self.get_query_parts()
+        (selects, aliases, froms, wheres, sorts, groups_by,
+         params) = self.get_query_parts()
         if not selects:
             validation_message = _(u"At least you must check a row to get.")
             raise forms.ValidationError, validation_message
@@ -136,6 +139,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         self._froms = froms
         self._wheres = wheres
         self._sorts = sorts
+        self._groups_by = groups_by
         self._params = params
 
     def get_query_parts(self):
@@ -147,6 +151,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         froms = []
         wheres = []
         sorts = []
+        groups_by = []
         params = []
         app_model_labels = None
         lookup_cast = self._db_operations.lookup_cast
@@ -173,6 +178,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
             alias = data["alias"]
             criteria = data["criteria"]
             sort = data["sort"]
+            group_by = data["group_by"]
             db_field = u"%s.%s" % (qn(model), qn(field))
             operator, over = criteria
             is_join = operator.lower() == 'join'
@@ -182,6 +188,8 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                 aliases.append(alias)
             if sort:
                 sorts.append(db_field)
+            if group_by:
+                groups_by.append(db_field)
             if all(criteria):
                 if is_join:
                     over_split = over.lower().rsplit(".", 1)
@@ -237,7 +245,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
 
             if qn(model) not in froms and model in self._db_table_names:
                 froms.append(qn(model))
-        return selects, aliases, froms, wheres, sorts, params
+        return selects, aliases, froms, wheres, sorts, groups_by, params
 
     def get_raw_query(self, limit=None, offset=None, count=False,
                       add_extra_ids=False, add_params=False):
@@ -247,6 +255,10 @@ class BaseQueryByExampleFormSet(BaseFormSet):
             order_by = u"ORDER BY %s" % (", ".join(self._sorts))
         else:
             order_by = u""
+        if self._groups_by:
+            group_by = u"GROUP BY %s" % (", ".join(self._groups_by))
+        else:
+            group_by = u""
         if self._wheres:
             wheres = u"WHERE %s" % (" AND ".join(self._wheres))
         else:
@@ -254,7 +266,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         if count:
             selects = (u"COUNT(*) as count", )
             order_by = u""
-        elif add_extra_ids:
+        elif add_extra_ids and not group_by:
             selects = self._get_selects_with_extra_ids()
         else:
             selects = self._selects
@@ -270,11 +282,12 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                 offsets = u"OFFSET %s" % int(offset)
             except ValueError:
                 pass
-        sql = u"""SELECT %s FROM %s %s %s %s %s;""" \
+        sql = u"""SELECT %s FROM %s %s %s %s %s %s;""" \
               % (", ".join(selects),
                  ", ".join(self._froms),
                  wheres,
                  order_by,
+                 group_by,
                  limits,
                  offsets)
         if add_params:
@@ -298,7 +311,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         cursor = self._db_connection.cursor()
         cursor.execute(sql, tuple(self._params))
         query_results = cursor.fetchall()
-        if admin_name:
+        if admin_name and not self._groups_by:
             selects = self._get_selects_with_extra_ids()
             results = []
             try:
@@ -375,6 +388,9 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                                         label_splits_field)
                 labels.append(label)
         return labels
+
+    def has_admin_urls(self):
+        return not bool(self._groups_by)
 
     def _unquote_name(self, name):
         quoted_space = self._db_operations.quote_name("")
