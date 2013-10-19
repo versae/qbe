@@ -55,6 +55,7 @@
         <thead>
             <tr>
                 <th>{% trans "Show" %}</th>
+                {% if aliases_enabled %}<th>{% trans "Show as" %}</th>{% endif %}
                 <th>{% trans "Model" %}</th>
                 <th>{% trans "Field" %}</th>
                 <th>{% trans "Sort" %}</th>
@@ -66,6 +67,7 @@
         {% for form in formset.forms %}
             <tr class="{% cycle 'row1' 'row2' %}">
                 <td>{{ form.show.errors }}{{ form.show }}</td>
+                {% if aliases_enabled %}<td>{{ form.alias.errors }}{{ form.alias }}</td>{% endif %}
                 <td>{{ form.model.errors }}{{ form.model }}</td>
                 <td>{{ form.field.errors }}{{ form.field }}</td>
                 <td>{{ form.sort.errors }}{{ form.sort }}</td>

@@ -35,6 +35,7 @@ SORT_CHOICES = (
 
 class QueryByExampleForm(forms.Form):
     show = forms.BooleanField(label=_("Show"), required=False)
+    alias = forms.CharField(label=_("Show as"), required=False)
     model = forms.CharField(label=_("Model"))
     field = forms.CharField(label=_("Field"))
     criteria = forms.CharField(label=_("Criteria"), required=False)
@@ -77,6 +78,7 @@ class QueryByExampleForm(forms.Form):
 
 class BaseQueryByExampleFormSet(BaseFormSet):
     _selects = []
+    _aliases = []
     _froms = []
     _wheres = []
     _sorts = []
@@ -125,11 +127,12 @@ class BaseQueryByExampleFormSet(BaseFormSet):
             # Don't bother validating the formset unless each form is valid on
             # its own
             return
-        selects, froms, wheres, sorts, params = self.get_query_parts()
+        selects, aliases, froms, wheres, sorts, params = self.get_query_parts()
         if not selects:
             validation_message = _(u"At least you must check a row to get.")
             raise forms.ValidationError, validation_message
         self._selects = selects
+        self._aliases = aliases
         self._froms = froms
         self._wheres = wheres
         self._sorts = sorts
@@ -140,6 +143,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         Return SQL query for cleaned data
         """
         selects = []
+        aliases = []
         froms = []
         wheres = []
         sorts = []
@@ -166,6 +170,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                 self._models[model] = app_models[position]
             field = data["field"]
             show = data["show"]
+            alias = data["alias"]
             criteria = data["criteria"]
             sort = data["sort"]
             db_field = u"%s.%s" % (qn(model), qn(field))
@@ -173,6 +178,8 @@ class BaseQueryByExampleFormSet(BaseFormSet):
             is_join = operator.lower() == 'join'
             if show and not is_join:
                 selects.append(db_field)
+            if alias and not is_join:
+                aliases.append(alias)
             if sort:
                 sorts.append(db_field)
             if all(criteria):
@@ -230,7 +237,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
 
             if qn(model) not in froms and model in self._db_table_names:
                 froms.append(qn(model))
-        return selects, froms, wheres, sorts, params
+        return selects, aliases, froms, wheres, sorts, params
 
     def get_raw_query(self, limit=None, offset=None, count=False,
                       add_extra_ids=False, add_params=False):
@@ -347,11 +354,14 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         else:
             return len(self.get_results())
 
-    def get_labels(self, add_extra_ids=False, row_number=False):
+    def get_labels(self, add_extra_ids=False, row_number=False, aliases=False):
         if row_number:
             labels = [_(u"#")]
         else:
             labels = []
+        if aliases:
+            labels.extend(self._aliases)
+            return labels
         if add_extra_ids:
             selects = self._get_selects_with_extra_ids()
         else:
