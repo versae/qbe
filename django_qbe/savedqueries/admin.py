@@ -2,7 +2,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.contrib.admin.util import unquote
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 from django.shortcuts import redirect
 from django.utils.functional import update_wrapper
 
