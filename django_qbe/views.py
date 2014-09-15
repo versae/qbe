@@ -6,7 +6,10 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
-from django.utils import simplejson
+try: #Fix for deprecated simplejson
+    from django.utils import simplejson
+except:
+    import json as simplejson
 from django.utils.translation import ugettext as _
 
 from django_qbe.forms import QueryByExampleFormSet, DATABASES
