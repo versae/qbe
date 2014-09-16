@@ -23,7 +23,11 @@ from django.db.models.fields.related import (ForeignKey, OneToOneField,
 from django.core.exceptions import SuspiciousOperation
 from django.conf import settings
 from django.utils.importlib import import_module
-from django.utils.simplejson import dumps
+
+try:
+    from django.utils.simplejson import dumps
+except:
+    from json import dumps
 
 try:
     # Default value to backwards compatibility
