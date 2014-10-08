@@ -286,8 +286,8 @@ class BaseQueryByExampleFormSet(BaseFormSet):
               % (", ".join(selects),
                  ", ".join(self._froms),
                  wheres,
-                 order_by,
                  group_by,
+                 order_by,
                  limits,
                  offsets)
         if add_params:
