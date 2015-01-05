@@ -193,7 +193,7 @@ qbe.Core = function() {};
                         optFields.push(option);
                     }
                 }
-                $("#"+ domTo).html('<option value="">*</option>' + optPrimaries.join("") + optForeigns.join("") + optManies.join("") + optFields.join(""));
+                $("#"+ domTo).html('<option value="">----</option>' + optPrimaries.join("") + optForeigns.join("") + optManies.join("") + optFields.join(""));
                 // We need to raise change event
                 $("#"+ domTo).change();
             }
