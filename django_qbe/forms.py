@@ -167,7 +167,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                 app_models = get_models(include_auto_created=True,
                                         include_deferred=True)
                 app_model_labels = [u"%s_%s" % (a._meta.app_label,
-                                                a._meta.module_name)
+                                                a._meta.model_name)
                                     for a in app_models]
             if model in app_model_labels:
                 position = app_model_labels.index(model)
@@ -184,7 +184,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
             is_join = operator.lower() == 'join'
             if show and not is_join:
                 selects.append(db_field)
-            if alias and not is_join:
+            if alias is not None and not is_join:
                 aliases.append(alias)
             if sort:
                 sorts.append(db_field)
@@ -333,7 +333,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                         if appmodel in self._models:
                             _model = self._models[appmodel]
                             _appmodel = u"%s_%s" % (_model._meta.app_label,
-                                                    _model._meta.module_name)
+                                                    _model._meta.model_name)
                         else:
                             _appmodel = appmodel
                         admin_url = reverse("%s:%s_change" % (
@@ -372,20 +372,19 @@ class BaseQueryByExampleFormSet(BaseFormSet):
             labels = [_(u"#")]
         else:
             labels = []
-        if aliases:
-            labels.extend(self._aliases)
-            return labels
         if add_extra_ids:
             selects = self._get_selects_with_extra_ids()
         else:
             selects = self._selects
         if selects and isinstance(selects, (tuple, list)):
-            for select in selects:
-                label_splits = select.replace("_", ".").split(".")
-                label_splits_field = " ".join(label_splits[2:]).capitalize()
-                label = u"%s.%s: %s" % (label_splits[0].capitalize(),
-                                        label_splits[1].capitalize(),
-                                        label_splits_field)
+            for i, select in enumerate(selects):
+                label = self._aliases[i]
+                if not aliases or label.strip() == u"":
+                    label_splits = select.replace(u"_", u".").split(u".")
+                    label_splits_field = u" ".join(label_splits[2:])
+                    label = u"%s.%s: %s" % (label_splits[0].capitalize(),
+                                            label_splits[1].capitalize(),
+                                            label_splits_field.capitalize())
                 labels.append(label)
         return labels
 

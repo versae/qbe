@@ -17,8 +17,8 @@ QBE_CUSTOM_OPERATORS = getattr(settings,
                                "QBE_CUSTOM_OPERATORS", "qbe_operators")
 
 # query form
-QBE_ALIASES = getattr(settings, "QBE_ALIASES", False),
-QBE_GROUP_BY = getattr(settings, "QBE_GROUP_BY", False),
+QBE_ALIASES = getattr(settings, "QBE_ALIASES", False)
+QBE_GROUP_BY = getattr(settings, "QBE_GROUP_BY", False)
 QBE_SHOW_ROW_NUMBER = getattr(settings, "QBE_SHOW_ROW_NUMBER", True)
 
 # saved queries

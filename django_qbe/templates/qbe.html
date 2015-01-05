@@ -26,7 +26,11 @@
         &rsaquo; <a href="{% url "admin:savedqueries_savedquery_change" query_hash %}">{{ saved_query.name }}</a>
     {% endif %}
     {% block breadcrumbs_inner %}
+    {% if query_hash %}
     &rsaquo; {% trans 'Edit' %}
+    {% else %}
+    &rsaquo; {% trans 'New' %}
+    {% endif %}
     {% endblock %}
 </div>
 {% endblock %}
@@ -68,9 +72,9 @@
         <thead>
             <tr>
                 <th>{% trans "Show" %}</th>
-                {% if aliases_enabled %}<th>{% trans "Show as" %}</th>{% endif %}
                 <th>{% trans "Model" %}</th>
                 <th>{% trans "Field" %}</th>
+                {% if aliases_enabled %}<th>{% trans "As" %}</th>{% endif %}
                 <th>{% trans "Sort" %}</th>
                 {% if group_by_enabled %}<th>{% trans "Group by" %}</th>{% endif %}
                 <th>{% trans "Criteria" %}</th>
@@ -81,9 +85,9 @@
         {% for form in formset.forms %}
             <tr class="{% cycle 'row1' 'row2' %}">
                 <td>{{ form.show.errors }}{{ form.show }}</td>
-                {% if aliases_enabled %}<td>{{ form.alias.errors }}{{ form.alias }}</td>{% endif %}
                 <td>{{ form.model.errors }}{{ form.model }}</td>
                 <td>{{ form.field.errors }}{{ form.field }}</td>
+                {% if aliases_enabled %}<td>{{ form.alias.errors }}{{ form.alias }}</td>{% endif %}
                 <td>{{ form.sort.errors }}{{ form.sort }}</td>
                 {% if group_by_enabled %}<td>{{ form.group_by.errors }}{{ form.group_by }}</td>{% endif %}
                 <td>{{ form.criteria.errors }}{{ form.criteria }}</td>
