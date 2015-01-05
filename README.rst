@@ -97,10 +97,6 @@ Settings
 
 The next lines show de available settings and its default values.
 
-Enable autocompletion tool (work in progress, not enabled yet)::
-
-  QBE_AUTOCOMPLETE = True
-
 Admin module name to add admin urls in results::
 
   QBE_ADMIN = "admin"
@@ -112,6 +108,12 @@ Set your own admin site if it's different to usual *django.contrib.admin.site*::
 Function to control to users with access to QBE::
 
   QBE_ACCESS_FOR = lambda user: user.is_staff
+
+Some options for the query builder form::
+
+  QBE_ALIASES = False  # It allows to add an alias to a model field
+  QBE_GROUP_BY = False  # It allows to group by in a query
+  QBE_SHOW_ROW_NUMBER = True  # It disables number rows in results
 
 Path to QBE formats export file, in order to add custom export formats::
 

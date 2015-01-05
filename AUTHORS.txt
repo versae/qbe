@@ -5,11 +5,13 @@ The PRIMARY AUTHORS are (ordered by aproximated LOC number):
 
 APPRECIATED CONTRIBUTORS:
 
-    * Lorenzo Gil <lorenzo.gil.sanchez@gmail.com>, adding the setuptools support: https://github.com/versae/qbe/pull/1
-    * Patrick Taylor <patricktaylor@mac.com> for reporting problems with the license.
-    * Sebastián Magrí <sebasmagri@gmail.com> for reporting bugs.
-    * Fidel Ramos <fidelramos@gmail.com> for compatibility code with Django 1.3 static files: https://github.com/versae/qbe/pull/11
-    * Olivier Larchevêque <olivier.larcheveque@gmail.com> for added a basis French translation.
+    * yatagan, @yatagan
+    * Miguel Angel Velazco, @MikeVelazcoMtz@users
+    * Lorenzo Gil, @lgs
+    * Patrick Taylor, @huxley
+    * Sebastián Magrí, @sebasmagri
+    * Fidel Ramos @haplo
+    * Olivier Larchevêque @olarcheveque
 
 And a big THANK YOU goes to:
 

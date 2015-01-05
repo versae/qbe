@@ -1,22 +1,24 @@
-0.2.0 (in development)
-----------------------
+0.3.0 (2015-01-05)
+------------------
+- Fix #39. Better to put '----' for field. Implementation of '*' to return all the fields will be done in the future.
+- Fix #20. Adds support for aliases
+- Fix #43. Modernizing the code. Now it works with Django 1.7
+- Deprecation in simplejson
+- Update change_form.html and url syntax
+- Fix #26. Add initial support for GROUP BY by enabling QBE_GROUP_BY=True in settings
+- Fix #25. From 1.6, urls and patterns have to be imported from django.conf.urls
 
+0.2.0 (2012-06-22)
+------------------
 - Fixed compatibility with Django 1.4 database introspection.
-
 - Fixed relative paths of static files.
-
 - Fixed a regression with JavaScript formsets.
-
 - Added SavedQuery model (including South migrations) to save queries in the
   database.
-
 - Fixed proxy model support (and other odd scenarios like django-taggit).
-
 - Added English base translation files, and an initial Canadian French
   translation (by Olivier Larchevêque).
-
 - Fixed packaging manifest template.
-
 - Changed license to MIT.
 
 0.1.6 (2011-04-20)
