@@ -12,11 +12,13 @@ from picklefield.fields import PickledObjectField
 
 
 class SavedQuery(models.Model):
-    query_hash = models.CharField(_("hash"), max_length=32, primary_key=True, editable=False)
+    query_hash = models.CharField(_("hash"), max_length=32, primary_key=True,
+                                  editable=False)
     name = models.CharField(_("name"), max_length=100)
     description = models.TextField(_("description"), blank=True)
     query_data = PickledObjectField(protocol=pickle.HIGHEST_PROTOCOL)
-    date_created = models.DateTimeField(_("date created"), default=now, editable=False)
+    date_created = models.DateTimeField(_("date created"), default=now,
+                                        editable=False)
     date_updated = models.DateTimeField(_("date updated"), editable=False)
 
     class Meta:

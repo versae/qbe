@@ -1,24 +1,27 @@
 # -*- coding: utf-8 -*-
+import json
+
 from django.db.models import get_apps
-from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
-try: #Fix for deprecated simplejson
-    from django.utils import simplejson
-except:
-    import json as simplejson
 from django.utils.translation import ugettext as _
 
 from django_qbe.forms import QueryByExampleFormSet, DATABASES
 from django_qbe.utils import (autocomplete_graph, qbe_models, formats,
                               pickle_encode, pickle_decode, get_query_hash,
                               admin_site)
-
-
-qbe_access_for = getattr(settings, "QBE_ACCESS_FOR", lambda u: u.is_staff)
+from django_qbe.settings import (
+    QBE_ACCESS_FOR,
+    QBE_GROUP_BY,
+    QBE_SHOW_ROW_NUMBER,
+    QBE_ADMIN,
+    QBE_ALIASES,
+    QBE_SAVED_QUERIES
+)
+qbe_access_for = QBE_ACCESS_FOR
 
 
 @user_passes_test(qbe_access_for)
@@ -34,10 +37,17 @@ def qbe_form(request, query_hash=None):
         if not formset.is_valid():
             formset = QueryByExampleFormSet(using=db_alias)
         else:
-            json_data = simplejson.dumps(data)
+            json_data = json.dumps(data)
     apps = get_apps()
     models = qbe_models(admin_site=admin_site, only_admin_models=False)
     json_models = qbe_models(admin_site=admin_site, json=True)
+    title_url = reverse("qbe_form")
+    saved_query = None
+    if QBE_SAVED_QUERIES:
+        title_url = reverse("admin:app_list", args=["savedqueries"])
+        from django_qbe.savedqueries.models import SavedQuery
+        saved_queries = SavedQuery.objects.filter(query_hash=query_hash)
+        saved_query = saved_queries.first()
     context = {
         'apps': apps,
         'models': models,
@@ -45,12 +55,14 @@ def qbe_form(request, query_hash=None):
         'databases': DATABASES,
         'database_alias': db_alias,
         'title': _(u"Query by Example"),
+        'title_url': title_url,
+        'saved_query': saved_query,
         'json_models': json_models,
         'json_data': json_data,
         'query_hash': query_hash,
-        'savedqueries_installed': 'django_qbe.savedqueries' in settings.INSTALLED_APPS,
-        'aliases_enabled': getattr(settings, 'QBE_ALIASES', False),
-        'group_by_enabled': getattr(settings, 'QBE_GROUP_BY', False),
+        'savedqueries_installed': QBE_SAVED_QUERIES,
+        'aliases_enabled': QBE_ALIASES,
+        'group_by_enabled': QBE_GROUP_BY
     }
     return render(request, 'qbe.html', context)
 
@@ -85,9 +97,9 @@ def qbe_results(request, query_hash):
         db_alias = request.session.get("qbe_database", "default")
     formset = QueryByExampleFormSet(data=data, using=db_alias)
     if formset.is_valid():
-        row_number = getattr(settings, 'QBE_SHOW_ROW_NUMBER', True)
-        admin_name = getattr(settings, "QBE_ADMIN", "admin")
-        aliases = getattr(settings, 'QBE_ALIASES', False)
+        row_number = QBE_SHOW_ROW_NUMBER
+        admin_name = QBE_ADMIN
+        aliases = QBE_ALIASES
         labels = formset.get_labels(row_number=row_number, aliases=aliases)
         count = formset.get_count()
         limit = count
@@ -106,9 +118,18 @@ def qbe_results(request, query_hash):
                                       row_number=row_number)
         query = formset.get_raw_query(add_params=True)
         pickled = pickle_encode(data)
+        title_url = reverse("qbe_form")
+        saved_query = None
+        if QBE_SAVED_QUERIES:
+            title_url = reverse("admin:app_list", args=["savedqueries"])
+            from django_qbe.savedqueries.models import SavedQuery
+            saved_queries = SavedQuery.objects.filter(query_hash=query_hash)
+            saved_query = saved_queries.first()
         context = {
             'formset': formset,
             'title': _(u"Query by Example"),
+            'title_url': title_url,
+            'saved_query': saved_query,
             'results': results,
             'labels': labels,
             'query': query,
@@ -119,9 +140,11 @@ def qbe_results(request, query_hash):
             'offset_limit': offset + limit,
             'pickled': pickled,
             'query_hash': query_hash,
-            'admin_urls': (admin_name != None and formset.has_admin_urls()),
+            'admin_urls': admin_name is not None and formset.has_admin_urls(),
             'formats': formats,
-            'savedqueries_installed': 'django_qbe.savedqueries' in settings.INSTALLED_APPS,
+            'savedqueries_installed': QBE_SAVED_QUERIES,
+            'aliases_enabled': QBE_ALIASES,
+            'group_by_enabled': QBE_GROUP_BY
         }
         return render(request, 'qbe_results.html', context)
     return redirect("qbe_form")
@@ -147,7 +170,7 @@ def qbe_export(request, query_hash, format):
         db_alias = request.session.get("qbe_database", "default")
         formset = QueryByExampleFormSet(data=data, using=db_alias)
         if formset.is_valid():
-            aliases = getattr(settings, 'QBE_ALIASES', False)
+            aliases = QBE_ALIASES
             labels = formset.get_labels(aliases=aliases)
             query = formset.get_raw_query()
             results = formset.get_results(query)
@@ -172,4 +195,3 @@ def qbe_autocomplete(request):
     if request.is_ajax() and request.POST:
         models = request.POST.get('models', []).split(",")
         nodes = autocomplete_graph(admin_site, models)
-    return HttpResponse(simplejson.dumps(nodes), mimetype="application/json")

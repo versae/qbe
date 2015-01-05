@@ -5,6 +5,7 @@ import random
 from collections import deque
 from copy import copy
 from hashlib import md5
+from json import dumps
 try:
     from itertools import combinations
 except ImportError:
@@ -24,14 +25,15 @@ from django.core.exceptions import SuspiciousOperation
 from django.conf import settings
 from django.utils.importlib import import_module
 
-try:
-    from django.utils.simplejson import dumps
-except:
-    from json import dumps
+from django_qbe.settings import (
+    QBE_ADMIN_SITE,
+    QBE_FORMATS_EXPORT,
+    QBE_CUSTOM_OPERATORS,
+)
 
 try:
     # Default value to backwards compatibility
-    qbe_admin_site = getattr(settings, "QBE_ADMIN_SITE", "admin.admin_site")
+    qbe_admin_site = QBE_ADMIN_SITE
     qbe_admin_site_splits = qbe_admin_site.rsplit(".", 1)
     qbe_admin_module = qbe_admin_site_splits[0]
     qbe_admin_object = qbe_admin_site_splits[1]
@@ -46,14 +48,14 @@ except ImportError:
     from django.contrib.contenttypes.generic import GenericRelation
 
 try:
-    qbe_formats = getattr(settings, "QBE_FORMATS_EXPORT", "qbe_formats")
+    qbe_formats = QBE_FORMATS_EXPORT
     formats = import_module(qbe_formats).formats
 except ImportError:
     from django_qbe.exports import formats
 formats  # Makes pyflakes happy
 
 try:
-    qbe_operators = getattr(settings, "QBE_CUSTOM_OPERATORS", "qbe_operators")
+    qbe_operators = QBE_CUSTOM_OPERATORS
     import_module(qbe_operators)
 except ImportError:
     pass

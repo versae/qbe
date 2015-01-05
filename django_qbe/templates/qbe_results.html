@@ -6,7 +6,8 @@
 <link rel="stylesheet" type="text/css" href="{% firstof STATIC_URL MEDIA_URL %}django_qbe/css/qbe.css" />
 {% endblock %}
 
-{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url "admin:index" %}">{% trans 'Home' %}</a>{% if title %} &rsaquo; <a href="{% url "qbe_form" %}">{{ title }}</a> &rsaquo; {% trans "Results" %}{% endif %}</div>
+{% block breadcrumbs_inner %}
+&rsaquo; {% trans "Results" %}
 {% endblock %}
 
 {% block content_title %}{% if title %}

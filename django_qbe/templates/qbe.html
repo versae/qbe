@@ -15,7 +15,20 @@
 <link rel="stylesheet" type="text/css" href="{% firstof STATIC_URL MEDIA_URL %}django_qbe/css/qbe.css"/>
 {% endblock %}
 
-{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url "admin:index" %}">{% trans 'Home' %}</a>{% if title %} &rsaquo; {{ title }}{% endif %}</div>
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url "admin:index" %}">{% trans 'Home' %}</a>
+    {% if title %}
+        &rsaquo; {% if title_url %}<a href="{{ title_url }}">{{ title }}</a>{% else %}{{ title }}{% endif %}
+    {% endif %}
+    {% if saved_query %}
+        &rsaquo; <a href="{% url "admin:savedqueries_savedquery_changelist" %}">{% trans "Saved queries" %}</a>
+        &rsaquo; <a href="{% url "admin:savedqueries_savedquery_change" query_hash %}">{{ saved_query.name }}</a>
+    {% endif %}
+    {% block breadcrumbs_inner %}
+    &rsaquo; {% trans 'Edit' %}
+    {% endblock %}
+</div>
 {% endblock %}
 
 {% block pretitle %}{% endblock %}

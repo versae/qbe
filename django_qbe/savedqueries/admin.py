@@ -14,10 +14,9 @@ except ImportError:
     # Backward compatibility for Django prior to 1.6
     from django.utils.functional import update_wrapper
 
-from django_qbe.utils import pickle_encode, get_query_hash
+from django_qbe.savedqueries.models import SavedQuery
+from django_qbe.settings import QBE_ADMIN
 from django_qbe.utils import admin_site
-
-from .models import SavedQuery
 
 
 class SavedQueryAdmin(admin.ModelAdmin):
@@ -25,12 +24,14 @@ class SavedQueryAdmin(admin.ModelAdmin):
                     'run_link')
 
     def run_link(self, obj):
-        info = self.model._meta.app_label, self.model._meta.module_name
-        pickled = pickle_encode(obj.query_data)
-        query_hash = get_query_hash(pickled)
-        return u'<span class="nowrap"><a href="%s">%s</a> | <a href="%s">%s</a></span>' % \
-            (reverse("admin:%s_%s_run" % info, args=(obj.pk,)), _("Run"),
-             reverse("qbe_form", kwargs={'query_hash': query_hash}), _("Edit"))
+        info = (QBE_ADMIN,
+                self.model._meta.app_label,
+                self.model._meta.model_name or self.model._meta.module_name)
+        return (u'<span class="nowrap"><a href="%s">%s</a>'
+                u' | <a href="%s">%s</a></span>' %
+                (reverse("%s:%s_%s_run" % info, args=(obj.pk,)), _("Run"),
+                 reverse("qbe_form", kwargs={'query_hash': obj.pk}),
+                 _("Edit")))
     run_link.short_description = _("query")
     run_link.allow_tags = True
 
@@ -39,8 +40,10 @@ class SavedQueryAdmin(admin.ModelAdmin):
             def wrapper(*args, **kwargs):
                 return self.admin_site.admin_view(view)(*args, **kwargs)
             return update_wrapper(wrapper, view)
-        info = self.model._meta.app_label, self.model._meta.module_name
-        urlpatterns = patterns('',
+        info = (self.model._meta.app_label,
+                self.model._meta.model_name or self.model._meta.module_name)
+        urlpatterns = patterns(
+            '',
             url(r'^(.+)/run/$', wrap(self.run_view), name='%s_%s_run' % info),
         )
         return urlpatterns + super(SavedQueryAdmin, self).get_urls()
@@ -58,11 +61,9 @@ class SavedQueryAdmin(admin.ModelAdmin):
             return redirect("qbe_form")
         return super(SavedQueryAdmin, self).add_view(request, *args, **kwargs)
 
-    def run_view(self, request, object_id, extra_context=None):
-        obj = self.get_object(request, unquote(object_id))
+    def run_view(self, request, query_hash, extra_context=None):
+        obj = self.get_object(request, unquote(query_hash))
         data = obj.query_data
-        pickled = pickle_encode(data)
-        query_hash = get_query_hash(pickled)
         query_key = "qbe_query_%s" % query_hash
         if not query_key in request.session:
             request.session[query_key] = data
