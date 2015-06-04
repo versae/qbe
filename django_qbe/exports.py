@@ -74,19 +74,19 @@ def base_export(labels, results, dialect=csv.excel_tab):
 @formats.add("csv")
 def csv_format(labels, results):
     output = base_export(labels, results, dialect=csv.excel)
-    mimetype = "text/csv"
-    return HttpResponse(output, mimetype=mimetype)
+    content_type = "text/csv"
+    return HttpResponse(output, content_type=content_type)
 
 
 @formats.add("ods")
 def ods_format(labels, results):
     output = base_export(labels, results)
-    mimetype = "application/vnd.oasis.opendocument.spreadsheet"
-    return HttpResponse(output, mimetype=mimetype)
+    content_type = "application/vnd.oasis.opendocument.spreadsheet"
+    return HttpResponse(output, content_type=content_type)
 
 
 @formats.add("xls")
 def xls_format(labels, results):
     output = base_export(labels, results)
-    mimetype = "application/vnd.ms-excel"
-    return HttpResponse(output, mimetype=mimetype)
+    content_type = "application/vnd.ms-excel"
+    return HttpResponse(output, content_type=content_type)
