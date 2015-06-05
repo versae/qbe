@@ -37,7 +37,7 @@
         {% trans "Save query as" %}
     </li>
     <li>
-        <a href="{% url "qbe_bookmark" %}?data={{ pickled }}" title="{% trans "Drag this yo your bookmarks bar to save this query" %}" id="qbeBookmarkQuery">{% trans "bookmark" %}</a>
+        <a href="{% url "qbe_bookmark" %}?data={{ pickled }}" title="{% trans "Drag this to your bookmarks bar to save this query" %}" id="qbeBookmarkQuery">{% trans "bookmark" %}</a>
     </li>
     {% if savedqueries_installed %}
     <li>
