@@ -11,7 +11,7 @@ from django_qbe.utils import formats, pickle_decode
 
 
 class Command(BaseCommand):
-    available_formats = ", ".join(list(formats.keys()))
+    available_formats = ", ".join(formats.keys())
     option_list = BaseCommand.option_list + (
         make_option('--output',
             dest='output',

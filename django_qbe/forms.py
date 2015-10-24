@@ -227,7 +227,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                     wheres.append(u"%s %s"
                                   % (lookup_cast(operator) % db_field,
                                      db_operator))
-                elif operator in list(self._custom_operators.keys()):
+                elif operator in self._custom_operators:
                     CustOperator = self._custom_operators[operator]
                     custom_operator = CustOperator(db_field, operator, over)
 

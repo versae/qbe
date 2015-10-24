@@ -74,7 +74,7 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
     app_models_with_no_includes = get_models(include_auto_created=False,
                                              include_deferred=False)
     if admin_site:
-        admin_models = [m for m, a in list(admin_site._registry.items())]
+        admin_models = [m for m, a in admin_site._registry.items()]
     else:
         admin_models = []
     if only_admin_models:
@@ -199,8 +199,8 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
 def qbe_graph(admin_site=None, directed=False):
     models = qbe_models(admin_site)
     graph = {}
-    for k, v in list(models.items()):
-        for l, w in list(v.items()):
+    for k, v in models.items():
+        for l, w in v.items():
             key = "%s.%s" % (k, l)
             if key not in graph:
                 graph[key] = []
@@ -274,7 +274,7 @@ def qbe_tree(graph, nodes, root=None):
 def remove_leafs(tree, nodes):
 
     def get_leafs(tree, nodes):
-        return [node for node, edges in list(tree.items())
+        return [node for node, edges in tree.items()
                 if len(edges) < 2 and node not in nodes]
 
     def delete_edge_leafs(tree, leaf):
@@ -298,7 +298,7 @@ def remove_leafs(tree, nodes):
 
 def qbe_forest(graph, nodes):
     forest = []
-    for node, edges in list(graph.items()):
+    for node, edges in graph.items():
         tree, are_all = qbe_tree(graph, copy(nodes), root=node)
         if are_all and tree not in forest:
             forest.append(tree)
@@ -373,7 +373,7 @@ def _combine(items, val=None, paths=None, length=None):
 
             def visited_path(x):
                 return x not in paths
-            path = list(filter(visited_path, path))
+            path = filter(visited_path, path)
             paths.extend(path)
     return paths
 
