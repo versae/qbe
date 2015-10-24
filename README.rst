@@ -38,20 +38,20 @@ Adding to the project settings::
 
 Add the context processor ``django.core.context_processors.static``::
 
-TEMPLATES = [
-{
-    'BACKEND': 'django.template.backends.django.DjangoTemplates',
-    'DIRS': [],
-    'APP_DIRS': True,
-    'OPTIONS': {
-        'context_processors': [
-                # [...] django context processors
-                'django.template.context_processors.static',
-                # [...] Any other context processors
-        ],
+    TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                    # [...] django context processors
+                    'django.template.context_processors.static',
+                    # [...] Any other context processors
+            ],
+        },
     },
-},
-]
+    ]
 
 See the `Django documentation on static files`__ for details.
 
