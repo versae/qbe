@@ -1,3 +1,4 @@
+from builtins import object
 # -*- coding: utf-8 -*-
 from django.forms.util import flatatt
 from django.forms.widgets import MultiWidget, Select, TextInput, Widget
@@ -51,7 +52,7 @@ class CheckboxLabelWidget(Widget):
 
 class CriteriaInput(MultiWidget):
 
-    class Media:
+    class Media(object):
         js = ('django_qbe/js/qbe.widgets.js', )
 
     def __init__(self, *args, **kwargs):
@@ -62,7 +63,7 @@ class CriteriaInput(MultiWidget):
 
         # inject custom operators
         ALL_OPERATOR_CHOICES = OPERATOR_CHOICES
-        for operator_slug, operator in custom_operators.items():
+        for operator_slug, operator in list(custom_operators.items()):
             ALL_OPERATOR_CHOICES += ((operator_slug, operator.label),)
 
         widgets = [Select(choices=ALL_OPERATOR_CHOICES), TextInput()]
