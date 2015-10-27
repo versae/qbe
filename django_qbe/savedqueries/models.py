@@ -1,3 +1,4 @@
+from builtins import object
 import pickle
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -21,7 +22,7 @@ class SavedQuery(models.Model):
                                         editable=False)
     date_updated = models.DateTimeField(_("date updated"), editable=False)
 
-    class Meta:
+    class Meta(object):
         verbose_name = _("Saved query")
         verbose_name_plural = _("Saved queries")
 

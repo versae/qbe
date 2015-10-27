@@ -1,7 +1,9 @@
+from builtins import object
 from django.conf import settings
 from django.db import connections
 from django.db.models.fields import Field
 from django.utils.importlib import import_module
+from future.utils import with_metaclass
 
 DATABASES = settings.DATABASES
 
@@ -39,7 +41,7 @@ class OperatorMount(type):
         return self.operators
 
 
-class CustomOperator:
+class CustomOperator(with_metaclass(OperatorMount, object)):
     """
     Mount point for operators which refer to actions that can be performed.
 
@@ -52,7 +54,6 @@ class CustomOperator:
     label     The label that will be displayed in the criteria dropdown
     ========  ========================================================
     """
-    __metaclass__ = OperatorMount
 
     def __init__(self, db_field, operator, value, db_alias="default"):
         self.params = []

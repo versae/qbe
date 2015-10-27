@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
+from __future__ import division
+from past.builtins import cmp
+from builtins import zip
+from builtins import filter
+from builtins import range
+from past.utils import old_div
 import base64
 import pickle
 import random
@@ -6,6 +13,7 @@ from collections import deque
 from copy import copy
 from hashlib import md5
 from json import dumps
+from functools import reduce
 try:
     from itertools import combinations
 except ImportError:
@@ -14,7 +22,7 @@ except ImportError:
         if n == 0:
             yield []
         else:
-            for i in xrange(len(items)):
+            for i in range(len(items)):
                 for cc in combinations(items[i + 1:], n - 1):
                     yield [items[i]] + cc
 
@@ -270,7 +278,7 @@ def remove_leafs(tree, nodes):
                 if len(edges) < 2 and node not in nodes]
 
     def delete_edge_leafs(tree, leaf):
-        for node, edges in tree.items():
+        for node, edges in list(tree.items()):
             for node_edge, neighbor, neighbor_edge in edges:
                 if leaf == neighbor:
                     edge = (node_edge, neighbor, neighbor_edge)
@@ -383,7 +391,7 @@ def combine(items, k=None):
     if k is not None:
         k = k % length
         # Python division by default is integer division (~ floor(a/b))
-        indices = [(k % (lengths[i] * repeats[i])) / repeats[i]
+        indices = [old_div((k % (lengths[i] * repeats[i])), repeats[i])
                    for i in range(length_items)]
         return [items[i][indices[i]] for i in range(length_items)]
     else:
@@ -392,14 +400,14 @@ def combine(items, k=None):
             row = []
             for subset in item:
                 row.extend([subset] * repeats[i])
-            times = length / len(row)
+            times = old_div(length, len(row))
             matrix.append(row * times)
         # Transpose the matrix or return the columns instead rows
-        return zip(*matrix)
+        return list(zip(*matrix))
 
 
 def graphs_join(graphs):
-    print "Combine % elements" % len(graphs)
+    print("Combine % elements" % len(graphs))
     return []
 
 
@@ -423,7 +431,7 @@ def autocomplete_graph(admin_site, current_models, directed=False):
 def pickle_encode(session_dict):
     "Returns the given session dictionary pickled and encoded as a string."
     pickled = pickle.dumps(session_dict, pickle.HIGHEST_PROTOCOL)
-    return base64.encodestring(pickled + get_query_hash(pickled))
+    return base64.encodestring(pickled + get_query_hash(pickled).encode())
 
 
 # Adapted from django.contrib.sessions.backends.base
@@ -431,7 +439,7 @@ def pickle_decode(session_data):
     # The '+' character is translated to ' ' in request
     session_data = session_data.replace(" ", "+")
     # The length of the encoded string should be a multiple of 4
-    while (((len(session_data) / 4.0) - (len(session_data) / 4)) != 0):
+    while (((old_div(len(session_data), 4.0)) - (old_div(len(session_data), 4))) != 0):
         session_data += u"="
     encoded_data = base64.decodestring(session_data)
     pickled, tamper_check = encoded_data[:-32], encoded_data[-32:]
@@ -447,4 +455,4 @@ def pickle_decode(session_data):
 
 
 def get_query_hash(data):
-    return md5(data + settings.SECRET_KEY).hexdigest()
+    return md5(data + str.encode(settings.SECRET_KEY)).hexdigest()

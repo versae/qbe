@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
+from builtins import range
 import collections
 from django import forms
 from django.db import connections
@@ -133,7 +135,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
          params) = self.get_query_parts()
         if not selects:
             validation_message = _(u"At least you must check a row to get.")
-            raise forms.ValidationError, validation_message
+            raise forms.ValidationError(validation_message)
         self._selects = selects
         self._aliases = aliases
         self._froms = froms
@@ -225,7 +227,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                     wheres.append(u"%s %s"
                                   % (lookup_cast(operator) % db_field,
                                      db_operator))
-                elif operator in self._custom_operators.keys():
+                elif operator in self._custom_operators:
                     CustOperator = self._custom_operators[operator]
                     custom_operator = CustOperator(db_field, operator, over)
 
@@ -307,7 +309,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         else:
             sql = query
         if settings.DEBUG:
-            print sql
+            print(sql)
         cursor = self._db_connection.cursor()
         cursor.execute(sql, tuple(self._params))
         query_results = cursor.fetchall()

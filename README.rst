@@ -36,22 +36,31 @@ Adding to the project settings::
       # [...] Any other application
   )
 
-And adding the urlconf in your project urls.py::
-
-    # qbe
-    url(r'^qbe/', include('django_qbe.urls')),
-
 Add the context processor ``django.core.context_processors.static``::
 
-  TEMPLATE_CONTEXT_PROCESSORS = (
-      # [...] django context processors
-      'django.core.context_processors.static',
-      # [...] Any other context processors
-  )
+    TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                    # [...] django context processors
+                    'django.template.context_processors.static',
+                    # [...] Any other context processors
+            ],
+        },
+    },
+    ]
 
 See the `Django documentation on static files`__ for details.
 
 __ staticfiles_
+
+And adding the urlconf in your project urls.py::
+
+    # qbe
+    url(r'^qbe/', include('django_qbe.urls')),
 
 That's all. Then you can access to http://host:port/qbe
 However, you can add a link from your admin page changing the admin index
