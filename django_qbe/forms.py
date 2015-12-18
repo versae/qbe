@@ -183,6 +183,14 @@ class BaseQueryByExampleFormSet(BaseFormSet):
             group_by = data["group_by"]
             db_field = u"%s.%s" % (qn(model), qn(field))
             operator, over = criteria
+            olower = operator.lower()
+            if 'contains' in olower:
+                over = '%' + over + '%'
+            elif 'endswith' in olower:
+                over = '%' + over
+            elif 'startswith' in olower:
+                over = over + '%'
+
             is_join = operator.lower() == 'join'
             if show and not is_join:
                 selects.append(db_field)
