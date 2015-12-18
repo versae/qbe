@@ -22,7 +22,7 @@ OPERATOR_CHOICES = (
     ('icontains', _('(i) contains')),
     ('iregex', _('(i) matchs regex')),
     ('istartswith', _('(i) starts with')),
-    ('endswith', _('(i) ends with')),
+    ('iendswith', _('(i) ends with')),
     ('join', _('joins to')),
 )
 
