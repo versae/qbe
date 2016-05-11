@@ -1,7 +1,11 @@
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
-from django.contrib.admin.util import unquote
+try:
+    from django.contrib.admin.utils import unquote
+except ImportError:
+    # Backward compatibility for Django prior to 1.7
+    from django.contrib.admin.util import unquote
 try:
     from django.conf.urls import patterns, url
 except ImportError:
