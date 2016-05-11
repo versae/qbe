@@ -8,7 +8,11 @@ import csv
 from io import StringIO
 
 from django.http import HttpResponse
-from django.utils.datastructures import SortedDict
+try:
+    from collections import OrderedDict
+except ImportError:
+    # Backward compatibility for Django prior to 1.7
+    from django.utils.datastructures import SortedDict as OrderedDict
 
 __all__ = ("formats", )
 
@@ -17,7 +21,7 @@ class FormatsException(Exception):
     pass
 
 
-class Formats(SortedDict):
+class Formats(OrderedDict):
 
     def add(self, format):
         parent = self
