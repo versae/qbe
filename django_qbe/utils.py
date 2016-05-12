@@ -26,12 +26,21 @@ except ImportError:
                 for cc in combinations(items[i + 1:], n - 1):
                     yield [items[i]] + cc
 
-from django.db.models import get_models
+try:
+    from django.apps import apps
+    get_models = apps.get_models
+except ImportError:
+    # Backward compatibility for Django prior to 1.7
+    from django.db.models import get_models
 from django.db.models.fields.related import (ForeignKey, OneToOneField,
                                              ManyToManyField)
 from django.core.exceptions import SuspiciousOperation
 from django.conf import settings
-from django.utils.importlib import import_module
+try:
+    from importlib import import_module
+except ImportError:
+    # Backward compatibility for Django prior to 1.7
+    from django.utils.importlib import import_module
 
 from django_qbe.settings import (
     QBE_ADMIN_SITE,
@@ -51,9 +60,13 @@ except (AttributeError, ImportError):
 admin_site
 
 try:
-    from django.db.models.fields.generic import GenericRelation
+    from django.contrib.contenttypes.fields import GenericRelation
 except ImportError:
-    from django.contrib.contenttypes.generic import GenericRelation
+    # Backward compatibility for Django prior to 1.7
+    try:
+        from django.db.models.fields.generic import GenericRelation
+    except ImportError:
+        from django.contrib.contenttypes.generic import GenericRelation
 
 try:
     qbe_formats = QBE_FORMATS_EXPORT
