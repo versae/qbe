@@ -189,7 +189,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
             if alias is not None and not is_join:
                 aliases.append(alias)
             if sort:
-                sorts.append(db_field)
+                sorts.append(db_field + ('' if sort == 'asc' else ' DESC'))
             if group_by:
                 groups_by.append(db_field)
             if all(criteria):
