@@ -8,7 +8,11 @@ from django.db.models.fields import Field
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.conf import settings
 from django.forms.formsets import BaseFormSet, formset_factory
-from django.utils.importlib import import_module
+try:
+    from importlib import import_module
+except ImportError:
+    # Backward compatibility for Django prior to 1.7
+    from django.utils.importlib import import_module
 from django.utils.translation import ugettext as _
 
 from django_qbe.operators import CustomOperator, BACKEND_TO_OPERATIONS

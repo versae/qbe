@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
 
-from django.db.models import get_apps
 from django.contrib.auth.decorators import user_passes_test
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -22,6 +21,16 @@ from django_qbe.settings import (
     QBE_SAVED_QUERIES
 )
 qbe_access_for = QBE_ACCESS_FOR
+
+
+def get_apps():
+    try:
+        from django.apps import apps
+        return [app.models_module for app in apps.get_app_configs() if app.models_module]
+    except ImportError:
+        # Backward compatibility for Django prior to 1.7
+        from django.db import models
+        return models.get_apps()
 
 
 @user_passes_test(qbe_access_for)
