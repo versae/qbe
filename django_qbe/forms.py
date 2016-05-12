@@ -144,6 +144,20 @@ class BaseQueryByExampleFormSet(BaseFormSet):
         self._groups_by = groups_by
         self._params = params
 
+    def get_db_field(self, model, field, qn, is_join=False):
+        if model in self._models:
+            _field = self._models[model]._meta.get_field(field)
+            # Backwards compatibility for Django 1.3
+            if hasattr(_field, "db_column") and _field.db_column:
+                _field_db_column = _field.db_column
+            else:
+                _field_db_column = _field.attname
+        elif is_join:
+            _field_db_column = u"%s_id" % field
+        else:
+            _field_db_column = field
+        return u"%s.%s" % (qn(model), qn(_field_db_column))
+
     def get_query_parts(self):
         """
         Return SQL query for cleaned data
@@ -181,9 +195,9 @@ class BaseQueryByExampleFormSet(BaseFormSet):
             criteria = data["criteria"]
             sort = data["sort"]
             group_by = data["group_by"]
-            db_field = u"%s.%s" % (qn(model), qn(field))
             operator, over = criteria
             is_join = operator.lower() == 'join'
+            db_field = self.get_db_field(model, field, qn, is_join=is_join)
             if show and not is_join:
                 selects.append(db_field)
             if alias is not None and not is_join:
@@ -197,20 +211,7 @@ class BaseQueryByExampleFormSet(BaseFormSet):
                     over_split = over.lower().rsplit(".", 1)
                     join_model = qn(over_split[0].replace(".", "_"))
                     join_field = qn(over_split[1])
-                    if model in self._models:
-                        _field = self._models[model]._meta.get_field(field)
-                        # Backwards compatibility for Django 1.3
-                        if hasattr(_field, "db_column") and _field.db_column:
-                            _field_db_column = _field.db_column
-                        else:
-                            _field_db_column = _field.attname
-                        join = u"%s.%s = %s.%s" \
-                               % (join_model, join_field, qn(model),
-                                  qn(_field_db_column))
-                    else:
-                        join = u"%s.%s = %s" \
-                               % (join_model, join_field,
-                                  u"%s_id" % db_field)
+                    join = u"%s.%s = %s" % (join_model, join_field, db_field)
                     if (join not in wheres
                             and uqn(join_model) in self._db_table_names):
                         wheres.append(join)
