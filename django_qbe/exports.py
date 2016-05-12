@@ -5,7 +5,11 @@ from builtins import object
 # -*- coding: utf-8 -*-
 import codecs
 import csv
-from io import StringIO
+try:
+    # Use byte-oriented StringIO on Python 2!
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 from django.http import HttpResponse
 from django.utils.datastructures import SortedDict
