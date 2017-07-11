@@ -66,12 +66,11 @@
     <tbody>
     {% for result_tuple in results %}
         <tr class="{% cycle 'row1' 'row2' %}">
+            <td>{{offset|add:forloop.counter}}</td>
         {% if admin_urls %}
-            {% for result, url in result_tuple %}
-                {% if url %}
-                <td><a href={{ url }}>{{ result }}</a></td>
-                {% else %}
-                <td>{{ result }}</td>
+            {% for result in result_tuple %}
+                {% if forloop.counter|add:"1"|divisibleby:"2" %}
+                    <td>{{ result }}</td>
                 {% endif %}
             {% endfor %}
         {% else %}
