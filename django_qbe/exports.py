@@ -67,7 +67,6 @@ class UnicodeWriter:
 def base_export(labels, results, dialect=csv.excel_tab):
     w = UnicodeWriter(dialect=dialect)
     count = 0
-    import ipdb; ipdb.set_trace()
     w.writerow(labels)
     for row in results:
         count += 1
