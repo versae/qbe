@@ -3,7 +3,7 @@ try:
     from django.conf.urls import url
 except ImportError:
     # Backward compatibility for Django prior to 1.6
-    from django.conf.urls.defaults import patterns, url
+    from django.conf.urls.defaults import url
 from django_qbe.exports import formats
 from . import views
 

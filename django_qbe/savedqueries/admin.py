@@ -7,10 +7,11 @@ except ImportError:
     # Backward compatibility for Django prior to 1.7
     from django.contrib.admin.util import unquote
 try:
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
 except ImportError:
     # Backward compatibility for Django prior to 1.6
-    from django.conf.urls.defaults import patterns, url
+    from django.conf.urls.defaults import url
+
 from django.shortcuts import redirect
 try:
     from functools import update_wrapper
@@ -46,10 +47,9 @@ class SavedQueryAdmin(admin.ModelAdmin):
             return update_wrapper(wrapper, view)
         info = (self.model._meta.app_label,
                 self.model._meta.model_name or self.model._meta.module_name)
-        urlpatterns = patterns(
-            '',
+        urlpatterns = [
             url(r'^(.+)/run/$', wrap(self.run_view), name='%s_%s_run' % info),
-        )
+        ]
         return urlpatterns + super(SavedQueryAdmin, self).get_urls()
 
     def save_model(self, request, obj, form, change):
