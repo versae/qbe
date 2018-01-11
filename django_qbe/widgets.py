@@ -1,5 +1,3 @@
-from builtins import object
-# -*- coding: utf-8 -*-
 from django.forms.utils import flatatt
 from django.forms.widgets import MultiWidget, Select, TextInput, Widget
 from django.utils.safestring import mark_safe
@@ -11,7 +9,7 @@ OPERATOR_CHOICES = (
     ('', ''),
     ('exact', _('is equal to')),
     ('contains', _('contains')),
-    ('regex', _('matchs regex')),
+    #    ('regex', _('matchs regex')),
     ('startswith', _('starts with')),
     ('endswith', _('ends with')),
     ('gt', _('is greater than')),
@@ -20,7 +18,7 @@ OPERATOR_CHOICES = (
     ('lte', _('is less than or equal to')),
     ('iexact', _('(i) is equal to')),
     ('icontains', _('(i) contains')),
-    ('iregex', _('(i) matchs regex')),
+    #    ('iregex', _('(i) matchs regex')),
     ('istartswith', _('(i) starts with')),
     ('iendswith', _('(i) ends with')),
     ('join', _('joins to')),
@@ -28,7 +26,6 @@ OPERATOR_CHOICES = (
 
 
 class CheckboxLabelWidget(Widget):
-
     def __init__(self, attrs=None, label=None, prelabel=None, *args, **kwargs):
         super(CheckboxLabelWidget, self).__init__(*args, **kwargs)
         self.attrs = attrs or {}
@@ -40,20 +37,19 @@ class CheckboxLabelWidget(Widget):
         final_attrs = self.build_attrs(self.attrs, name=name)
         prelabel = prelabel or self.prelabel
         if prelabel:
-            out = u'<label for="%s" >%s</label><input type="checkbox"%s >' \
+            out = '<label for="%s" >%s</label><input type="checkbox"%s >' \
                   % (self.attrs.get("id", ""), value or self.label,
                      flatatt(final_attrs))
         else:
-            out = u'<input type="checkbox"%s ><label for="%s" >%s</label>' \
+            out = '<input type="checkbox"%s ><label for="%s" >%s</label>' \
                   % (flatatt(final_attrs), self.attrs.get("id", ""),
                      value or self.label)
         return mark_safe(out)
 
 
 class CriteriaInput(MultiWidget):
-
-    class Media(object):
-        js = ('django_qbe/js/qbe.widgets.js', )
+    class Media:
+        js = ('django_qbe/js/qbe.widgets.js',)
 
     def __init__(self, *args, **kwargs):
         # widgets = [CheckboxLabelWidget(label=_("Inverse")),
@@ -72,4 +68,4 @@ class CriteriaInput(MultiWidget):
     def decompress(self, value):
         if value:
             return value
-        return (None, None)
+        return None, None

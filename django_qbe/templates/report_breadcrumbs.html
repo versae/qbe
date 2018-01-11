@@ -1,0 +1,11 @@
+<div class="breadcrumbs">
+    <ul>
+        <li><a href="#">{{request.session.report_type|title}}</a></li> &gt;
+        {% if extra_link_name %}
+            <li><a href="{{ extra_link_href|default:"#" }}">{{request.session.report_title}}</a></li> &gt;
+            <li>{{extra_link_name}}</li>
+        {% else %}
+            <li>{{request.session.report_title}}</li>
+        {% endif %}
+    </ul>
+</div>

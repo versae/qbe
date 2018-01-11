@@ -1,14 +1,5 @@
 {% if user_passes_test %}
 window.onload = function() {
-//    var divUserTools = document.getElementById("user-tools");
-//    var aQBE = document.createElement("a");
-//    var txtQBE = document.createTextNode('{{ qbe_label }}');
-//    aQBE.setAttribute("href", "{{ qbe_url }}");
-//    aQBE.appendChild(txtQBE);
-//    var txtSeparator = document.createTextNode('/ ');
-//    divUserTools.appendChild(txtSeparator);
-//    divUserTools.appendChild(aQBE);
-
     var divContentRelated = document.getElementById("content-related");
     var divQBE = document.createElement("div")
     var aQBE = document.createElement("a");

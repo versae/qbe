@@ -1,0 +1,22 @@
+<button class="button big" id="saved_report_btn"><i class="fa-database2"></i>Report Templates</button>
+
+<script>
+    jQuery(document).ready(function ($) {
+        $('#saved_report_btn').click(function () {
+            var btn = $(this).loader();
+            $.get('{% url 'django_qbe:qbe_saved_reports' %}', function (data) {
+                var overlay = new LightOverlay({
+                    maximize: true,
+                    minimize: true,
+                    resize: true
+                });
+                overlay.title = 'Report Templates';
+                overlay.width = '60%';
+                overlay.height = "70%";
+                overlay.html = data;
+                overlay.open();
+                btn.unloader();
+            });
+        });
+    });
+</script>

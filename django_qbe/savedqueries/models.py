@@ -1,15 +1,15 @@
-from builtins import object
 import pickle
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from picklefield.fields import PickledObjectField
 
 try:
     from django.utils.timezone import now
 except ImportError:
     from datetime import datetime
-    now = datetime.now
 
-from picklefield.fields import PickledObjectField
+    now = datetime.now
 
 
 class SavedQuery(models.Model):
@@ -22,11 +22,11 @@ class SavedQuery(models.Model):
                                         editable=False)
     date_updated = models.DateTimeField(_("date updated"), editable=False)
 
-    class Meta(object):
+    class Meta:
         verbose_name = _("Saved query")
         verbose_name_plural = _("Saved queries")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):

@@ -1,9 +1,10 @@
 from builtins import object
+
 from django.conf import settings
 from django.db import connections
 from django.db.models.fields import Field
-from importlib import import_module
 from future.utils import with_metaclass
+from importlib import import_module
 
 DATABASES = settings.DATABASES
 
@@ -13,7 +14,6 @@ BACKEND_TO_OPERATIONS = {
     'postgis': 'PostGISOperations',
     'spatialite': 'SpatiaLiteOperations',
 }
-
 
 """
 Plugin infrastructure based on
@@ -67,11 +67,9 @@ class CustomOperator(with_metaclass(OperatorMount, object)):
 
         database_properties = DATABASES.get(self._db_alias, "default")
         module = database_properties['ENGINE']
-        try:
-            base_mod = import_module("%s.base" % module)
-            intros_mod = import_module("%s.introspection" % module)
-        except ImportError:
-            pass
+
+        base_mod = import_module("%s.base" % module)
+        intros_mod = import_module("%s.introspection" % module)
 
         if base_mod and intros_mod:
             self._db_operators = base_mod.DatabaseWrapper.operators
@@ -80,16 +78,12 @@ class CustomOperator(with_metaclass(OperatorMount, object)):
                 DatabaseOperations = getattr(base_mod, operations_name)
             else:
                 DatabaseOperations = base_mod.DatabaseOperations
-            try:
-                self._db_operations = DatabaseOperations(self._db_connection)
-            except TypeError:
-                # Some engines have no params to instance DatabaseOperations
-                self._db_operations = DatabaseOperations()
+            self._db_operations = DatabaseOperations(self._db_connection)
 
     def _get_lookup(self, operator, over):
-        lookup = Field().get_db_prep_lookup(operator, over,
-                                            connection=self._db_connection,
-                                            prepared=True)
+        lookup = Field().get_db_prep_value(over,
+                                           connection=self._db_connection,
+                                           prepared=True)
         if isinstance(lookup, (tuple, list)):
             return lookup[0]
         return lookup
@@ -106,7 +100,29 @@ class CustomOperator(with_metaclass(OperatorMount, object)):
         """
         returns a list
         """
-        self.wheres.append(u"%s %s"
+        self.wheres.append("%s %s"
                            % (lookup_cast(operator) % self.db_field,
                               self.operator))
         return self.wheres
+
+
+class InOperator(CustomOperator):
+    label = "is equal to (multiple values)"
+    slug = "in"
+
+    def get_params(self):
+        return [self._get_lookup(None, v.strip()) for v in self.value.split(',')]
+
+    def get_wheres(self):
+        return ['%s IN (%s)' % (self.db_field, ", ".join(['%s'] * len(self.get_params())))]
+
+
+class NullOperator(CustomOperator):
+    label = "is null"
+    slug = "None"
+
+    def get_params(self):
+        return []
+
+    def get_wheres(self):
+        return ['%s is null' % self.db_field]

@@ -1,147 +1,178 @@
-{% extends "admin/change_list.html" %}
+{% extends "base.html" %}
 {% load i18n %}
-
+{% load compress %}
+{% load sitetree %}
 {% block extrahead %}
-<!--[if IE]>
+    <!--[if IE]>
 <script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/excanvas.js"></script>
 <![endif]-->
-<script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/jquery.js"></script>
-<script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/jquery.ui.js"></script>
-<script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/jquery.formset.js"></script>
-<script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/jquery.jsplumb.js"></script>
-<script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/qbe.core.js"></script>
-<script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/qbe.diagram.js"></script>
-<link rel="stylesheet" type="text/css" href="{% firstof STATIC_URL MEDIA_URL %}admin/css/forms.css" />
-<link rel="stylesheet" type="text/css" href="{% firstof STATIC_URL MEDIA_URL %}django_qbe/css/qbe.css"/>
+    <script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}SupportLink/js/jquery.formset.js"></script>
+    {% compress js %}
+        <script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/jquery.ui.js"></script>
+        <script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/jquery.jsplumb.js"></script>
+        <script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/qbe.core.js"></script>
+        <script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/qbe.diagram.js"></script>
+
+        <script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}SupportLink/pikaday/pikaday.js"></script>
+    {% endcompress %}
+
+    {% compress css %}
+        <link rel="stylesheet" type="text/css" href="{% firstof STATIC_URL MEDIA_URL %}django_qbe/css/forms.css"/>
+        <link rel="stylesheet" type="text/css" href="{% firstof STATIC_URL MEDIA_URL %}django_qbe/css/widgets.css"/>
+        <link rel="stylesheet" type="text/css" href="{% firstof STATIC_URL MEDIA_URL %}django_qbe/css/qbe.css"/>
+        <link rel="stylesheet" type="text/css" href="{% firstof STATIC_URL MEDIA_URL %}django_qbe/css/base.css"/>
+
+        <link rel="stylesheet" type="text/css"
+              href="{% firstof STATIC_URL MEDIA_URL %}SupportLink/pikaday/pikaday.css"/>
+    {% endcompress %}
 {% endblock %}
 
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="{% url "admin:index" %}">{% trans 'Home' %}</a>
-    {% if title %}
-        &rsaquo; {% if title_url %}<a href="{{ title_url }}">{{ title }}</a>{% else %}{{ title }}{% endif %}
-    {% endif %}
-    {% if saved_query %}
-        &rsaquo; <a href="{% url "admin:savedqueries_savedquery_changelist" %}">{% trans "Saved queries" %}</a>
-        &rsaquo; <a href="{% url "admin:savedqueries_savedquery_change" query_hash %}">{{ saved_query.name }}</a>
-    {% endif %}
-    {% block breadcrumbs_inner %}
-    {% if query_hash %}
-    &rsaquo; {% trans 'Edit' %}
-    {% else %}
-    &rsaquo; {% trans 'New' %}
-    {% endif %}
-    {% endblock %}
-</div>
-{% endblock %}
+
 
 {% block pretitle %}{% endblock %}
-{% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
 {% block content %}
-{% block object-tools %}
-<ul class="object-tools">
-  {% if savedqueries_installed %}
-  <li>
-  {% if query_hash %}
-    <a href="{% url "admin:savedqueries_savedquery_change" query_hash %}">{% trans "Saved query" %}</a>
-  {% else %}
-    <a href="{% url "admin:savedqueries_savedquery_changelist" %}">{% trans "Saved queries" %}</a>
-  {% endif %}
-  </li>
-  {% endif %}
-  <li>
-    <a href="javascript:void(0);" id="qbeDiagramTab">{% trans "Diagram" %}</a>
-  </li>
-  <li>
-    <a href="javascript:void(0);" id="qbeTabularTab">{% trans "Tabular" %}</a>
-  </li>
-  <li>
-    <a class="addlink" href="javascript:void(0);" id="qbeModelsTab">{% trans "Models" %}</a>
-  </li>
-</ul>
-{% endblock %}
+    {% block object-tools %}
 
-<form id="qbeForm" method="post" action="{% url "qbe_proxy" %}">
-{% csrf_token %}
-<div class="qbeContainer qbeDiagram" id="qbeDiagram" style="display: none;">
-    <div id="qbeDiagramContainer"></div>
-</div>
-<div class="qbeContainer qbeTabular" id="qbeTabular">
-    <div class="inline-group">
-    <table cellspacing="0" class="tabular" width="100%" id="qbeConditionsTable">
-        <thead>
-            <tr>
-                <th>{% trans "Show" %}</th>
-                <th>{% trans "Model" %}</th>
-                <th>{% trans "Field" %}</th>
-                {% if aliases_enabled %}<th>{% trans "As" %}</th>{% endif %}
-                <th>{% trans "Sort" %}</th>
-                {% if group_by_enabled %}<th>{% trans "Group by" %}</th>{% endif %}
-                <th>{% trans "Criteria" %}</th>
-                <th>{% trans "Delete" %}</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for form in formset.forms %}
-            <tr class="{% cycle 'row1' 'row2' %}">
-                <td>{{ form.show.errors }}{{ form.show }}</td>
-                <td>{{ form.model.errors }}{{ form.model }}</td>
-                <td>{{ form.field.errors }}{{ form.field }}</td>
-                {% if aliases_enabled %}<td>{{ form.alias.errors }}{{ form.alias }}</td>{% endif %}
-                <td>{{ form.sort.errors }}{{ form.sort }}</td>
-                {% if group_by_enabled %}<td>{{ form.group_by.errors }}{{ form.group_by }}</td>{% endif %}
-                <td>{{ form.criteria.errors }}{{ form.criteria }}</td>
-                <td class="delete"></td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    </div>
+        {% include 'qbe_help.html' %}
 
-    <div class="submit-row">
-        {% trans "Show" %} <input type="text" name="limit" id="id_form_limit" value="100"> {% trans "rows" %}
-        <input type="hidden" name="positions" id="id_form_positions">
-        {% comment %}
-<!--        <input type="button" name="autocomplete" id="autocomplete" value="{% trans "Auto complete" %}">-->
-<!--        <select name="autocompletionOptions" id="autocompletionOptions" style="display: none;"></select>-->
-        {% endcomment %}
-        <input type="submit" name="_save" class="default" value="{% trans "Run" %}">
-    </div>
+        <div class="top_right">
+            <a href="?resetq=1" class="button"><i class="fa-refresh"></i>Reset Page</a>
+            {% if 'qbe_change' in request.path %}
+                <a href="{{ request.path }}" class="button"><i class="fa-back"></i> Undo Changes</a>
+            {% endif %}
+        </div>
 
-    <div >
-        {% trans "Database" %}
-        <select name="database_alias" id="id_database_alias">
-        {% for db_alias, database_properties in databases.items %}
-            {% ifequal database_alias db_alias %}
-            <option value="{{ db_alias }}" selected="selected">{{ db_alias }}: {{ database_properties.NAME }} ({{ database_properties.ENGINE }})</option>
-            {% else %}
-            <option value="{{ db_alias }}">{{ db_alias }}: {{ database_properties.NAME }} ({{ database_properties.ENGINE }})</option>
-            {% endifequal %}
-        {% endfor %}
-        </select>
-    </div>
+        <div id="content">
+
+        {% include 'report_include.html' %}
 
 
-</div>
-
-<div id="changelist-filter" class="qbeModelList module">
-    <h2>{% trans "Models" %}</h2>
-    {% for app_name, app_models in models.items %}
-        <h3>{{ app_name }}</h3>
-        <ul>
-        {% for model_name, model in app_models.items %}
-        <li id="qbeModelItem_{{ model_name }}"><a id="qbeModelAnchor_{{ app_name }}.{{ model_name }}" href="javascript:void(0);" class="qbeModelAnchor">{{ model_name }}</a></li>
-        {% endfor %}
+        <ul class="object-tools hidden">
+            <li>
+                <a href="javascript:void(0);" id="qbeDiagramTab">{% trans "Diagram" %}</a>
+            </li>
+            <li>
+                <a href="javascript:void(0);" id="qbeTabularTab">{% trans "Tabular" %}</a>
+            </li>
+            <li>
+                <a class="addlink" href="javascript:void(0);" id="qbeModelsTab">{% trans "Models" %}</a>
+            </li>
         </ul>
-    {% endfor %}
-</div>
+    {% endblock %}
 
-{{ formset.management_form }}
+{% include 'messages.html' %}
+
+<form id="qbeForm" method="post" action="{% url "django_qbe:qbe_proxy" %}">
+    {% csrf_token %}
+    <div class="qbeContainer qbeTabular" id="qbeTabular">
+        <div class="inline-group">
+            <table class="tabular" id="qbeConditionsTable">
+                <thead>
+                <tr>
+                    <th>{% trans "Show" %}</th>
+                    <th>{% trans "Table" %} *</th>
+                    <th>{% trans "Field" %} *</th>
+                    {% if aliases_enabled %}
+                        <th>{% trans "As" %}</th>{% endif %}
+                    <th>{% trans "Sort" %}</th>
+                    {% if group_by_enabled %}
+                        <th>{% trans "Group by" %}</th>{% endif %}
+                    <th>{% trans "Criteria" %}</th>
+                    <th>{% trans "Delete" %}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for form in formset.forms %}
+                    <tr class="{% cycle 'row1' 'row2' %}">
+                        <td>{{ form.show.errors }}{{ form.show }}</td>
+                        <td>{{ form.model.errors }}{{ form.model }}</td>
+                        <td>{{ form.field.errors }}{{ form.field }}</td>
+                        {% if aliases_enabled %}
+                            <td>{{ form.alias.errors }}{{ form.alias }}</td>{% endif %}
+                        <td>{{ form.sort.errors }}{{ form.sort }}</td>
+                        {% if group_by_enabled %}
+                            <td>{{ form.group_by.errors }}{{ form.group_by }}</td>{% endif %}
+                        <td class="cell_criteria">{{ form.criteria.errors }}{{ form.criteria }}</td>
+                        <td class="delete"></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="submit-row">
+            <div class="helptext fleft">* denotes required field</div>
+            {% trans "Show" %} <input type="text" name="limit" id="id_form_limit" value="100"> {% trans "rows" %}
+            <input type="hidden" name="positions" id="id_form_positions">
+            <input type="submit" name="_save" class="default" value="{% trans "Run" %}">
+        </div>
+
+        <div class="hidden">
+            {% trans "Database" %}
+            <select name="database_alias" id="id_database_alias">
+                {% for db_alias, database_properties in databases.items %}
+                    {% ifequal database_alias db_alias %}
+                        <option value="{{ db_alias }}"
+                                selected="selected">{{ db_alias }}: {{ database_properties.NAME }}
+                            ({{ database_properties.ENGINE }})
+                        </option>
+                    {% else %}
+                        <option value="{{ db_alias }}">{{ db_alias }}: {{ database_properties.NAME }}
+                            ({{ database_properties.ENGINE }})
+                        </option>
+                    {% endifequal %}
+                {% endfor %}
+            </select>
+        </div>
+
+
+    </div>
+
+    <div id="changelist-filter" class="qbeModelList module">
+        <h2>{% trans "Tables" %}</h2>
+        {% for app_name, app_models in models.items %}
+            <h3>{{ app_name }}</h3>
+            <ul>
+                {% for model_name, model in app_models.items %}
+                    <li id="qbeModelItem_{{ model_name }}"><a id="qbeModelAnchor_{{ app_name }}.{{ model_name }}"
+                                                              href="javascript:void(0);"
+                                                              class="qbeModelAnchor">{{ model.verbose_name }}</a></li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+        <h2>Legend</h2>
+        <div class="legend_wrap">
+            <div>
+                <div class="lngd_box" style="background-color: #F7FF6C"></div>
+                Primary Key
+                <div class="helptext">This is what other tables join to.</div>
+            </div>
+            <div class="spacetop">
+                <div class="lngd_box" style="background-color: #d1f4ff"></div>
+                Foreign Key
+                <div class="helptext">This joins from one table to another table's primary key.</div>
+            </div>
+            <div class="helptext spacetop">
+                Note: to join different models, (e.g. a device to it's device type), select the
+                <b style="background-color: #d1f4ff">foreign key</b> in the <b>"Field"</b> dropdown.
+                The model the foreign key relates to will be automatically inserted on the next row.
+            </div>
+        </div>
+    </div>
+
+    {{ formset.management_form }}
+    <div class="cleft"></div>
 </form>
-
 <script>
-{% include "qbe.js" %}
+    {% include "qbe.js" %}
 </script>
 
+<div class="qbeContainer qbeDiagram" id="qbeDiagram">
+    <div id="qbeDiagramContainer"></div>
+</div>
+
+<div class="cleft cright"></div>
+
+</div>
 {% endblock %}
 {% block sidebar %}{% endblock %}

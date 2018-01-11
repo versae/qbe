@@ -1,0 +1,61 @@
+<div id="help_icon"></div>
+<div id="help_content" data-width="1000" data-height="85%" data-extra-classes="qbe_help_overlay help_overlay_wrap">
+    <h3 class="text_center">Support Link Reporting Help</h3>
+    <div class="help_inner">
+        <p> This tool allows you to create custom reports. Any of the data provided can be
+            sorted, filtered, joined, and displayed any way you see fit. The data is stored in tables. Once you add
+            tables to your report, you need to select which fields should be displayed and how the data should be
+            used. The diagram at the bottom is used for informational purposes to show you how tables are related
+            and which fields are in each table. The form at the top of the page is where you create your report.
+            Here are some basic instructions for using this tool. </p>
+        <div class="help_block" style="padding-right: 280px; min-height: 160px">
+            <figure class="rimg"><img src="{{ STATIC_URL }}/django_qbe/img/help_models.png"/>
+                <figcaption>Toggle tables on or off by clicking them</figcaption>
+            </figure>
+            <h4>Adding Tables</h4>
+            <p> Click the tables that you want to use in the box on the right of the page labeled &ldquo;Tables&rdquo;.
+                These are the tables that will be included in your report. Clicking them will add or remove them
+                to the &ldquo;Table&rdquo; dropdown. </p></div>
+        <div class="help_block" style="padding-left: 510px; min-hieght: 100px">
+            <figure class="limg"><img src="{{ STATIC_URL }}/django_qbe/img/help_fields.png"/>
+                <figcaption>Select the fields you want to use</figcaption>
+            </figure>
+            <h4>Adding Fields</h4>
+            <p> You can click "Add Another Field" to add fields you want to display, join, filter, or sort on.
+                After you click "Add Another Field", select a table you want to use in the Table dropdown and a
+                Field for that Table in the Fields dropdown. It does not matter what order these are added to
+                the form. Click the show checkbox to display the field in the results. You can filter or sort on
+                a field without displaying it. </p></div>
+        <div class="help_block" style="padding-right: 250px; min-height: 169px">
+            <figure class="rimg"><img src="{{ STATIC_URL }}/django_qbe/img/help_joining.png"/>
+                <figcaption>Select the blue fields to join other tables</figcaption>
+            </figure>
+            <h4>Joining Tables</h4>
+            <p> If all of the fields you want to select are on the same table, you don't need to join anything.
+                But if you want data from two different tables, the tables must be joined together. Meaning, you
+                must select how tables should be related to each other. After you select a table in the Table
+                dropdown, the related tables are shown in the Fields dropdown in blue. Clicking the blue field
+                will join the tables together as well as automatically adding the new table to the form. For
+                example, if you select a Device table, you would select the Store field to join the Stores
+                table. Now you can select things like the Device's IP address the Store's store number.
+            </p></div>
+        <div class="help_block" style="padding-left: 310px; min-height: 90px">
+            <figure class="limg"><img src="{{ STATIC_URL }}/django_qbe/img/help_filter.png"/>
+                <figcaption>You can combine on multiple filters on multiple fields</figcaption>
+            </figure>
+            <h4>Filtering</h4>
+            <p> There are many filters to choose from. These are selected in the Criteria column. Some filters
+                are only applicable to certain data types. Any filter with ( I ) prefixed indicates the filter is case
+                insensitive. Greater than and less than filters can be used on numbers and dates. Example: If
+                you filter dates that are less than a certain date, that will return dates that came before
+                that date. </p></div>
+        <div class="help_block" style="padding-right: 325px; min-height: 95px">
+            <figure class="rimg"><img src="{{ STATIC_URL }}/django_qbe/img/help_sort.png"/></figure>
+            <h4>Sorting</h4>
+            <p> To sort you simply select ascending or descending in the Sort dropdown. If you sort on multiple
+                fields, the sort will cascade if two items are equal, sorting on the next field in the form with
+                a &ldquo;Sort&rdquo; option selected. </p></div>
+        <p class="helptext text_center"> There are many example templates on the "Report Templates" button that
+            should help give you an idea of how to use this tool. </p>
+    </div>
+</div>

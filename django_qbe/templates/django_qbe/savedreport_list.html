@@ -1,0 +1,32 @@
+{% if object_list %}
+    <table class="slim-table" id="report_list">
+        <thead>
+        <tr>
+            <th>Report Name</th>
+            <th>Report Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for obj in object_list %}
+            <tr>
+                <td><a href="{{ obj.report_url }}">{{ obj.title }}</a></td>
+                <td>{{ obj.description }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="2">
+                If what you are looking for isn't shown above, you can modify these templates to fit your needs.
+            </td>
+        </tr>
+        </tfoot>
+    </table>
+{% else %}
+    <div class="notice">
+        <div class="notice_t"></div>
+        <div class="notice_c">
+            No reports have been created.
+        </div>
+    </div>
+{% endif %}

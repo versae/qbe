@@ -1,90 +1,109 @@
 {% extends "qbe.html" %}
 {% load i18n qbe_tags %}
-
-{% block extrahead %}
-<script type="text/javascript" src="{% firstof STATIC_URL MEDIA_URL %}django_qbe/js/jquery.js"></script>
-<link rel="stylesheet" type="text/css" href="{% firstof STATIC_URL MEDIA_URL %}django_qbe/css/qbe.css" />
-{% endblock %}
-
 {% block breadcrumbs_inner %}
-&rsaquo; {% trans "Results" %}
+    &rsaquo; {% trans "Results" %}
 {% endblock %}
-
-{% block content_title %}{% if title %}
-<h1>
-    {{ title }}: {{ count|floatformat:0 }} {{ count|floatformat:0|pluralize:_("result,results") }}
-</h1>
-{% endif %}{% endblock %}
-
 {% block content %}
-{% block object-tools %}
-    {% ifequal limit count %}
-    {% trans "Showing all" %} {{ count|floatformat:0 }} {{ results|length|pluralize:_("result,results") }}
-    {% else %}
-    {% trans "Showing from" %} {{ offset|floatformat:0 }} {% trans "to" %} {{ offset_limit|floatformat:0 }} {% trans "of" %} {{ count|floatformat:0 }} {{ results|length|pluralize:_("result,results") }}
-    {% endifequal %}
-<span id="qbeResultsOptions">
-    {% ifequal limit count %}
-    (<a href="{% url "qbe_results" query_hash %}">{% trans "show first ones" %}</a>
-    {% else %}
-    (<a href="{% url "qbe_results" query_hash %}?show=all">{% trans "show all" %}</a>
-    {% endifequal %}
-    | <a href="{% url "qbe_form" query_hash %}">{% trans "edit query" %}</a>
-    | <a href="#" onclick="jQuery('#qbeSQL').toggle();return false;">{% trans "view query" %}</a>)
-</span>
-<ul class="object-tools">
-    <li id="qbeSaveQueryLi">
-        {% trans "Save query as" %}
-    </li>
-    <li>
-        <a href="{% url "qbe_bookmark" %}?data={{ pickled }}" title="{% trans "Drag this to your bookmarks bar to save this query" %}" id="qbeBookmarkQuery">{% trans "bookmark" %}</a>
-    </li>
-    {% if savedqueries_installed %}
-    <li>
-        <a href="{% url "admin:savedqueries_savedquery_add" %}?hash={{ query_hash }}">model</a>
-    </li>
+
+
+
+    {% block content_title %}{% if title %}
+
     {% endif %}
-    {% for format in formats %}
-    <li>
-        <a href="{% url "qbe_export" query_hash format %}" title="{% trans "Export to" %} .{{ format }}" id="qbeExport{{ format }}">.{{ format }}</a>
-    </li>
-    {% endfor %}
-</ul>
-{% endblock %}
-<code id="qbeSQL" style="display: none;">
-{{ query }}
-</code>
-<div id="changelist" class="module">
-<table cellspacing="0">
-    <thead>
-        <tr>
-        {% for label in labels %}
-            <th>{{ label }}</th>
-        {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-    {% for result_tuple in results %}
-        <tr class="{% cycle 'row1' 'row2' %}">
-            <td>{{offset|add:forloop.counter}}</td>
-        {% if admin_urls %}
-            {% for result in result_tuple %}
-                {% if forloop.counter|add:"1"|divisibleby:"2" %}
-                    <td>{{ result }}</td>
-                {% endif %}
-            {% endfor %}
-        {% else %}
-            {% for result in result_tuple %}
-                <td>{{ result }}</td>
-            {% endfor %}
-        {% endif %}
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
-<p class="paginator">
-{% qbe_paginator count limit page %}
-{{ count|floatformat:0 }} {{ count|floatformat:0|pluralize:_("result,results") }}
-</p>
-</div>
+
+    {% endblock %}
+    <div id="content">
+
+        {% url "django_qbe:qbe_form" query_hash as edit_link %}
+
+        {% include 'messages.html' %}
+
+        <div id="resultOptionsWrap">
+            <div class="helptext fright">Right click and save the link on the bookmark button to access your report at a
+                later date
+            </div>
+
+            {% block object-tools %}
+
+                <ul class="object-tools cright">
+                    <li id="qbeSaveQueryLi">
+                        {% trans "Save query as" %}
+                    </li>
+                    <li>
+                        <a href="{% url "django_qbe:qbe_bookmark" %}?data={{ pickled|safe }}"
+                           title="{% trans "Drag this to your bookmarks bar to save this query" %}"
+                           id="qbeBookmarkQuery">{% trans "bookmark" %}</a>
+                    </li>
+                    {% if savedqueries_installed %}
+                        <li>
+                            <a href="{% url "admin:savedqueries_savedquery_add" %}?hash={{ query_hash }}">model</a>
+                        </li>
+                    {% endif %}
+                    {% for format in formats %}
+                        <li>
+                            <a href="{% url "django_qbe:qbe_export" query_hash format %}"
+                               title="{% trans "Export to" %} .{{ format }}"
+                               id="qbeExport{{ format }}">.{{ format }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endblock %}
+
+            {% ifequal limit count %}
+                <a class="button left" href="{% url "django_qbe:qbe_results" query_hash %}"><i class="fa-eye"></i>Show
+                    by Page</a>
+            {% else %}
+                <a class="button left" href="{% url "django_qbe:qbe_results" query_hash %}?show=all"><i
+                        class="fa-eye"></i>Show All</a>
+            {% endifequal %}
+            <a id="edit_btn" class="button middle" href="{% url "django_qbe:qbe_bookmark" %}?data={{ pickled|safe }}"><i
+                    class="fa-edit"></i>Edit Report</a>
+            <a href="#" class="button right hidden" onclick="jQuery('#qbeSQL').toggle();return false;"><i
+                    class="fa-database2"></i>View Query</a>
+
+        </div>
+        <code id="qbeSQL" style="display: none;">
+            {{ query }}
+        </code>
+
+
+        <div class="helptext">
+            {% ifequal limit count %}
+                {% trans "Showing all" %} {{ count|floatformat:0 }} {{ results|length|pluralize:_("result,results") }}
+            {% else %}
+                {% trans "Showing from" %} {{ offset|floatformat:0 }} {% trans "to" %} {{ offset_limit|floatformat:0 }}
+                {% trans "of" %} {{ count|floatformat:0 }} {{ results|length|pluralize:_("result,results") }}
+            {% endifequal %}
+        </div>
+
+        {% qbe_paginator count limit page as pagination %}
+        <p class="paginator">
+            Page {{pagination}}
+        </p>
+
+        <div id="changelist" class="module">
+            <table cellspacing="0">
+                <thead>
+                <tr>
+                    {% for label in labels %}
+                        <th>{{ label }}</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for result_tuple in results %}
+                    <tr class="{% cycle 'row1' 'row2' %}">
+                        <td>{{ offset|add:forloop.counter }}</td>
+                        {% for result in result_tuple %}
+                            <td>{{ result }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <p class="paginator">
+                Page {{pagination}}
+            </p>
+        </div>
+    </div>
 {% endblock %}

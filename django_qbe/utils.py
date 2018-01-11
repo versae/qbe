@@ -1,19 +1,31 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function
-from __future__ import division
-from past.builtins import cmp
-from builtins import zip
-from builtins import filter
-from builtins import range
-from past.utils import old_div
-import base64
+
+
+import inspect
 import pickle
-import random
-from collections import deque
-from copy import copy
-from hashlib import md5
+import sys
+from builtins import filter, range, zip
 from json import dumps
+
+import base64
+import random
+from collections import OrderedDict, deque
+from copy import copy
+from django.apps import apps
+from django.conf import settings
+from django.contrib.contenttypes.fields import GenericRelation
+from django.core.exceptions import SuspiciousOperation
+from django.db.models.fields.related import (ForeignKey, ManyToManyField,
+                                             OneToOneField)
 from functools import reduce
+from hashlib import md5
+from importlib import import_module
+from past.builtins import cmp
+from past.utils import old_div
+
+from django_qbe.settings import (IGNORE_FIELDS, QBE_ADMIN_SITE,
+                                 QBE_CUSTOM_OPERATORS, QBE_FORMATS_EXPORT)
+
 try:
     from itertools import combinations
 except ImportError:
@@ -26,19 +38,6 @@ except ImportError:
                 for cc in combinations(items[i + 1:], n - 1):
                     yield [items[i]] + cc
 
-from django.apps import apps as django_apps
-from django.db.models.fields.related import (ForeignKey, OneToOneField,
-                                             ManyToManyField)
-from django.core.exceptions import SuspiciousOperation
-from django.conf import settings
-from importlib import import_module
-
-from django_qbe.settings import (
-    QBE_ADMIN_SITE,
-    QBE_FORMATS_EXPORT,
-    QBE_CUSTOM_OPERATORS,
-)
-
 try:
     # Default value to backwards compatibility
     qbe_admin_site = QBE_ADMIN_SITE
@@ -49,11 +48,6 @@ try:
 except (AttributeError, ImportError):
     from django.contrib.admin import site as admin_site
 admin_site
-
-try:
-    from django.contrib.contenttypes.fields import GenericRelation
-except ImportError:
-    from django.contrib.contenttypes.generic import GenericRelation
 
 try:
     qbe_formats = QBE_FORMATS_EXPORT
@@ -68,10 +62,23 @@ try:
 except ImportError:
     pass
 
+get_models = apps.get_models
 
-def qbe_models(admin_site=None, only_admin_models=False, json=False):
-    app_models = django_apps.get_models(include_auto_created=True)
-    app_models_with_no_includes = django_apps.get_models(include_auto_created=False)
+
+def get_store_db_models(name):
+    if not name:
+        return []
+    key = 'devices.%s' % name
+    if key in sys.modules:
+        return [obj[1].__name__ for obj in inspect.getmembers(sys.modules[key]) if inspect.isclass(obj[1])]
+    return []
+
+
+def qbe_models(admin_site=None, only_admin_models=False, json=False, qbe_type=None):
+    qbe_db = get_database(qbe_type)
+
+    app_models = apps.get_models(include_auto_created=True)
+    app_models_with_no_includes = apps.get_models(include_auto_created=False)
     if admin_site:
         admin_models = [m for m, a in admin_site._registry.items()]
     else:
@@ -80,57 +87,37 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
         app_models = admin_models
     graphs = {}
 
+    def make_title_if_not_title(input):
+        # Verbose names begin with uppercase. If a verbose name has not been set, make one.
+        return input if input[0].isupper() else input.title()
+
     def get_field_attributes(field):
         return {field.name: {
             'name': field.name,
             'type': type(field).__name__,
             'blank': field.blank,
-            'label': u"%s" % field.verbose_name.lower().capitalize(),
+            'label': make_title_if_not_title(field.verbose_name),
             'primary': field.primary_key,
         }}
 
-    def get_through_fields(field):
-        # Deprecated
-        through_fields = []
-        for through_field in field.rel.through._meta.fields:
-            label = through_field.verbose_name.lower().capitalize()
-            through_fields_dic = {
-                'name': through_field.name,
-                'type': type(through_field).__name__,
-                'blank': through_field.blank,
-                'label': u"%s" % label,
-            }
-            if hasattr(through_field.rel, "to"):
-                through_rel = through_field.rel
-                through_mod = through_rel.to.__module__.split(".")[-2]
-                through_name = through_mod.lower().capitalize()
-                through_target = {
-                    'name': through_name,
-                    'model': through_rel.to.__name__,
-                    'field': through_rel.get_related_field().name,
-                }
-                through_fields_dic.update({
-                    "target": through_target,
-                })
-            through_fields.append(through_fields_dic)
-        return through_fields
-
     def get_target(field):
-        name = field.rel.to.__module__.split(".")[-2].lower().capitalize()
+        name = field.related_model.__module__.split('.')[-2]
         target = {
             'name': name,
-            'model': field.rel.to.__name__,
-            'field': field.rel.to._meta.pk.name,
+            'model': field.related_model.__name__,
+            'field': field.related_model._meta.pk.name,
         }
+        """
         if hasattr(field.rel, 'through') and field.rel.through is not None:
             name = field.rel.through.__module__.split(".")[-2]
             target.update({
                 'through': {
-                    'name': name.lower().capitalize(),
+                    'name': name,
                     'model': field.rel.through.__name__,
                     'field': field.rel.through._meta.pk.name,
                 }
             })
+        """
         return target
 
     def get_target_relation(field, extras=""):
@@ -150,10 +137,20 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
         model['fields'][field.name].update({'target': target})
         return model
 
+    db = qbe_type
+    if db == 'store':
+        check_models = get_store_db_models('store_models_' + qbe_db.split(',')[0])
+    else:
+        check_models = settings.REPORT_MODELS[db]
+
     for app_model in app_models:
+
+        if app_model.__name__ not in check_models:
+            continue
+
         model = {
             'name': app_model.__name__,
-            'fields': {},
+            'fields': OrderedDict(),
             'relations': [],
             'primary': app_model._meta.pk.name,
             'collapse': ((app_model not in admin_models) or
@@ -163,28 +160,29 @@ def qbe_models(admin_site=None, only_admin_models=False, json=False):
 
         for field in app_model._meta.fields:
             field_attributes = get_field_attributes(field)
+
+            if list(field_attributes.values())[0]['name'] in IGNORE_FIELDS:
+                continue
+
             model['fields'].update(field_attributes)
             if isinstance(field, ForeignKey):
                 model = add_relation(model, field)
             elif isinstance(field, OneToOneField):
-                extras = ""  # "[arrowhead=none arrowtail=none]"
-                model = add_relation(model, field, extras=extras)
+                model = add_relation(model, field)
+
+        model['verbose_name'] = make_title_if_not_title(app_model._meta.verbose_name)
 
         if app_model._meta.many_to_many:
             for field in app_model._meta.many_to_many:
                 if not hasattr(field, 'primary_key'):
                     continue
-                field_attributes = get_field_attributes(field)
-                model['fields'].update(field_attributes)
-                if isinstance(field, ManyToManyField):
-                    extras = ""  # "[arrowhead=normal arrowtail=normal]"
-                    model = add_relation(model, field, extras=extras)
-                elif isinstance(field, GenericRelation):
-                    extras = ""  # '[style="dotted"]
-                                 # [arrowhead=normal arrowtail=normal]'
-                    model = add_relation(model, field, extras=extras)
 
-        app_title = app_model._meta.app_label.title().lower().capitalize()
+                model['fields'].update(get_field_attributes(field))
+
+                if isinstance(field, ManyToManyField) or isinstance(field, GenericRelation):
+                    model = add_relation(model, field)
+
+        app_title = app_model._meta.app_label
         if app_title not in graphs:
             graphs[app_title] = {}
         graphs[app_title].update({app_model.__name__: model})
@@ -229,7 +227,7 @@ def qbe_graph(admin_site=None, directed=False):
 
 def qbe_tree(graph, nodes, root=None):
     """
-    Given a graph, nodes to explore and an optinal root, do a breadth-first
+    Given a graph, nodes to explore and an optional root, do a breadth-first
     search in order to return the tree.
     """
     if root:
@@ -271,7 +269,6 @@ def qbe_tree(graph, nodes, root=None):
 
 
 def remove_leafs(tree, nodes):
-
     def get_leafs(tree, nodes):
         return [node for node, edges in tree.items()
                 if len(edges) < 2 and node not in nodes]
@@ -322,7 +319,6 @@ def find_all_paths(graph, start_node, end_node, path=None):
 
 
 def find_minimal_paths(graph, start_node, end_node):
-
     def find_all_paths(graph, start_node, end_node, start_edge, end_edge,
                        path=None, minimun=float("Inf")):
         if not path:
@@ -372,7 +368,8 @@ def _combine(items, val=None, paths=None, length=None):
 
             def visited_path(x):
                 return x not in paths
-            path = filter(visited_path, path)
+
+            path = list(filter(visited_path, path))
             paths.extend(path)
     return paths
 
@@ -419,18 +416,20 @@ def autocomplete_graph(admin_site, current_models, directed=False):
     for combined_set in combined_sets:
         path = graphs_join(combined_set)
         valid_paths.append(path)
-#        for path in paths:
-#            if all(map(lambda x: x in path, current_models)):
-#                if path not in valid_paths:
-#                    valid_paths.append(path)
+    # for path in paths:
+    #            if all(map(lambda x: x in path, current_models)):
+    #                if path not in valid_paths:
+    #                    valid_paths.append(path)
     return sorted(valid_paths, cmp=lambda x, y: cmp(len(x), len(y)))
 
 
 # Taken from django.contrib.sessions.backends.base
 def pickle_encode(session_dict):
-    "Returns the given session dictionary pickled and encoded as a string."
+    """Returns the given session dictionary pickled and encoded as a string."""
+    if 'csrfmiddlewaretoken' in session_dict:
+        del session_dict['csrfmiddlewaretoken']
     pickled = pickle.dumps(session_dict, pickle.HIGHEST_PROTOCOL)
-    return base64.encodestring(pickled + get_query_hash(pickled).encode())
+    return base64.encodebytes(pickled + get_query_hash(pickled).encode())
 
 
 # Adapted from django.contrib.sessions.backends.base
@@ -438,14 +437,15 @@ def pickle_decode(session_data):
     # The '+' character is translated to ' ' in request
     session_data = session_data.replace(" ", "+")
     # The length of the encoded string should be a multiple of 4
-    while (((old_div(len(session_data), 4.0)) - (old_div(len(session_data), 4))) != 0):
-        session_data += u"="
-    encoded_data = base64.decodestring(session_data)
+    while ((old_div(len(session_data), 4.0)) - (old_div(len(session_data), 4))) != 0:
+        session_data += "="
+    encoded_data = base64.decodebytes(session_data.encode('ascii'))
     pickled, tamper_check = encoded_data[:-32], encoded_data[-32:]
     pickled_md5 = get_query_hash(pickled)
-    if pickled_md5 != tamper_check:
-        raise SuspiciousOperation("User tampered with session cookie.")
     try:
+        if pickled_md5 != tamper_check.decode('utf-8'):
+            raise SuspiciousOperation("User tampered with session cookie.")
+
         return pickle.loads(pickled)
     # Unpickling can cause a variety of exceptions. If something happens,
     # just return an empty dictionary (an empty session).
@@ -454,4 +454,15 @@ def pickle_decode(session_data):
 
 
 def get_query_hash(data):
+    if type(data) is not bytes:
+        data = str.encode(data)
     return md5(data + str.encode(settings.SECRET_KEY)).hexdigest()
+
+def table_to_model_name(table):
+    if isinstance(table, (list, set, tuple)):
+        return [table_to_model_name(t) for t in table]
+    return '"%s"' % apps.get_model(table.replace('_', '.'))._meta.verbose_name.strip()
+
+
+def get_database(qbe_type):
+    return 'devices' if qbe_type == 'devices_reporting' else 'slave'

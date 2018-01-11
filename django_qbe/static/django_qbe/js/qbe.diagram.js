@@ -1,7 +1,7 @@
 qbe.Diagram = {};
 
 (function($) {
-    $(document).ready(function() {
+    jsPlumb.ready(function() {
         /**
          * Default options for Diagram and jsPlumb
          */
@@ -19,14 +19,14 @@ qbe.Diagram = {};
             },
             makeOverlays: function() {
                 return [
-                    new jsPlumb.Overlays.PlainArrow({
+                    ["Arrow", {
                         foldback: 0,
                         fillStyle: '#96D25C',
                         strokeStyle: '#70A249',
                         location: 0.99,
                         width: 10,
-                        length: 10})
-                ];
+                        length: 10}]
+                    ];
             }
         };
         qbe.Diagram.Defaults["many"] = {
@@ -34,9 +34,9 @@ qbe.Diagram = {};
             labelStyle: {
                 fillStyle: "white",
                 padding: 0.25,
-                font: "12px sans-serif", 
+                font: "12px sans-serif",
                 color: "#C55454",
-                borderStyle: "#C55454", 
+                borderStyle: "#C55454",
                 borderWidth: 3
             },
             paintStyle: {
@@ -65,10 +65,61 @@ qbe.Diagram = {};
                         length: 10})
                 ];
             }
-        }
+        };
 
         jsPlumb.Defaults.DragOptions = {cursor: 'pointer', zIndex: 2000};
         jsPlumb.Defaults.Container = "qbeDiagramContainer";
+
+        var get_position = function() {
+
+            function intersectRect(r1, r2) {
+              return !(r2.left > r1.right ||
+                       r2.right < r1.left ||
+                       r2.top > r1.bottom ||
+                       r2.bottom < r1.top);
+            }
+            function make_rect(top_top, top_left, bot_top, bot_left){
+                return {
+                    'top': top_top,
+                    'left': top_left,
+                    'right': bot_left,
+                    'bottom': bot_top,
+                };
+            }
+
+            var found_pos, pos, left, top = 0;
+            var boxes = [];
+            // Make sure that a new box does not overlap and existing box
+            $('#qbeDiagramContainer > div').each(function(){
+                pos = $(this).position();
+                boxes.push([pos.top, pos.left, pos.top + $(this).height(), pos.left + $(this).width()]);
+            });
+
+            var max_width = $('#qbeDiagramContainer').innerWidth() - 180;
+            var max_height = $('#qbeDiagramContainer').innerHeight() - 200;
+
+            var tries = 0;
+            do{
+                top = parseInt(Math.random() * max_height);
+                left = parseInt(Math.random() * max_width);
+
+                found_pos = true;
+                for (var i in boxes){
+                    if (intersectRect(
+                        make_rect(top, left, top + 170, left + 190),
+                        make_rect(boxes[i][0], boxes[i][1], boxes[i][2], boxes[i][3])
+                    )) {
+                        found_pos = false;
+                        break;
+                    }
+                }
+                tries++;
+                if (tries > 50)
+                    break;
+            }while(!found_pos);
+
+            return {'left': left, 'top': top};
+        };
 
         /**
          * Adds a new model box with its fields
@@ -80,15 +131,11 @@ qbe.Diagram = {};
             root = $("#qbeDiagramContainer");
             divBox = $("<DIV>");
             divBox.attr("id", "qbeBox_"+ modelName);
-            divBox.css({
-                "left": (parseInt(Math.random() * 55 + 1) * 10) + "px",
-                "top": (parseInt(Math.random() * 25 + 1) * 10) + "px"
-            });
-            divBox.attr();
+            divBox.css(get_position());
             divBox.addClass("body");
             divTitle = $("<DIV>");
             divTitle.addClass("title");
-            qbe.Diagram.setLabel(divTitle, modelName, false);
+            qbe.Diagram.setLabel(divTitle, qbe.Core.getVerboseName(appName, modelName), false);
             anchorDelete = $("<A>");
             anchorDelete.html("x");
             anchorDelete.attr("href", "javascript:void(0);");
@@ -105,7 +152,7 @@ qbe.Diagram = {};
                 divField.addClass("field");
                 qbe.Diagram.setLabel(divField, field.label, field.primary);
                 divField.attr("id", "qbeBoxField_"+ appName +"."+ modelName +"."+ fieldName);
-                if (field.type == "ForeignKey") {
+                if (field.type == "ForeignKey" || field.type == "OneToOneField") {
                     divField.addClass("foreign");
                     divField.click(qbe.Diagram.addRelated);
                     divBox.prepend(divField);
@@ -145,17 +192,24 @@ qbe.Diagram = {};
             }
             divBox.append(divFields);
             for(divField in primaries) {
-                divBox.prepend(primaries[divField]);
+                if ('html' in primaries[divField])
+                    divBox.prepend(primaries[divField]);
             }
             divBox.prepend(divTitle);
             root.append(divBox);
+            this.repaintAll();
+            var that = this;
             divBox.draggable({
                 handle: ".title",
                 grid: [10, 10],
+                drag: function(event, ui) {
+                    jsPlumb.repaintEverything();
+                },
                 stop: function (event, ui) {
                     var $this, position, left, top;
+                    that.repaintAll();
                     $this = $(this);
-                    position = $this.position()
+                    position = $this.position();
                     left = position.left;
                     if (position.left < 0) {
                         left = "0px";
@@ -199,6 +253,7 @@ qbe.Diagram = {};
          * - overlays.
          */
         qbe.Diagram.addRelation = function(sourceId, sourceField, targetId, targetField, label, labelStyle, paintStyle, backgroundPaintStyle, overlays) {
+
             var mediumHeight;
             mediumHeight = sourceField.css("height");
             mediumHeight = parseInt(mediumHeight.substr(0, mediumHeight.length - 2)) / 2;
@@ -209,21 +264,17 @@ qbe.Diagram = {};
                 source: sourceId,
                 target: targetId,
                 endpoints: [
-                    new jsPlumb.Endpoints.Dot({radius: 0}),
-                    new jsPlumb.Endpoints.Dot({radius: 0})
+                    ["Blank", {}],
+                    ["Blank", {}],
                 ],
                 paintStyle: paintStyle,
                 backgroundPaintStyle: backgroundPaintStyle,
                 overlays: overlays,
                 anchors: [
-                    jsPlumb.makeDynamicAnchor([
-                        jsPlumb.makeAnchor(1, 0, 1, 0, 0, sourceField.position().top + mediumHeight + 4),
-                        jsPlumb.makeAnchor(0, 0, -1, 0, 0, sourceField.position().top + mediumHeight + 4)
-                    ]),
-                    jsPlumb.makeDynamicAnchor([
-                        jsPlumb.makeAnchor(0, 0, -1, 0, 0, targetField.position().top + mediumHeight + 4),
-                        jsPlumb.makeAnchor(1, 0, 1, 0, 0, targetField.position().top + mediumHeight + 4)
-                    ])
+                    [1, 0, 1, 0, 0, sourceField.position().top + mediumHeight + 4],
+                    [0, 0, -1, 0, 0, targetField.position().top + mediumHeight + 4],
+                    [0, 0, -1, 0, 0, sourceField.position().top + mediumHeight + 4],
+                    [1, 0, 1, 0, 0, targetField.position().top + mediumHeight + 4]
                 ]
             });
             qbe.CurrentRelations.push(sourceField.attr("id") +"~"+ targetField.attr("id"));
@@ -255,18 +306,19 @@ qbe.Diagram = {};
          */
         qbe.Diagram.hasConnection = function (sourceField, targetField) {
             return (sourceField && targetField
-                    && qbe.CurrentRelations.indexOf(sourceField.attr("id") +"~"+ targetField.attr("id")) >= 0);
+                    && $.inArray(sourceField.attr("id") +"~"+ targetField.attr("id"),qbe.CurrentRelations) >= 0);
         };
 
         /**
          * Remove the box and all connections related to it
          */
         qbe.Diagram.removeBox = function (appName, modelName) {
+            jsPlumb.anchorManager.clearFor("qbeBox_"+ modelName);
             $("#qbeBox_"+ modelName).remove();
         };
 
         /**
-         * Remove all connetions for the box identified by appName and modelName
+         * Remove all connections for the box identified by appName and modelName
          */
         qbe.Diagram.removeRelations = function (appName, modelName) {
             var currentRelations, relation, relationsSplits, relationsLength, sourceSplits, sourceId, targetSplits, targetId;
@@ -288,7 +340,6 @@ qbe.Diagram = {};
                 }
             }
             qbe.CurrentRelations = currentRelations;
-            jsPlumb.clearCache();
         };
 
         /**
@@ -319,28 +370,11 @@ qbe.Diagram = {};
                 splits = appModel.split(".");
                 qbe.Diagram.removeRelations(splits[0], splits[1]);
             }
+            jsPlumb.deleteEveryEndpoint();
             qbe.Core.updateRelations();
+            jsPlumb.repaintEverything();
         };
 
     });
 
-
-    /**
-     * Resize the diagram container height according to the resize event over
-     * the window
-     */
-    $(window).resize(function () {
-        var height;
-        height = $(window).height() - 140;
-        $("#qbeDiagramContainer").height(height);
-        $(".qbeModelList").height(height);
-    });
-
-    /**
-     * Unload jsPlumb
-     */
-    $(window).unload(function () {
-        jsPlumb.unload();
-    });
-
-})(jQuery.noConflict());
+})($);
