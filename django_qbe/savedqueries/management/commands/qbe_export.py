@@ -74,9 +74,9 @@ class Command(BaseCommand):
                 results = formset.get_results(query)
                 response = formats[export_format](labels, results)
                 if file_descr:
-                    file_descr.write(response.streaming_content)
+                    file_descr.writelines(response.streaming_content)
                 else:
-                    self.stdout.write(response.streaming_content)
+                    self.stdout.writelines(response.streaming_content)
             else:
                 self.stderr.write(u"Malformed query: %s\n" % query_hash)
         else:
