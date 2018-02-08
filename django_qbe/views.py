@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 
+from django.apps import apps as django_apps
 from django.contrib.auth.decorators import user_passes_test
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -9,9 +10,6 @@ from django.template.loader import render_to_string
 from django.utils.translation import ugettext as _
 
 from django_qbe.forms import QueryByExampleFormSet, DATABASES
-from django_qbe.utils import (autocomplete_graph, qbe_models, formats,
-                              pickle_encode, pickle_decode, get_query_hash,
-                              admin_site)
 from django_qbe.settings import (
     QBE_ACCESS_FOR,
     QBE_GROUP_BY,
@@ -20,17 +18,11 @@ from django_qbe.settings import (
     QBE_ALIASES,
     QBE_SAVED_QUERIES
 )
+from django_qbe.utils import (autocomplete_graph, qbe_models, formats,
+                              pickle_encode, pickle_decode, get_query_hash,
+                              admin_site)
+
 qbe_access_for = QBE_ACCESS_FOR
-
-
-def get_apps():
-    try:
-        from django.apps import apps
-        return [app.models_module for app in apps.get_app_configs() if app.models_module]
-    except ImportError:
-        # Backward compatibility for Django prior to 1.7
-        from django.db import models
-        return models.get_apps()
 
 
 @user_passes_test(qbe_access_for)
@@ -47,7 +39,7 @@ def qbe_form(request, query_hash=None):
             formset = QueryByExampleFormSet(using=db_alias)
         else:
             json_data = json.dumps(data)
-    apps = get_apps()
+    apps = django_apps.get_models()
     models = qbe_models(admin_site=admin_site, only_admin_models=False)
     json_models = qbe_models(admin_site=admin_site, json=True)
     title_url = reverse("qbe_form")

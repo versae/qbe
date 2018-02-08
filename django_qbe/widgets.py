@@ -1,10 +1,6 @@
 from builtins import object
 # -*- coding: utf-8 -*-
-try:
-    from django.forms.utils import flatatt
-except ImportError:
-    # Backward compatibility for Django prior to 1.7
-    from django.forms.util import flatatt
+from django.forms.utils import flatatt
 from django.forms.widgets import MultiWidget, Select, TextInput, Widget
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _

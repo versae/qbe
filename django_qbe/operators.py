@@ -2,11 +2,7 @@ from builtins import object
 from django.conf import settings
 from django.db import connections
 from django.db.models.fields import Field
-try:
-    from importlib import import_module
-except ImportError:
-    # Backward compatibility for Django prior to 1.7
-    from django.utils.importlib import import_module
+from importlib import import_module
 from future.utils import with_metaclass
 
 DATABASES = settings.DATABASES

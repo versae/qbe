@@ -1,22 +1,11 @@
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import object
 # -*- coding: utf-8 -*-
-import codecs
 import csv
-try:
-    # Use byte-oriented StringIO on Python 2!
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
+from collections import OrderedDict, Callable
+from io import StringIO, BytesIO
 
-from django.http import HttpResponse
-try:
-    from collections import OrderedDict
-except ImportError:
-    # Backward compatibility for Django prior to 1.7
-    from django.utils.datastructures import SortedDict as OrderedDict
+import six
+from django.http import StreamingHttpResponse
+
 
 __all__ = ("formats", )
 
@@ -31,7 +20,7 @@ class Formats(OrderedDict):
         parent = self
 
         def decorator(func):
-            if callable(func):
+            if isinstance(func, Callable):
                 parent.update({format: func})
             else:
                 raise FormatsException("func is not a function.")
@@ -49,24 +38,25 @@ class UnicodeWriter(object):
     which is encoded in the given encoding.
     """
 
-    def __init__(self, f, dialect=csv.excel_tab, encoding="utf-8", **kwds):
+    def __init__(self, dialect=csv.excel_tab, encoding="utf-8", **kwds):
         # Redirect output to a queue
-        self.queue = StringIO()
+        self.queue = BytesIO() if six.PY2 else StringIO()
         self.writer = csv.writer(self.queue, dialect=dialect, **kwds)
-        self.stream = f
-        self.encoder = codecs.getincrementalencoder(encoding)()
 
     def writerow(self, row):
-        self.writer.writerow([str(s).encode("utf-8") for s in row])
+        if six.PY2:
+            self.writer.writerow([s.encode('utf-8') for s in row])
+        else:
+            self.writer.writerow([s for s in row])
+
+    def get_values(self):
         # Fetch UTF-8 output from the queue ...
-        data = self.queue.getvalue()
-        data = data.decode("utf-8")
-        # ... and reencode it into the target encoding
-        data = self.encoder.encode(data)
-        # write to the target stream
-        self.stream.write(data)
+        ret = self.queue.getvalue()
         # empty queue
         self.queue.truncate(0)
+        if six.PY2:
+            return ret.lstrip(b'\0')
+        return ret.encode('utf-8').lstrip(b'\0')
 
     def writerows(self, rows):
         for row in rows:
@@ -74,31 +64,37 @@ class UnicodeWriter(object):
 
 
 def base_export(labels, results, dialect=csv.excel_tab):
-    output = StringIO()
-    w = UnicodeWriter(output, dialect=dialect)
+    w = UnicodeWriter(dialect=dialect)
+    count = 0
     w.writerow(labels)
     for row in results:
+        count += 1
         w.writerow(row)
-    output.seek(0)
-    return output.read()
+
+        if count % 200 == 0:
+            yield w.get_values()
+
+    yield w.get_values()
+
+
+def make_attachment(response, ext):
+    response['Content-Disposition'] = 'attachment; filename=export.%s' % ext
+    return response
 
 
 @formats.add("csv")
 def csv_format(labels, results):
-    output = base_export(labels, results, dialect=csv.excel)
     content_type = "text/csv"
-    return HttpResponse(output, content_type=content_type)
+    return make_attachment(StreamingHttpResponse(base_export(labels, results, dialect=csv.excel), content_type=content_type), "csv")
 
 
 @formats.add("ods")
 def ods_format(labels, results):
-    output = base_export(labels, results)
     content_type = "application/vnd.oasis.opendocument.spreadsheet"
-    return HttpResponse(output, content_type=content_type)
+    return make_attachment(StreamingHttpResponse(base_export(labels, results, dialect=csv.excel), content_type=content_type), "ods")
 
 
 @formats.add("xls")
 def xls_format(labels, results):
-    output = base_export(labels, results)
     content_type = "application/vnd.ms-excel"
-    return HttpResponse(output, content_type=content_type)
+    return make_attachment(StreamingHttpResponse(base_export(labels, results, dialect=csv.excel), content_type=content_type), "xls")

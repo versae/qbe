@@ -11,31 +11,40 @@ from django_qbe.utils import formats, pickle_decode
 
 
 class Command(BaseCommand):
-    available_formats = ", ".join(formats.keys())
-    option_list = BaseCommand.option_list + (
-        make_option('--output',
+
+    def add_arguments(self, parser):
+        available_formats = ", ".join(formats.keys())
+
+        parser.add_argument(
+            '--output',
             dest='output',
             default=False,
-            help='Export to a file. By default standard output will be used'),
-        make_option('--format',
+            help='Export to a file. By default standard output will be used'
+        )
+        parser.add_argument(
+            '--format',
             dest='export_format',
             default="csv",
-            help='Format for the returned data: %s' % available_formats),
-        make_option('--db-alias',
+            help='Format for the returned data: %s' % available_formats
+        )
+        parser.add_argument(
+            '--db-alias',
             dest='db_alias',
             default="default",
-            help='Database alias to run the query'),
+            help='Database alias to run the query'
+        )
 
-    )
-    args = "query_hash"
-    help = "\tExports the results of the query identified by query_hash."
+        parser.add_argument(
+            "query_hash",
+            help="\tExports the results of the query identified by query_hash."
+        )
+
     # can_import_settings = True  # To check db_alias?
 
-    def handle(self, *args, **options):
-        # Checking args and options
-        if args:
-            query_hash = args[0]
-        else:
+    def handle(self, **options):
+        # Checking options
+        query_hash = options.get("query_hash", None)
+        if not query_hash:
             self.stderr.write(u"Wrong or missing hash code\n")
             return None
         output = options.get("output", None)
@@ -65,9 +74,9 @@ class Command(BaseCommand):
                 results = formset.get_results(query)
                 response = formats[export_format](labels, results)
                 if file_descr:
-                    file_descr.write(response.content)
+                    file_descr.writelines(response.streaming_content)
                 else:
-                    self.stdout.write(response.content)
+                    self.stdout.writelines(response.streaming_content)
             else:
                 self.stderr.write(u"Malformed query: %s\n" % query_hash)
         else:

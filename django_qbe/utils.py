@@ -26,21 +26,12 @@ except ImportError:
                 for cc in combinations(items[i + 1:], n - 1):
                     yield [items[i]] + cc
 
-try:
-    from django.apps import apps
-    get_models = apps.get_models
-except ImportError:
-    # Backward compatibility for Django prior to 1.7
-    from django.db.models import get_models
+from django.apps import apps as django_apps
 from django.db.models.fields.related import (ForeignKey, OneToOneField,
                                              ManyToManyField)
 from django.core.exceptions import SuspiciousOperation
 from django.conf import settings
-try:
-    from importlib import import_module
-except ImportError:
-    # Backward compatibility for Django prior to 1.7
-    from django.utils.importlib import import_module
+from importlib import import_module
 
 from django_qbe.settings import (
     QBE_ADMIN_SITE,
@@ -83,9 +74,8 @@ except ImportError:
 
 
 def qbe_models(admin_site=None, only_admin_models=False, json=False):
-    app_models = get_models(include_auto_created=True, include_deferred=True)
-    app_models_with_no_includes = get_models(include_auto_created=False,
-                                             include_deferred=False)
+    app_models = django_apps.get_models(include_auto_created=True)
+    app_models_with_no_includes = django_apps.get_models(include_auto_created=False)
     if admin_site:
         admin_models = [m for m, a in admin_site._registry.items()]
     else:

@@ -101,8 +101,10 @@
     <div class="submit-row">
         {% trans "Show" %} <input type="text" name="limit" id="id_form_limit" value="100"> {% trans "rows" %}
         <input type="hidden" name="positions" id="id_form_positions">
+        {% comment %}
 <!--        <input type="button" name="autocomplete" id="autocomplete" value="{% trans "Auto complete" %}">-->
 <!--        <select name="autocompletionOptions" id="autocompletionOptions" style="display: none;"></select>-->
+        {% endcomment %}
         <input type="submit" name="_save" class="default" value="{% trans "Run" %}">
     </div>
 
